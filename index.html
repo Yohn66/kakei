@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ふたりの家計簿">
+<title>ふたりの家計簿</title>
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg: #ede5d8;
+  --white: #ffffff;
+  --black: #111111;
+  --gray1: #aaaaaa;
+  --gray2: #cccccc;
+  --gray3: #dddddd;
+  --gray4: #f5f5f5;
+  --border: #e0e0e0;
+  --font: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--black);
+  overflow: hidden;
+}
+
+/* ===== ルート・スクリーン管理 ===== */
+#app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  max-width: 430px;
+  margin: 0 auto;
+  background: var(--white);
+  position: relative;
+  overflow: hidden;
+}
+
+.screen {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+.screen.active {
+  display: flex;
+}
+
+/* ===== ローディング ===== */
+#screen-loading {
+  align-items: center;
+  justify-content: center;
+}
+.loading-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== トップ画面 ===== */
+#screen-top {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+#screen-top::-webkit-scrollbar { display: none; }
+
+.top-body {
+  padding: 32px 20px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.app-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+.app-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--black);
+  margin-bottom: 3px;
+}
+.app-sub {
+  font-size: 11px;
+  color: var(--gray1);
+  margin-bottom: 28px;
+}
+
+.section-label {
+  font-size: 10px;
+  color: var(--gray1);
+  margin-bottom: 5px;
+  align-self: flex-start;
+}
+
+.name-input {
+  width: 100%;
+  border: 0.5px solid var(--gray3);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--black);
+  font-family: var(--font);
+  background: var(--white);
+  margin-bottom: 6px;
+  outline: none;
+}
+.name-input:focus {
+  border-color: var(--black);
+}
+.name-input::placeholder {
+  color: var(--gray2);
+}
+
+.cat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 6px;
+  margin-top: 14px;
+}
+.cat-header-lbl { font-size: 10px; color: var(--gray1); }
+.cat-limit { font-size: 10px; color: var(--gray2); }
+
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  width: 100%;
+  margin-bottom: 5px;
+}
+.cat-btn {
+  padding: 8px 0;
+  border-radius: 7px;
+  border: 1.5px solid var(--black);
+  font-size: 11px;
+  text-align: center;
+  background: #fafafa;
+  color: var(--black);
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.1s;
+}
+.cat-btn.off {
+  border: 0.5px solid var(--gray3);
+  background: var(--white);
+  color: var(--gray2);
+  font-weight: 400;
+}
+
+.cat-hint {
+  font-size: 10px;
+  color: var(--gray2);
+  align-self: flex-start;
+  margin-bottom: 20px;
+}
+
+.primary-btn {
+  width: 100%;
+  background: var(--black);
+  color: var(--white);
+  border-radius: 10px;
+  padding: 13px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  font-family: var(--font);
+  margin-bottom: 14px;
+}
+.primary-btn:active { opacity: 0.7; }
+
+.divider-or {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 14px;
+}
+.divider-line { flex: 1; height: 0.5px; background: var(--border); }
+.divider-text { font-size: 10px; color: var(--gray2); }
+
+.secondary-btn {
+  width: 100%;
+  border: 0.5px solid var(--gray3);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 14px;
+  color: #555;
+  text-align: center;
+  cursor: pointer;
+  background: var(--white);
+  font-family: var(--font);
+  margin-bottom: 10px;
+}
+.secondary-btn:active { opacity: 0.7; }
+
+.url-join-area {
+  width: 100%;
+  display: none;
+}
+.url-join-area.open { display: block; }
+
+.url-input {
+  width: 100%;
+  border: 0.5px solid var(--gray3);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--black);
+  font-family: var(--font);
+  background: var(--white);
+  margin-bottom: 8px;
+  outline: none;
+}
+.url-input:focus { border-color: var(--black); }
+.url-input::placeholder { color: var(--gray2); }
+
+/* ===== URL発行・案内画面 ===== */
+#screen-guide {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+#screen-guide::-webkit-scrollbar { display: none; }
+
+.guide-body {
+  padding: 40px 20px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.guide-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--black);
+  margin-bottom: 24px;
+}
+.url-box {
+  width: 100%;
+  background: #f8f8f8;
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+.url-text {
+  font-size: 11px;
+  color: #666;
+  word-break: break-all;
+  line-height: 1.6;
+}
+.copy-btn {
+  width: 100%;
+  border: 0.5px solid var(--gray3);
+  border-radius: 10px;
+  padding: 11px;
+  font-size: 13px;
+  color: #555;
+  text-align: center;
+  cursor: pointer;
+  background: var(--white);
+  font-family: var(--font);
+  margin-bottom: 20px;
+}
+.copy-btn:active { opacity: 0.7; }
+
+.steps-box {
+  width: 100%;
+  background: #f5f3ef;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 20px;
+}
+.steps-title { font-size: 10px; color: var(--gray1); margin-bottom: 10px; }
+.step-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+.step-row:last-child { margin-bottom: 0; }
+.step-num {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #ddd; display: flex; align-items: center; justify-content: center;
+  font-size: 10px; color: #777; flex-shrink: 0; font-weight: 600;
+}
+.step-text { font-size: 11px; color: #555; line-height: 1.6; }
+
+/* ===== タブバー ===== */
+#tab-bar {
+  display: none;
+  border-bottom: 0.5px solid var(--border);
+  background: var(--white);
+  flex-shrink: 0;
+}
+#tab-bar.visible { display: flex; }
+.tab {
+  flex: 1; text-align: center;
+  padding: 11px 0 9px;
+  font-size: 13px;
+  color: var(--gray2);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+.tab.active {
+  color: var(--black);
+  border-bottom: 2px solid var(--black);
+  font-weight: 500;
+}
+
+/* ===== 入力画面 ===== */
+#screen-input {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+#screen-input::-webkit-scrollbar { display: none; }
+
+.input-body { padding: 14px 16px 30px; }
+
+.lbl-mini {
+  font-size: 10px;
+  color: var(--gray2);
+  margin-bottom: 4px;
+  margin-top: 10px;
+}
+
+.toggle-group {
+  display: flex;
+  gap: 4px;
+}
+.toggle-btn {
+  flex: 1;
+  padding: 9px 0;
+  border-radius: 8px;
+  border: 0.5px solid var(--gray3);
+  font-size: 12px;
+  text-align: center;
+  background: var(--white);
+  color: var(--gray1);
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all 0.1s;
+}
+.toggle-btn.active {
+  border: 1.5px solid var(--black);
+  color: var(--black);
+  font-weight: 500;
+  background: #fafafa;
+}
+
+.divider { height: 0.5px; background: #f0f0f0; margin: 10px 0; }
+
+.text-input {
+  width: 100%;
+  border: 0.5px solid var(--gray3);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--black);
+  font-family: var(--font);
+  background: var(--white);
+  outline: none;
+}
+.text-input:focus { border-color: var(--black); }
+.text-input::placeholder { color: var(--gray2); }
+
+.amount-row {
+  display: flex;
+  align-items: center;
+  border: 0.5px solid var(--gray3);
+  border-radius: 8px;
+  padding: 9px 12px;
+  gap: 8px;
+  margin-top: 8px;
+  cursor: pointer;
+}
+.currency-badge {
+  font-size: 14px;
+  color: #666;
+  padding: 2px 6px;
+  border-radius: 5px;
+  border: 0.5px solid var(--border);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.amount-display {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--black);
+  flex: 1;
+}
+.amount-display.placeholder { color: var(--gray2); }
+
+.date-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 0.5px solid var(--gray3);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+}
+
+.input-cat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  width: 100%;
+}
+.input-cat-btn {
+  padding: 8px 0;
+  border-radius: 7px;
+  border: 0.5px solid var(--gray3);
+  font-size: 11px;
+  text-align: center;
+  background: var(--white);
+  color: var(--gray2);
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all 0.1s;
+}
+.input-cat-btn.active {
+  border: 1.5px solid var(--black);
+  color: var(--black);
+  font-weight: 500;
+  background: #fafafa;
+}
+
+.cat-edit-link {
+  text-align: center;
+  font-size: 10px;
+  color: var(--gray2);
+  padding: 6px 0 2px;
+  cursor: pointer;
+}
+
+/* ===== 集計画面（骨格のみ） ===== */
+#screen-summary {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ===== エラー・トースト ===== */
+.toast {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.75);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 13px;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; }
+
+/* ===== 数字キーボードモーダル ===== */
+.numpad-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 1000;
+  align-items: flex-end;
+}
+.numpad-overlay.open { display: flex; }
+.numpad-sheet {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  background: #f2f2f7;
+  border-radius: 16px 16px 0 0;
+  padding: 12px 8px 20px;
+}
+.numpad-display {
+  text-align: right;
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--black);
+  padding: 6px 16px 10px;
+  min-height: 50px;
+}
+.numpad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.numpad-key {
+  background: var(--white);
+  border-radius: 10px;
+  padding: 16px 0;
+  font-size: 20px;
+  font-weight: 400;
+  text-align: center;
+  cursor: pointer;
+  color: var(--black);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.15);
+  user-select: none;
+}
+.numpad-key:active { opacity: 0.6; }
+.numpad-key.dark { background: #aeb4bc; font-size: 16px; }
+.numpad-key.done { background: var(--black); color: var(--white); font-size: 15px; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ローディング -->
+  <div id="screen-loading" class="screen active">
+    <div class="loading-icon">
+      <svg width="34" height="34" viewBox="0 0 32 32">
+        <path d="M16 24C16 24 6 18 6 12C6 8.5 9 6 12.5 7C14.5 7.8 15.5 9.8 16 11C16.5 9.8 17.5 7.8 19.5 7C23 6 26 8.5 26 12C26 18 16 24 16 24Z" fill="#c97a7a" opacity="0.35"/>
+        <text x="16" y="21" font-family="-apple-system,sans-serif" font-size="15" font-weight="500" fill="#b8962e" text-anchor="middle">¥</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- タブバー（入力・集計画面で表示） -->
+  <div id="tab-bar">
+    <div class="tab active" data-tab="input">入力</div>
+    <div class="tab" data-tab="summary">集計</div>
+  </div>
+
+  <!-- トップ画面 -->
+  <div id="screen-top" class="screen">
+    <div class="top-body">
+      <div class="app-icon">
+        <svg width="34" height="34" viewBox="0 0 32 32">
+          <path d="M16 24C16 24 6 18 6 12C6 8.5 9 6 12.5 7C14.5 7.8 15.5 9.8 16 11C16.5 9.8 17.5 7.8 19.5 7C23 6 26 8.5 26 12C26 18 16 24 16 24Z" fill="#c97a7a" opacity="0.35"/>
+          <text x="16" y="21" font-family="-apple-system,sans-serif" font-size="15" font-weight="500" fill="#b8962e" text-anchor="middle">¥</text>
+        </svg>
+      </div>
+      <div class="app-name">ふたりの家計簿</div>
+      <div class="app-sub">二人の生活費をいっしょに管理</div>
+
+      <div style="width:100%;margin-bottom:4px;">
+        <div class="section-label">お二人の名前</div>
+        <input class="name-input" id="input-person1" placeholder="一人目の名前" maxlength="10" />
+        <input class="name-input" id="input-person2" placeholder="二人目の名前" maxlength="10" />
+      </div>
+
+      <div class="cat-header">
+        <span class="cat-header-lbl">カテゴリ（後から変更できます）</span>
+        <span class="cat-limit">※上限8つ</span>
+      </div>
+      <div class="cat-grid" id="top-cat-grid"></div>
+      <div class="cat-hint">タップで選択・解除、長押しで名前を変更</div>
+
+      <button class="primary-btn" id="btn-create">家計簿をつくる</button>
+
+      <div class="divider-or">
+        <div class="divider-line"></div>
+        <div class="divider-text">または</div>
+        <div class="divider-line"></div>
+      </div>
+
+      <button class="secondary-btn" id="btn-toggle-join">URLで参加する</button>
+      <div class="url-join-area" id="url-join-area">
+        <input class="url-input" id="input-join-url" placeholder="URLを貼り付け" />
+        <button class="primary-btn" id="btn-join">参加する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- URL発行・案内画面 -->
+  <div id="screen-guide" class="screen">
+    <div class="guide-body">
+      <div class="app-icon">
+        <svg width="34" height="34" viewBox="0 0 32 32">
+          <path d="M16 24C16 24 6 18 6 12C6 8.5 9 6 12.5 7C14.5 7.8 15.5 9.8 16 11C16.5 9.8 17.5 7.8 19.5 7C23 6 26 8.5 26 12C26 18 16 24 16 24Z" fill="#c97a7a" opacity="0.35"/>
+          <text x="16" y="21" font-family="-apple-system,sans-serif" font-size="15" font-weight="500" fill="#b8962e" text-anchor="middle">¥</text>
+        </svg>
+      </div>
+      <div class="guide-title">家計簿ができました</div>
+      <div class="section-label" style="margin-bottom:6px;">パートナーと共有するURL</div>
+      <div class="url-box"><div class="url-text" id="guide-url-text"></div></div>
+      <div class="copy-btn" id="btn-copy-url">URLをコピー</div>
+      <div class="steps-box" id="guide-steps"></div>
+      <button class="primary-btn" id="btn-go-app">家計簿へ進む</button>
+    </div>
+  </div>
+
+  <!-- 入力画面 -->
+  <div id="screen-input" class="screen">
+    <div class="input-body">
+      <div class="date-row" id="input-date-row">
+        <span id="input-date-display"></span>
+        <span style="color:var(--gray2);font-size:11px;">▼</span>
+      </div>
+
+      <div class="lbl-mini">誰が</div>
+      <div class="toggle-group" id="toggle-paid-by">
+        <div class="toggle-btn active" data-value="both">二人</div>
+        <div class="toggle-btn" data-value="person1" id="toggle-paid-p1">-</div>
+        <div class="toggle-btn" data-value="person2" id="toggle-paid-p2">-</div>
+      </div>
+
+      <div class="lbl-mini">誰の分</div>
+      <div class="toggle-group" id="toggle-for-whom">
+        <div class="toggle-btn active" data-value="both">二人</div>
+        <div class="toggle-btn" data-value="person1" id="toggle-for-p1">-</div>
+        <div class="toggle-btn" data-value="person2" id="toggle-for-p2">-</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <input class="text-input" id="input-memo" placeholder="例：長浜ラーメン" maxlength="30" />
+
+      <div class="toggle-group" style="margin-top:8px;" id="toggle-method">
+        <div class="toggle-btn" data-value="barcode">バーコード</div>
+        <div class="toggle-btn active" data-value="card">カード</div>
+        <div class="toggle-btn" data-value="cash">現金</div>
+      </div>
+
+      <div class="amount-row" id="amount-row">
+        <div class="currency-badge" id="currency-badge">¥</div>
+        <div class="amount-display placeholder" id="amount-display">0</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="input-cat-grid" id="input-cat-grid"></div>
+      <div class="cat-edit-link" id="btn-cat-edit-input">カテゴリを編集</div>
+
+      <button class="primary-btn" id="btn-add-expense" style="margin-top:10px;">追加する</button>
+    </div>
+  </div>
+
+  <!-- 集計画面（骨格のみ） -->
+  <div id="screen-summary" class="screen">
+    <div style="padding:40px 20px; text-align:center; color:var(--gray1); font-size:13px;">
+      集計画面（実装中）
+    </div>
+  </div>
+
+</div>
+
+<!-- 数字キーボード -->
+<div class="numpad-overlay" id="numpad-overlay">
+  <div class="numpad-sheet">
+    <div class="numpad-display" id="numpad-display">0</div>
+    <div class="numpad-grid">
+      <div class="numpad-key" data-key="1">1</div>
+      <div class="numpad-key" data-key="2">2</div>
+      <div class="numpad-key" data-key="3">3</div>
+      <div class="numpad-key" data-key="4">4</div>
+      <div class="numpad-key" data-key="5">5</div>
+      <div class="numpad-key" data-key="6">6</div>
+      <div class="numpad-key" data-key="7">7</div>
+      <div class="numpad-key" data-key="8">8</div>
+      <div class="numpad-key" data-key="9">9</div>
+      <div class="numpad-key dark" data-key="del">⌫</div>
+      <div class="numpad-key" data-key="0">0</div>
+      <div class="numpad-key done" data-key="done">確定</div>
+    </div>
+  </div>
+</div>
+
+<!-- トースト -->
+<div class="toast" id="toast"></div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+// ===== Firebase初期化 =====
+const firebaseConfig = {
+  apiKey: "AIzaSyCaotRs3-GmU44UEng8g31tFMfbAC8KTws",
+  authDomain: "kakei-513dd.firebaseapp.com",
+  databaseURL: "https://kakei-513dd-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "kakei-513dd",
+  storageBucket: "kakei-513dd.firebasestorage.app",
+  messagingSenderId: "845734241488",
+  appId: "1:845734241488:web:636b8a06483666b441aad5"
+};
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getDatabase(firebaseApp);
+
+// ===== アプリ状態 =====
+const state = {
+  roomId: null,
+  meta: null, // { person1, person2, categories }
+  // 入力フォーム
+  input: {
+    date: todayString(),
+    paidBy: "both",
+    forWhom: "both",
+    memo: "",
+    method: "card",
+    amount: 0,
+    currency: "JPY",
+    category: null,
+  }
+};
+
+// ===== ユーティリティ =====
+function todayString() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function formatDateJP(dateStr) {
+  const d = new Date(dateStr + "T00:00:00");
+  const days = ["日","月","火","水","木","金","土"];
+  return `${d.getMonth()+1}月${d.getDate()}日（${days[d.getDay()]}）`;
+}
+
+function generateRoomId() {
+  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let id = "";
+  for (let i = 0; i < 12; i++) id += chars[Math.floor(Math.random() * chars.length)];
+  return id;
+}
+
+function getRoomUrl(roomId) {
+  return `${location.origin}${location.pathname}#${roomId}`;
+}
+
+function showToast(msg, duration = 2000) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), duration);
+}
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  const showTab = id === "screen-input" || id === "screen-summary";
+  document.getElementById("tab-bar").classList.toggle("visible", showTab);
+  if (showTab) {
+    document.querySelectorAll(".tab").forEach(t => {
+      t.classList.toggle("active", t.dataset.tab === id.replace("screen-", ""));
+    });
+  }
+}
+
+// ===== カテゴリ初期値 =====
+const DEFAULT_CATS = ["食費","外食","医療","交通","日用品","衣類","固定費","旅行"];
+let topSelectedCats = [...DEFAULT_CATS]; // トップ画面での選択状態
+
+function renderTopCatGrid() {
+  const grid = document.getElementById("top-cat-grid");
+  grid.innerHTML = "";
+  DEFAULT_CATS.forEach(cat => {
+    const btn = document.createElement("div");
+    btn.className = "cat-btn" + (topSelectedCats.includes(cat) ? "" : " off");
+    btn.textContent = cat;
+    btn.addEventListener("click", () => toggleTopCat(cat, btn));
+    // 長押しで名前変更
+    let pressTimer;
+    btn.addEventListener("pointerdown", () => {
+      pressTimer = setTimeout(() => {
+        const newName = prompt(`カテゴリ名を変更：`, cat);
+        if (newName && newName.trim()) {
+          const idx = DEFAULT_CATS.indexOf(cat);
+          DEFAULT_CATS[idx] = newName.trim();
+          const selIdx = topSelectedCats.indexOf(cat);
+          if (selIdx >= 0) topSelectedCats[selIdx] = newName.trim();
+          renderTopCatGrid();
+        }
+      }, 600);
+    });
+    btn.addEventListener("pointerup", () => clearTimeout(pressTimer));
+    btn.addEventListener("pointerleave", () => clearTimeout(pressTimer));
+    grid.appendChild(btn);
+  });
+}
+
+function toggleTopCat(cat, btn) {
+  if (topSelectedCats.includes(cat)) {
+    if (topSelectedCats.length <= 1) return; // 最低1個
+    topSelectedCats = topSelectedCats.filter(c => c !== cat);
+    btn.classList.add("off");
+  } else {
+    if (topSelectedCats.length >= 8) { showToast("カテゴリは最大8つです"); return; }
+    topSelectedCats.push(cat);
+    btn.classList.remove("off");
+  }
+}
+
+// ===== 入力画面カテゴリグリッド =====
+function renderInputCatGrid() {
+  const grid = document.getElementById("input-cat-grid");
+  grid.innerHTML = "";
+  const cats = state.meta?.categories || [];
+  cats.forEach((cat, i) => {
+    const btn = document.createElement("div");
+    btn.className = "input-cat-btn" + (state.input.category === cat ? " active" : "");
+    btn.textContent = cat;
+    btn.addEventListener("click", () => {
+      state.input.category = cat;
+      renderInputCatGrid();
+    });
+    grid.appendChild(btn);
+  });
+}
+
+// ===== トグルグループ共通 =====
+function setupToggleGroup(groupId, stateKey) {
+  document.getElementById(groupId).addEventListener("click", e => {
+    const btn = e.target.closest(".toggle-btn");
+    if (!btn) return;
+    document.querySelectorAll(`#${groupId} .toggle-btn`).forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    state.input[stateKey] = btn.dataset.value;
+  });
+}
+
+// ===== 人名トグル更新 =====
+function updatePersonToggles() {
+  const p1 = state.meta?.person1 || "-";
+  const p2 = state.meta?.person2 || "-";
+  ["toggle-paid-p1","toggle-for-p1"].forEach(id => document.getElementById(id).textContent = p1);
+  ["toggle-paid-p2","toggle-for-p2"].forEach(id => document.getElementById(id).textContent = p2);
+  document.getElementById("toggle-paid-p1").dataset.value = "person1";
+  document.getElementById("toggle-paid-p2").dataset.value = "person2";
+  document.getElementById("toggle-for-p1").dataset.value = "person1";
+  document.getElementById("toggle-for-p2").dataset.value = "person2";
+}
+
+// ===== 数字キーボード =====
+let numpadTarget = null;
+let numpadValue = "0";
+
+function openNumpad() {
+  numpadValue = state.input.amount > 0 ? String(state.input.amount) : "0";
+  document.getElementById("numpad-display").textContent = Number(numpadValue).toLocaleString();
+  document.getElementById("numpad-overlay").classList.add("open");
+}
+
+function closeNumpad() {
+  document.getElementById("numpad-overlay").classList.remove("open");
+}
+
+document.getElementById("numpad-overlay").addEventListener("click", e => {
+  if (e.target === document.getElementById("numpad-overlay")) closeNumpad();
+});
+
+document.querySelectorAll(".numpad-key").forEach(key => {
+  key.addEventListener("click", () => {
+    const k = key.dataset.key;
+    if (k === "done") {
+      state.input.amount = parseInt(numpadValue) || 0;
+      updateAmountDisplay();
+      closeNumpad();
+    } else if (k === "del") {
+      numpadValue = numpadValue.length > 1 ? numpadValue.slice(0, -1) : "0";
+    } else {
+      if (numpadValue === "0") numpadValue = k;
+      else if (numpadValue.length < 8) numpadValue += k;
+    }
+    document.getElementById("numpad-display").textContent = Number(numpadValue).toLocaleString();
+  });
+});
+
+function updateAmountDisplay() {
+  const el = document.getElementById("amount-display");
+  if (state.input.amount === 0) {
+    el.textContent = "0";
+    el.classList.add("placeholder");
+  } else {
+    el.textContent = state.input.amount.toLocaleString();
+    el.classList.remove("placeholder");
+  }
+}
+
+document.getElementById("amount-row").addEventListener("click", openNumpad);
+
+// ===== 日付入力 =====
+function updateDateDisplay() {
+  document.getElementById("input-date-display").textContent = formatDateJP(state.input.date);
+}
+
+document.getElementById("input-date-row").addEventListener("click", () => {
+  const input = document.createElement("input");
+  input.type = "date";
+  input.value = state.input.date;
+  input.style.cssText = "position:fixed;opacity:0;top:0;left:0;width:1px;height:1px;";
+  document.body.appendChild(input);
+  input.focus();
+  input.click();
+  input.addEventListener("change", () => {
+    if (input.value) {
+      state.input.date = input.value;
+      updateDateDisplay();
+    }
+    document.body.removeChild(input);
+  });
+  input.addEventListener("blur", () => {
+    setTimeout(() => { if (document.body.contains(input)) document.body.removeChild(input); }, 300);
+  });
+});
+
+// ===== 入力リセット =====
+function resetInputForm() {
+  // リセット対象：日付・金額・メモ
+  state.input.date = todayString();
+  state.input.amount = 0;
+  state.input.memo = "";
+  // 維持：誰が・誰の分・支払方法・カテゴリ
+  document.getElementById("input-memo").value = "";
+  updateDateDisplay();
+  updateAmountDisplay();
+}
+
+// ===== 追加ボタン =====
+document.getElementById("btn-add-expense").addEventListener("click", async () => {
+  if (!state.input.memo.trim()) { showToast("「何に使ったか」を入力してください"); return; }
+  if (state.input.amount <= 0) { showToast("金額を入力してください"); return; }
+  if (!state.input.category) { showToast("カテゴリを選択してください"); return; }
+  if (!state.roomId) { showToast("エラー：ルームが見つかりません"); return; }
+
+  const expenseData = {
+    date: state.input.date,
+    memo: state.input.memo.trim(),
+    paidBy: state.input.paidBy,
+    forWhom: state.input.forWhom,
+    amount: state.input.amount,
+    currency: state.input.currency,
+    method: state.input.method,
+    category: state.input.category,
+    createdAt: Date.now()
+  };
+
+  try {
+    const expensesRef = ref(db, `rooms/${state.roomId}/expenses`);
+    await push(expensesRef, expenseData);
+    showToast("追加しました ✓");
+    resetInputForm();
+  } catch (e) {
+    console.error(e);
+    showToast("保存に失敗しました");
+  }
+});
+
+// ===== テキスト入力イベント =====
+document.getElementById("input-memo").addEventListener("input", e => {
+  state.input.memo = e.target.value;
+});
+
+// ===== トグル初期化 =====
+setupToggleGroup("toggle-paid-by", "paidBy");
+setupToggleGroup("toggle-for-whom", "forWhom");
+setupToggleGroup("toggle-method", "method");
+
+// ===== タブ切り替え =====
+document.getElementById("tab-bar").addEventListener("click", e => {
+  const tab = e.target.closest(".tab");
+  if (!tab) return;
+  const target = tab.dataset.tab;
+  showScreen(`screen-${target}`);
+});
+
+// ===== URL案内画面 =====
+function renderGuideScreen(roomId) {
+  const url = getRoomUrl(roomId);
+  document.getElementById("guide-url-text").textContent = url;
+
+  // iOS / Android判定
+  const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+  const isAndroid = /Android/.test(navigator.userAgent);
+  const stepsEl = document.getElementById("guide-steps");
+
+  let stepsHtml = '<div class="steps-title">';
+  if (isIOS) {
+    stepsHtml += 'ホーム画面に追加する方法（Safari）</div>';
+    stepsHtml += step(1, "Safariでこのページを開く");
+    stepsHtml += step(2, "下部の共有ボタン（□↑）をタップ");
+    stepsHtml += step(3, "「ホーム画面に追加」を選ぶ");
+  } else if (isAndroid) {
+    stepsHtml += 'ホーム画面に追加する方法（Chrome）</div>';
+    stepsHtml += step(1, "Chromeでこのページを開く");
+    stepsHtml += step(2, "右上のメニューボタン（︙）をタップ");
+    stepsHtml += step(3, "「ホーム画面に追加」を選ぶ");
+  } else {
+    stepsHtml += 'スマホでURLを開いてください</div>';
+    stepsHtml += step(1, "上のURLをコピーしてスマホに送る");
+    stepsHtml += step(2, "スマホのブラウザでURLを開く");
+    stepsHtml += step(3, "「ホーム画面に追加」で便利に使えます");
+  }
+  stepsEl.innerHTML = stepsHtml;
+}
+
+function step(n, text) {
+  return `<div class="step-row"><div class="step-num">${n}</div><div class="step-text">${text}</div></div>`;
+}
+
+document.getElementById("btn-copy-url").addEventListener("click", () => {
+  const url = document.getElementById("guide-url-text").textContent;
+  navigator.clipboard.writeText(url).then(() => showToast("URLをコピーしました")).catch(() => showToast("コピーできませんでした"));
+});
+
+document.getElementById("btn-go-app").addEventListener("click", () => {
+  showScreen("screen-input");
+});
+
+// ===== トップ画面 =====
+document.getElementById("btn-toggle-join").addEventListener("click", () => {
+  const area = document.getElementById("url-join-area");
+  area.classList.toggle("open");
+});
+
+document.getElementById("btn-create").addEventListener("click", async () => {
+  const p1 = document.getElementById("input-person1").value.trim();
+  const p2 = document.getElementById("input-person2").value.trim();
+  if (!p1 || !p2) { showToast("お二人の名前を入力してください"); return; }
+  if (topSelectedCats.length === 0) { showToast("カテゴリを1つ以上選んでください"); return; }
+
+  const roomId = generateRoomId();
+  const meta = {
+    person1: p1,
+    person2: p2,
+    categories: topSelectedCats,
+    createdAt: Date.now()
+  };
+
+  try {
+    await set(ref(db, `rooms/${roomId}/meta`), meta);
+    state.roomId = roomId;
+    state.meta = meta;
+    state.input.category = meta.categories[0];
+    localStorage.setItem("kakei_room", roomId);
+    location.hash = roomId;
+    updatePersonToggles();
+    renderInputCatGrid();
+    renderGuideScreen(roomId);
+    showScreen("screen-guide");
+  } catch (e) {
+    console.error(e);
+    showToast("作成に失敗しました。通信を確認してください");
+  }
+});
+
+document.getElementById("btn-join").addEventListener("click", () => {
+  const urlVal = document.getElementById("input-join-url").value.trim();
+  const match = urlVal.match(/#([a-z0-9]{12})$/);
+  if (!match) { showToast("URLの形式が正しくありません"); return; }
+  location.href = urlVal;
+});
+
+// ===== 起動ロジック =====
+async function init() {
+  renderTopCatGrid();
+
+  // URLにhashがあればルームIDとして扱う
+  const hash = location.hash.replace("#", "");
+  if (hash && /^[a-z0-9]{12}$/.test(hash)) {
+    try {
+      const snap = await get(ref(db, `rooms/${hash}/meta`));
+      if (snap.exists()) {
+        state.roomId = hash;
+        state.meta = snap.val();
+        state.input.category = state.meta.categories[0];
+        localStorage.setItem("kakei_room", hash);
+        updatePersonToggles();
+        renderInputCatGrid();
+        updateDateDisplay();
+        showScreen("screen-input");
+        return;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  // ローカルストレージに保存済みルームがあるか確認
+  const savedRoom = localStorage.getItem("kakei_room");
+  if (savedRoom) {
+    try {
+      const snap = await get(ref(db, `rooms/${savedRoom}/meta`));
+      if (snap.exists()) {
+        state.roomId = savedRoom;
+        state.meta = snap.val();
+        state.input.category = state.meta.categories[0];
+        location.hash = savedRoom;
+        updatePersonToggles();
+        renderInputCatGrid();
+        updateDateDisplay();
+        showScreen("screen-input");
+        return;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  // どちらもなければトップ画面
+  showScreen("screen-top");
+}
+
+init();
+</script>
+</body>
+</html>
