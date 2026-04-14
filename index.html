@@ -146,6 +146,27 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .share-link { text-align: center; font-size: 11px; color: var(--gray1); padding: 4px 0; cursor: pointer; }
 .csv-btn { text-align: center; font-size: 11px; color: #666; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 8px; margin-top: 4px; margin-bottom: 8px; cursor: pointer; }
 
+/* ===== 一覧画面 ===== */
+#screen-list { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+#screen-list.active { display: flex; }
+.list-nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 0.5px solid var(--border); flex-shrink: 0; background: var(--white); }
+.list-nav-title { font-size: 14px; font-weight: 500; }
+.list-nav-back { font-size: 13px; color: var(--gray1); cursor: pointer; padding: 4px 0; }
+.list-nav-arrow { font-size: 18px; color: var(--gray2); cursor: pointer; padding: 4px 8px; }
+.list-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.list-scroll::-webkit-scrollbar { display: none; }
+.date-group-header { padding: 5px 16px 4px; font-size: 10px; color: var(--gray1); background: #f8f8f8; border-bottom: 0.5px solid #f0f0f0; }
+.record-row { display: flex; align-items: center; padding: 10px 16px; border-bottom: 0.5px solid #f5f5f5; gap: 8px; cursor: pointer; }
+.record-row:active { background: #f8f8f8; }
+.cat-badge { font-size: 10px; padding: 2px 7px; border-radius: 99px; background: #f5f5f5; color: #666; white-space: nowrap; border: 0.5px solid var(--border); flex-shrink: 0; }
+.record-main { flex: 1; min-width: 0; }
+.record-memo { font-size: 12px; color: var(--black); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.record-sub { font-size: 10px; color: var(--gray1); margin-top: 2px; }
+.record-right { text-align: right; white-space: nowrap; flex-shrink: 0; }
+.record-amount { font-size: 13px; font-weight: 500; color: var(--black); }
+.record-method { font-size: 10px; color: var(--gray1); margin-top: 2px; }
+.list-empty { padding: 40px 20px; text-align: center; font-size: 13px; color: var(--gray1); }
+
 /* モーダル共通 */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 500; flex-direction: column; justify-content: flex-end; max-width: 430px; margin: 0 auto; }
 .modal-overlay.open { display: flex; }
@@ -181,9 +202,15 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .fx-modal-input { border: 0.5px solid var(--gray3); border-radius: 6px; padding: 6px 10px; font-size: 13px; color: var(--black); font-family: var(--font); width: 110px; text-align: right; outline: none; }
 .fx-modal-input:focus { border-color: var(--black); }
 
-/* トースト */
-.toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 13px; z-index: 9999; pointer-events: none; opacity: 0; transition: opacity 0.2s; white-space: nowrap; }
-.toast.show { opacity: 1; }
+/* ===== 編集モーダル ===== */
+.edit-modal-date { font-size: 11px; color: var(--gray1); margin-bottom: 14px; }
+.delete-btn { width: 100%; border: 0.5px solid #e0a0a0; border-radius: 10px; padding: 12px; font-size: 14px; color: #c0392b; text-align: center; cursor: pointer; background: #fff8f8; font-family: var(--font); margin-top: 4px; }
+.delete-btn:active { opacity: 0.7; }
+
+/* トースト（取り消し付き） */
+.toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); background: rgba(20,20,20,0.88); color: #fff; padding: 11px 18px; border-radius: 22px; font-size: 13px; z-index: 9999; pointer-events: none; opacity: 0; transition: opacity 0.2s; display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+.toast.show { opacity: 1; pointer-events: auto; }
+.toast-undo { font-size: 13px; color: #f0c060; font-weight: 600; cursor: pointer; border-left: 1px solid rgba(255,255,255,0.25); padding-left: 12px; }
 
 /* 数字キーボード */
 .numpad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 1000; align-items: flex-end; }
@@ -340,6 +367,19 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     </div>
   </div>
 
+  <!-- 一覧画面 -->
+  <div id="screen-list" class="screen">
+    <div class="list-nav">
+      <div class="list-nav-back" id="btn-list-back">← 集計</div>
+      <div class="list-nav-title" id="list-title"></div>
+      <div style="display:flex;gap:0;">
+        <div class="list-nav-arrow" id="btn-list-prev">◀</div>
+        <div class="list-nav-arrow" id="btn-list-next">▶</div>
+      </div>
+    </div>
+    <div class="list-scroll" id="list-scroll"></div>
+  </div>
+
 </div>
 
 <!-- 精算詳細モーダル -->
@@ -376,9 +416,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 <!-- カテゴリ編集モーダル -->
 <div class="modal-overlay" id="modal-cat-edit">
   <div class="modal-sheet">
-    <div class="modal-header">
-      <span class="modal-title">カテゴリを編集</span>
-    </div>
+    <div class="modal-header"><span class="modal-title">カテゴリを編集</span></div>
     <div id="cat-edit-list"></div>
     <div class="cat-add-btn" id="btn-cat-add">＋ カテゴリを追加（あと<span id="cat-add-remain">0</span>個）</div>
     <button class="primary-btn" id="btn-cat-save" style="margin-top:10px;">保存する</button>
@@ -396,6 +434,44 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     <p style="font-size:11px;color:var(--gray1);margin-bottom:12px;">外貨の記録があります。集計のため1外貨あたりの円レートを入力してください。</p>
     <div id="fx-input-rows"></div>
     <button class="primary-btn" id="btn-fx-save" style="margin-top:12px;">保存する</button>
+  </div>
+</div>
+
+<!-- 編集モーダル -->
+<div class="modal-overlay" id="modal-edit">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <span class="modal-title">記録を編集</span>
+      <span class="modal-sub" id="edit-modal-date"></span>
+    </div>
+    <div class="lbl-mini" style="margin-top:0;">誰が</div>
+    <div class="toggle-group" id="edit-toggle-paid-by">
+      <div class="toggle-btn active" data-value="both">二人</div>
+      <div class="toggle-btn" data-value="person1" id="edit-paid-p1">-</div>
+      <div class="toggle-btn" data-value="person2" id="edit-paid-p2">-</div>
+    </div>
+    <div class="lbl-mini">誰の分</div>
+    <div class="toggle-group" id="edit-toggle-for-whom">
+      <div class="toggle-btn active" data-value="both">二人</div>
+      <div class="toggle-btn" data-value="person1" id="edit-for-p1">-</div>
+      <div class="toggle-btn" data-value="person2" id="edit-for-p2">-</div>
+    </div>
+    <div class="divider"></div>
+    <input class="text-input" id="edit-memo" placeholder="何に使ったか" maxlength="30" style="margin-bottom:8px;" />
+    <div class="toggle-group" id="edit-toggle-method">
+      <div class="toggle-btn" data-value="barcode">バーコード</div>
+      <div class="toggle-btn active" data-value="card">カード</div>
+      <div class="toggle-btn" data-value="cash">現金</div>
+    </div>
+    <div class="amount-row" id="edit-amount-row" style="margin-top:8px;">
+      <div class="currency-badge" id="edit-currency-badge">¥</div>
+      <div class="amount-display" id="edit-amount-display">0</div>
+    </div>
+    <div class="divider"></div>
+    <div class="input-cat-grid" id="edit-cat-grid"></div>
+    <button class="primary-btn" id="btn-edit-save" style="margin-top:12px;">保存する</button>
+    <div class="delete-btn" id="btn-edit-delete">この記録を削除する</div>
+    <div class="modal-close-btn" id="btn-edit-cancel">キャンセル</div>
   </div>
 </div>
 
@@ -421,11 +497,14 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 </div>
 
 <!-- トースト -->
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast">
+  <span id="toast-msg"></span>
+  <span class="toast-undo" id="toast-undo" style="display:none;">取り消す</span>
+</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, get, push, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, set, get, push, update, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCaotRs3-GmU44UEng8g31tFMfbAC8KTws",
@@ -442,17 +521,17 @@ const db = getDatabase(firebaseApp);
 const CAT_COLORS = ["#c4846a","#b8962e","#7a9abf","#8fba8f","#a0889e","#7aab9e","#888780","#c9a87c"];
 
 const state = {
-  roomId: null,
-  meta: null,
-  expenses: {},
-  loans: {},
-  fxRates: {},
+  roomId: null, meta: null,
+  expenses: {}, loans: {}, fxRates: {},
   summary: { yearMonth: currentYearMonth(), filter: "all" },
+  list: { yearMonth: currentYearMonth() },
   input: { date: todayString(), paidBy: "both", forWhom: "both", memo: "", method: "card", amount: 0, currency: "JPY", category: null }
 };
 
-let summaryChart = null;
-let settleChart = null;
+let summaryChart = null, settleChart = null;
+let editingExpenseId = null, editState = {};
+let numpadValue = "0", numpadTarget = "input"; // "input" | "edit"
+let deleteUndoTimer = null, deleteUndoData = null;
 
 // ===== ユーティリティ =====
 function todayString() {
@@ -487,12 +566,29 @@ function generateRoomId() {
   return id;
 }
 function getRoomUrl(roomId) { return `${location.origin}${location.pathname}#${roomId}`; }
-function showToast(msg, duration = 2000) {
-  const el = document.getElementById("toast");
-  el.textContent = msg; el.classList.add("show");
-  setTimeout(() => el.classList.remove("show"), duration);
-}
 function fmtAmt(n) { return "¥" + Math.abs(Math.round(n)).toLocaleString(); }
+
+function showToast(msg, withUndo = false, duration = 3000) {
+  const el = document.getElementById("toast");
+  const msgEl = document.getElementById("toast-msg");
+  const undoEl = document.getElementById("toast-undo");
+  msgEl.textContent = msg;
+  undoEl.style.display = withUndo ? "inline" : "none";
+  el.classList.add("show");
+  if (el._timer) clearTimeout(el._timer);
+  el._timer = setTimeout(() => {
+    el.classList.remove("show");
+    if (!withUndo) return;
+    // タイマー切れたら削除確定
+    if (deleteUndoTimer) { commitDelete(); }
+  }, duration);
+}
+
+function hideToast() {
+  const el = document.getElementById("toast");
+  el.classList.remove("show");
+  if (el._timer) clearTimeout(el._timer);
+}
 
 function showScreen(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
@@ -503,7 +599,17 @@ function showScreen(id) {
     document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === id.replace("screen-","")));
   }
   if (id === "screen-summary") renderSummary();
+  if (id === "screen-list") renderList();
 }
+
+// モーダルの背景タップで閉じる
+function setupModalBackgroundClose(modalId) {
+  const overlay = document.getElementById(modalId);
+  overlay.addEventListener("click", e => {
+    if (e.target === overlay) overlay.classList.remove("open");
+  });
+}
+["modal-settle","modal-cat-edit","modal-fx","modal-edit"].forEach(setupModalBackgroundClose);
 
 // ===== カテゴリ =====
 const DEFAULT_CATS = ["食費","外食","医療","交通","日用品","衣類","固定費","旅行"];
@@ -549,6 +655,18 @@ function renderInputCatGrid() {
   });
 }
 
+function renderEditCatGrid() {
+  const grid = document.getElementById("edit-cat-grid");
+  grid.innerHTML = "";
+  (state.meta?.categories || []).forEach(cat => {
+    const btn = document.createElement("div");
+    btn.className = "input-cat-btn" + (editState.category === cat ? " active" : "");
+    btn.textContent = cat;
+    btn.addEventListener("click", () => { editState.category = cat; renderEditCatGrid(); });
+    grid.appendChild(btn);
+  });
+}
+
 // ===== カテゴリ編集モーダル =====
 let catEditValues = [];
 
@@ -565,12 +683,9 @@ function renderCatEditList() {
     const item = document.createElement("div");
     item.className = "cat-edit-item";
     const dot = document.createElement("div");
-    dot.className = "color-dot";
-    dot.style.background = CAT_COLORS[i];
-    dot.style.flexShrink = "0";
+    dot.className = "color-dot"; dot.style.background = CAT_COLORS[i]; dot.style.flexShrink = "0";
     const input = document.createElement("input");
-    input.className = "cat-edit-input";
-    input.value = cat; input.maxLength = 10;
+    input.className = "cat-edit-input"; input.value = cat; input.maxLength = 10;
     input.addEventListener("input", e => { catEditValues[i] = e.target.value; });
     item.appendChild(dot); item.appendChild(input);
     list.appendChild(item);
@@ -624,11 +739,7 @@ function toJPY(amount, currency, fxRates, ym) {
 function calcSettle(expenses, loans, fxRates, ym) {
   const exps = Object.values(expenses || {}).filter(e => e.date.startsWith(ym));
   const lns = Object.values(loans || {}).filter(l => l.date && l.date.startsWith(ym));
-
-  let p1PaidBoth = 0, p2PaidBoth = 0;
-  let p1PaidForP2 = 0, p2PaidForP1 = 0;
-  let bothPaidForP1 = 0, bothPaidForP2 = 0;
-
+  let p1PaidBoth = 0, p2PaidBoth = 0, p1PaidForP2 = 0, p2PaidForP1 = 0, bothPaidForP1 = 0, bothPaidForP2 = 0;
   exps.forEach(e => {
     const amt = toJPY(e.amount, e.currency, fxRates, ym);
     if (e.paidBy === "person1" && e.forWhom === "both") p1PaidBoth += amt;
@@ -638,31 +749,23 @@ function calcSettle(expenses, loans, fxRates, ym) {
     else if (e.paidBy === "both" && e.forWhom === "person1") bothPaidForP1 += amt;
     else if (e.paidBy === "both" && e.forWhom === "person2") bothPaidForP2 += amt;
   });
-
-  // person1→person2 方向をプラスとして統一
-  // 共通費の差額: p1が多く払った分の半額をp2が返す
   const commonNet = Math.round(p2PaidBoth / 2) - Math.round(p1PaidBoth / 2);
-  // 共通口座支払い: bothPaidForP1はp1が共通口座に返す → p2視点で受け取り相当
   const hasBothPayer = exps.some(e => e.paidBy === "both");
   const commonAccountNet = hasBothPayer ? (bothPaidForP1 - bothPaidForP2) : 0;
-  // 立替
   const advanceNet = p2PaidForP1 - p1PaidForP2;
-  // 貸し借り
   let loanNet = 0;
   lns.forEach(l => {
     if (l.from === "person1" && l.to === "person2") loanNet += l.amount;
     else if (l.from === "person2" && l.to === "person1") loanNet -= l.amount;
   });
-
   const total = commonNet + commonAccountNet + advanceNet + loanNet;
   return { total, commonNet, commonAccountNet, advanceNet, loanNet, p1PaidBoth, p2PaidBoth, p1PaidForP2, p2PaidForP1, bothPaidForP1, bothPaidForP2, hasBothPayer };
 }
 
-// ===== 集計画面レンダリング =====
+// ===== 集計画面 =====
 function renderSummary() {
   const ym = state.summary.yearMonth;
   document.getElementById("summary-month-title").textContent = formatYearMonthJP(ym);
-
   const expenses = state.expenses || {};
   const filter = state.summary.filter;
   const filtered = getFilteredExpenses(expenses, ym, filter);
@@ -687,7 +790,6 @@ function renderSummary() {
 
   const total = Object.values(catTotals).reduce((a, b) => a + b, 0);
   document.getElementById("chart-total").textContent = fmtAmt(total);
-
   renderDonutChart("summary-chart", cats.map(c => catTotals[c]), cats.map((_, i) => CAT_COLORS[i]));
 
   const listEl = document.getElementById("cat-list");
@@ -702,7 +804,6 @@ function renderSummary() {
     listEl.appendChild(row);
   });
 
-  // 為替レート表示
   const fxArea = document.getElementById("fx-area");
   const hasFx = filtered.some(e => e.currency && e.currency !== "JPY");
   if (hasFx) {
@@ -716,13 +817,11 @@ function renderSummary() {
     html += '<div class="divider"></div>';
     fxArea.innerHTML = html;
     document.getElementById("fx-edit-trigger")?.addEventListener("click", openFxModal);
-    const unset = currencies.some(cur => !monthFx[cur]);
-    if (unset) openFxModal();
+    if (currencies.some(cur => !monthFx[cur])) openFxModal();
   } else {
     fxArea.innerHTML = "";
   }
 
-  // 精算
   const settle = calcSettle(expenses, state.loans, fxRates, ym);
   const p1 = state.meta?.person1 || "一人目";
   const p2 = state.meta?.person2 || "二人目";
@@ -738,16 +837,13 @@ function renderDonutChart(canvasId, data, colors) {
   const total = data.reduce((a, b) => a + b, 0);
   const chartData = total === 0 ? [1] : data;
   const chartColors = total === 0 ? ["#f0f0f0"] : colors;
-
   if (canvasId === "summary-chart" && summaryChart) { summaryChart.destroy(); summaryChart = null; }
   if (canvasId === "settle-chart" && settleChart) { settleChart.destroy(); settleChart = null; }
-
   const chart = new Chart(canvas, {
     type: "doughnut",
     data: { datasets: [{ data: chartData, backgroundColor: chartColors, borderWidth: 0 }] },
     options: { cutout: "62%", plugins: { legend: { display: false }, tooltip: { enabled: false } }, animation: { duration: 400 } }
   });
-
   if (canvasId === "summary-chart") summaryChart = chart;
   if (canvasId === "settle-chart") settleChart = chart;
 }
@@ -759,9 +855,7 @@ document.getElementById("btn-settle-detail").addEventListener("click", () => {
   const fxRates = state.fxRates || {};
   const p1 = state.meta?.person1 || "一人目";
   const p2 = state.meta?.person2 || "二人目";
-
   document.getElementById("settle-modal-month").textContent = formatYearMonthJP(ym);
-
   const exps = Object.values(expenses).filter(e => e.date.startsWith(ym));
   let bothTotal = 0, p1Total = 0, p2Total = 0;
   exps.forEach(e => {
@@ -772,46 +866,32 @@ document.getElementById("btn-settle-detail").addEventListener("click", () => {
   });
   const grandTotal = bothTotal + p1Total + p2Total;
   document.getElementById("settle-chart-total").textContent = fmtAmt(grandTotal);
-
   renderDonutChart("settle-chart", [bothTotal, p1Total, p2Total], ["#7a9abf","#c4846a","#8fba8f"]);
-
   document.getElementById("settle-legend").innerHTML = `
     <div class="legend-item"><div class="legend-dot" style="background:#7a9abf;"></div>共通費 ${fmtAmt(bothTotal)}</div>
     <div class="legend-item"><div class="legend-dot" style="background:#c4846a;"></div>${p1} ${fmtAmt(p1Total)}</div>
     <div class="legend-item"><div class="legend-dot" style="background:#8fba8f;"></div>${p2} ${fmtAmt(p2Total)}</div>`;
-
   const settle = calcSettle(expenses, state.loans, fxRates, ym);
   const p1PaidCount = exps.filter(e => e.paidBy === "person1" && e.forWhom === "both").length;
   const p2PaidCount = exps.filter(e => e.paidBy === "person2" && e.forWhom === "both").length;
-
   document.getElementById("settle-common-rows").innerHTML = `
-    <div class="detail-row">
-      <div class="detail-left">${p1}が支払った共通費<div class="detail-sub">${p1PaidCount}件</div></div>
-      <div class="detail-right">${fmtAmt(settle.p1PaidBoth)}</div>
-    </div>
-    <div class="detail-row" style="border:none;">
-      <div class="detail-left">${p2}が支払った共通費<div class="detail-sub">${p2PaidCount}件</div></div>
-      <div class="detail-right">${fmtAmt(settle.p2PaidBoth)}</div>
-    </div>`;
-
+    <div class="detail-row"><div class="detail-left">${p1}が支払った共通費<div class="detail-sub">${p1PaidCount}件</div></div><div class="detail-right">${fmtAmt(settle.p1PaidBoth)}</div></div>
+    <div class="detail-row" style="border:none;"><div class="detail-left">${p2}が支払った共通費<div class="detail-sub">${p2PaidCount}件</div></div><div class="detail-right">${fmtAmt(settle.p2PaidBoth)}</div></div>`;
   const adv = settle.advanceNet;
   let advText = "立替なし";
   if (adv > 0) advText = `差し引き：${p1} → ${p2} へ ${fmtAmt(adv)}`;
   else if (adv < 0) advText = `差し引き：${p2} → ${p1} へ ${fmtAmt(adv)}`;
   document.getElementById("settle-advance-row").innerHTML = `<div class="detail-row" style="border:none;"><div class="detail-left">${advText}</div></div>`;
-
   const loan = settle.loanNet;
   let loanText = "貸し借りなし";
   if (loan > 0) loanText = `差し引き：${p1} → ${p2} へ ${fmtAmt(loan)}`;
   else if (loan < 0) loanText = `差し引き：${p2} → ${p1} へ ${fmtAmt(loan)}`;
   document.getElementById("settle-loan-row").innerHTML = `<div class="detail-row" style="border:none;"><div class="detail-left">${loanText}</div></div>`;
-
   const tot = settle.total;
   let finalText = "精算なし";
   if (tot > 0) finalText = `${p1} → ${p2} へ ${fmtAmt(tot)}`;
   else if (tot < 0) finalText = `${p2} → ${p1} へ ${fmtAmt(tot)}`;
   document.getElementById("settle-final-text").textContent = finalText;
-
   document.getElementById("modal-settle").classList.add("open");
 });
 document.getElementById("btn-settle-close").addEventListener("click", () => { document.getElementById("modal-settle").classList.remove("open"); });
@@ -828,7 +908,6 @@ function openFxModal() {
   ).join("");
   document.getElementById("modal-fx").classList.add("open");
 }
-
 document.getElementById("btn-fx-save").addEventListener("click", async () => {
   const ym = state.summary.yearMonth;
   const exps = Object.values(state.expenses || {}).filter(e => e.date.startsWith(ym) && e.currency && e.currency !== "JPY");
@@ -869,12 +948,203 @@ document.getElementById("filter-btn").addEventListener("click", () => {
 
 // ===== 各種ボタン =====
 document.getElementById("btn-add-loan").addEventListener("click", () => showToast("貸し借り入力は近日実装予定です"));
-document.getElementById("btn-go-list").addEventListener("click", () => showToast("一覧画面は近日実装予定です"));
+document.getElementById("btn-go-list").addEventListener("click", () => {
+  state.list.yearMonth = state.summary.yearMonth;
+  showScreen("screen-list");
+});
 document.getElementById("btn-share-url").addEventListener("click", () => {
   if (navigator.share) navigator.share({ url: getRoomUrl(state.roomId) });
   else navigator.clipboard.writeText(getRoomUrl(state.roomId)).then(() => showToast("URLをコピーしました"));
 });
 document.getElementById("btn-csv").addEventListener("click", () => showToast("CSV出力は近日実装予定です"));
+
+// ===== 一覧画面 =====
+function renderList() {
+  const ym = state.list.yearMonth;
+  document.getElementById("list-title").textContent = formatYearMonthJP(ym) + "　一覧";
+
+  const expenses = state.expenses || {};
+  const fxRates = state.fxRates || {};
+  const exps = Object.entries(expenses)
+    .filter(([, e]) => e.date.startsWith(ym))
+    .sort(([, a], [, b]) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
+
+  const scroll = document.getElementById("list-scroll");
+  scroll.innerHTML = "";
+
+  if (exps.length === 0) {
+    scroll.innerHTML = '<div class="list-empty">この月の記録はありません</div>';
+    return;
+  }
+
+  const p1 = state.meta?.person1 || "一人目";
+  const p2 = state.meta?.person2 || "二人目";
+
+  const paidByLabel = v => v === "both" ? "二人" : v === "person1" ? p1 : p2;
+  const forWhomLabel = v => v === "both" ? "二人分" : v === "person1" ? `${p1}の分` : `${p2}の分`;
+  const methodLabel = v => v === "barcode" ? "バーコード" : v === "card" ? "カード" : "現金";
+
+  let lastDate = "";
+  exps.forEach(([id, e]) => {
+    if (e.date !== lastDate) {
+      const header = document.createElement("div");
+      header.className = "date-group-header";
+      header.textContent = formatDateJP(e.date);
+      scroll.appendChild(header);
+      lastDate = e.date;
+    }
+
+    const row = document.createElement("div");
+    row.className = "record-row";
+
+    const cats = state.meta?.categories || [];
+    const catIdx = cats.indexOf(e.category);
+    const catColor = catIdx >= 0 ? CAT_COLORS[catIdx] : "#aaa";
+    const amtDisplay = e.currency && e.currency !== "JPY"
+      ? `${e.currency} ${e.amount.toLocaleString()}`
+      : fmtAmt(e.amount);
+
+    row.innerHTML = `
+      <span class="cat-badge" style="border-color:${catColor};color:${catColor};">${e.category || "?"}</span>
+      <div class="record-main">
+        <div class="record-memo">${e.memo || ""}</div>
+        <div class="record-sub">${paidByLabel(e.paidBy)}・${forWhomLabel(e.forWhom)}</div>
+      </div>
+      <div class="record-right">
+        <div class="record-amount">${amtDisplay}</div>
+        <div class="record-method">${methodLabel(e.method)}</div>
+      </div>`;
+
+    row.addEventListener("click", () => openEditModal(id, e));
+    scroll.appendChild(row);
+  });
+}
+
+document.getElementById("btn-list-back").addEventListener("click", () => showScreen("screen-summary"));
+document.getElementById("btn-list-prev").addEventListener("click", () => { state.list.yearMonth = prevYearMonth(state.list.yearMonth); renderList(); });
+document.getElementById("btn-list-next").addEventListener("click", () => { state.list.yearMonth = nextYearMonth(state.list.yearMonth); renderList(); });
+
+// ===== 編集モーダル =====
+function openEditModal(id, expense) {
+  editingExpenseId = id;
+  editState = { ...expense };
+
+  const p1 = state.meta?.person1 || "一人目";
+  const p2 = state.meta?.person2 || "二人目";
+  document.getElementById("edit-paid-p1").textContent = p1;
+  document.getElementById("edit-paid-p2").textContent = p2;
+  document.getElementById("edit-for-p1").textContent = p1;
+  document.getElementById("edit-for-p2").textContent = p2;
+  document.getElementById("edit-modal-date").textContent = formatDateJP(expense.date);
+  document.getElementById("edit-memo").value = expense.memo || "";
+
+  // トグル設定
+  setEditToggle("edit-toggle-paid-by", expense.paidBy);
+  setEditToggle("edit-toggle-for-whom", expense.forWhom);
+  setEditToggle("edit-toggle-method", expense.method);
+
+  // 金額
+  document.getElementById("edit-amount-display").textContent = expense.amount.toLocaleString();
+  document.getElementById("edit-currency-badge").textContent = expense.currency === "JPY" ? "¥" : expense.currency;
+
+  renderEditCatGrid();
+  document.getElementById("modal-edit").classList.add("open");
+}
+
+function setEditToggle(groupId, value) {
+  document.querySelectorAll(`#${groupId} .toggle-btn`).forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.value === value);
+  });
+}
+
+// 編集トグル
+["edit-toggle-paid-by","edit-toggle-for-whom","edit-toggle-method"].forEach(groupId => {
+  document.getElementById(groupId).addEventListener("click", e => {
+    const btn = e.target.closest(".toggle-btn");
+    if (!btn) return;
+    document.querySelectorAll(`#${groupId} .toggle-btn`).forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    const key = groupId === "edit-toggle-paid-by" ? "paidBy" : groupId === "edit-toggle-for-whom" ? "forWhom" : "method";
+    editState[key] = btn.dataset.value;
+  });
+});
+
+document.getElementById("edit-memo").addEventListener("input", e => { editState.memo = e.target.value; });
+
+document.getElementById("edit-amount-row").addEventListener("click", () => {
+  numpadTarget = "edit";
+  numpadValue = editState.amount > 0 ? String(editState.amount) : "0";
+  document.getElementById("numpad-display").textContent = Number(numpadValue).toLocaleString();
+  document.getElementById("numpad-overlay").classList.add("open");
+});
+
+document.getElementById("btn-edit-save").addEventListener("click", async () => {
+  if (!editState.memo?.trim()) { showToast("「何に使ったか」を入力してください"); return; }
+  if (!editState.amount || editState.amount <= 0) { showToast("金額を入力してください"); return; }
+  if (!editState.category) { showToast("カテゴリを選択してください"); return; }
+  try {
+    await update(ref(db, `rooms/${state.roomId}/expenses/${editingExpenseId}`), {
+      memo: editState.memo.trim(),
+      paidBy: editState.paidBy,
+      forWhom: editState.forWhom,
+      method: editState.method,
+      amount: editState.amount,
+      category: editState.category,
+    });
+    document.getElementById("modal-edit").classList.remove("open");
+    showToast("更新しました ✓");
+    renderList();
+    if (document.getElementById("screen-summary").classList.contains("active")) renderSummary();
+  } catch(e) { showToast("保存に失敗しました"); }
+});
+
+document.getElementById("btn-edit-cancel").addEventListener("click", () => { document.getElementById("modal-edit").classList.remove("open"); });
+
+// ===== 削除（取り消し付き） =====
+document.getElementById("btn-edit-delete").addEventListener("click", () => {
+  const id = editingExpenseId;
+  const data = { ...state.expenses[id] };
+
+  document.getElementById("modal-edit").classList.remove("open");
+
+  // ローカルから先に消す（見た目を即座に更新）
+  delete state.expenses[id];
+  renderList();
+  if (document.getElementById("screen-summary").classList.contains("active")) renderSummary();
+
+  // 取り消しデータを保存
+  deleteUndoData = { id, data };
+
+  // 取り消しトースト表示
+  showToast("削除しました", true, 4000);
+
+  // 4秒後に本当に削除
+  if (deleteUndoTimer) clearTimeout(deleteUndoTimer);
+  deleteUndoTimer = setTimeout(commitDelete, 4000);
+});
+
+async function commitDelete() {
+  if (!deleteUndoData) return;
+  const { id } = deleteUndoData;
+  deleteUndoData = null;
+  deleteUndoTimer = null;
+  try {
+    await remove(ref(db, `rooms/${state.roomId}/expenses/${id}`));
+  } catch(e) { console.error("削除失敗", e); }
+}
+
+// 取り消しボタン
+document.getElementById("toast-undo").addEventListener("click", () => {
+  if (!deleteUndoData) return;
+  // ローカルに戻す
+  state.expenses[deleteUndoData.id] = deleteUndoData.data;
+  deleteUndoData = null;
+  if (deleteUndoTimer) { clearTimeout(deleteUndoTimer); deleteUndoTimer = null; }
+  hideToast();
+  renderList();
+  if (document.getElementById("screen-summary").classList.contains("active")) renderSummary();
+  showToast("削除を取り消しました");
+});
 
 // ===== 入力画面 =====
 function updatePersonToggles() {
@@ -894,23 +1164,39 @@ function setupToggleGroup(groupId, stateKey) {
   });
 }
 
-let numpadValue = "0";
+// 数字キーボード
 function openNumpad() {
+  numpadTarget = "input";
   numpadValue = state.input.amount > 0 ? String(state.input.amount) : "0";
   document.getElementById("numpad-display").textContent = Number(numpadValue).toLocaleString();
   document.getElementById("numpad-overlay").classList.add("open");
 }
 function closeNumpad() { document.getElementById("numpad-overlay").classList.remove("open"); }
+
 document.getElementById("numpad-overlay").addEventListener("click", e => { if (e.target === document.getElementById("numpad-overlay")) closeNumpad(); });
 document.querySelectorAll(".numpad-key").forEach(key => {
   key.addEventListener("click", () => {
     const k = key.dataset.key;
-    if (k === "done") { state.input.amount = parseInt(numpadValue) || 0; updateAmountDisplay(); closeNumpad(); }
-    else if (k === "del") { numpadValue = numpadValue.length > 1 ? numpadValue.slice(0,-1) : "0"; }
-    else { if (numpadValue === "0") numpadValue = k; else if (numpadValue.length < 8) numpadValue += k; }
+    if (k === "done") {
+      const val = parseInt(numpadValue) || 0;
+      if (numpadTarget === "input") {
+        state.input.amount = val;
+        updateAmountDisplay();
+      } else {
+        editState.amount = val;
+        document.getElementById("edit-amount-display").textContent = val.toLocaleString();
+      }
+      closeNumpad();
+    } else if (k === "del") {
+      numpadValue = numpadValue.length > 1 ? numpadValue.slice(0,-1) : "0";
+    } else {
+      if (numpadValue === "0") numpadValue = k;
+      else if (numpadValue.length < 8) numpadValue += k;
+    }
     document.getElementById("numpad-display").textContent = Number(numpadValue).toLocaleString();
   });
 });
+
 function updateAmountDisplay() {
   const el = document.getElementById("amount-display");
   if (state.input.amount === 0) { el.textContent = "0"; el.classList.add("placeholder"); }
@@ -1013,6 +1299,7 @@ function subscribeRoom(roomId) {
   onValue(ref(db, `rooms/${roomId}/expenses`), snap => {
     state.expenses = snap.val() || {};
     if (document.getElementById("screen-summary").classList.contains("active")) renderSummary();
+    if (document.getElementById("screen-list").classList.contains("active")) renderList();
   });
   onValue(ref(db, `rooms/${roomId}/loans`), snap => { state.loans = snap.val() || {}; });
   onValue(ref(db, `rooms/${roomId}/fxRates`), snap => { state.fxRates = snap.val() || {}; });
