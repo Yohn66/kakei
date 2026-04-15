@@ -37,36 +37,36 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 
 /* ローディング */
 #screen-loading { align-items: center; justify-content: center; }
-.loading-icon { width: 52px; height: 52px; border-radius: 12px; background: var(--bg); display: flex; align-items: center; justify-content: center; }
+.loading-icon { width: 56px; height: 56px; border-radius: 14px; background: var(--bg); display: flex; align-items: center; justify-content: center; }
 
 /* トップ画面 */
 #screen-top { overflow-y: auto; -webkit-overflow-scrolling: touch; }
 #screen-top::-webkit-scrollbar { display: none; }
 .top-body { padding: 32px 20px 40px; display: flex; flex-direction: column; align-items: center; }
-.app-icon { width: 52px; height: 52px; border-radius: 12px; background: var(--bg); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
-.app-name { font-size: 15px; font-weight: 600; color: var(--black); margin-bottom: 3px; }
-.app-sub { font-size: 11px; color: var(--gray1); margin-bottom: 28px; }
-.section-label { font-size: 10px; color: var(--gray1); margin-bottom: 5px; align-self: flex-start; }
-.name-input { width: 100%; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 10px 12px; font-size: 14px; color: var(--black); font-family: var(--font); background: var(--white); margin-bottom: 6px; outline: none; }
+.app-icon { width: 56px; height: 56px; border-radius: 14px; background: var(--bg); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+.app-name { font-size: 17px; font-weight: 600; color: var(--black); margin-bottom: 4px; }
+.app-sub { font-size: 13px; color: var(--gray1); margin-bottom: 28px; }
+.section-label { font-size: 12px; color: var(--gray1); margin-bottom: 6px; align-self: flex-start; }
+.name-input { width: 100%; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 11px 12px; font-size: 15px; color: var(--black); font-family: var(--font); background: var(--white); margin-bottom: 7px; outline: none; }
 .name-input:focus { border-color: var(--black); }
 .name-input::placeholder { color: var(--gray2); }
-.cat-header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 6px; margin-top: 14px; }
-.cat-header-lbl { font-size: 10px; color: var(--gray1); }
-.cat-limit { font-size: 10px; color: var(--gray2); }
-.cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; width: 100%; margin-bottom: 5px; }
-.cat-btn { padding: 8px 0; border-radius: 7px; border: 1.5px solid var(--black); font-size: 11px; text-align: center; background: #fafafa; color: var(--black); font-weight: 500; cursor: pointer; user-select: none; }
+.cat-header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 7px; margin-top: 14px; }
+.cat-header-lbl { font-size: 12px; color: var(--gray1); }
+.cat-limit { font-size: 12px; color: var(--gray2); }
+.cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; width: 100%; margin-bottom: 6px; }
+.cat-btn { padding: 9px 0; border-radius: 7px; border: 1.5px solid var(--black); font-size: 12px; text-align: center; background: #fafafa; color: var(--black); font-weight: 500; cursor: pointer; user-select: none; }
 .cat-btn.off { border: 0.5px solid var(--gray3); background: var(--white); color: var(--gray2); font-weight: 400; }
-.cat-hint { font-size: 10px; color: var(--gray2); align-self: flex-start; margin-bottom: 20px; }
-.primary-btn { width: 100%; background: var(--black); color: var(--white); border-radius: 10px; padding: 13px; font-size: 14px; font-weight: 600; text-align: center; cursor: pointer; border: none; font-family: var(--font); margin-bottom: 14px; }
+.cat-hint { font-size: 11px; color: var(--gray2); align-self: flex-start; margin-bottom: 20px; }
+.primary-btn { width: 100%; background: var(--black); color: var(--white); border-radius: 10px; padding: 14px; font-size: 15px; font-weight: 600; text-align: center; cursor: pointer; border: none; font-family: var(--font); margin-bottom: 14px; }
 .primary-btn:active { opacity: 0.7; }
 .divider-or { display: flex; align-items: center; gap: 10px; width: 100%; margin-bottom: 14px; }
 .divider-line { flex: 1; height: 0.5px; background: var(--border); }
-.divider-text { font-size: 10px; color: var(--gray2); }
-.secondary-btn { width: 100%; border: 0.5px solid var(--gray3); border-radius: 10px; padding: 12px; font-size: 14px; color: #555; text-align: center; cursor: pointer; background: var(--white); font-family: var(--font); margin-bottom: 10px; }
+.divider-text { font-size: 12px; color: var(--gray2); }
+.secondary-btn { width: 100%; border: 0.5px solid var(--gray3); border-radius: 10px; padding: 13px; font-size: 15px; color: #555; text-align: center; cursor: pointer; background: var(--white); font-family: var(--font); margin-bottom: 10px; }
 .secondary-btn:active { opacity: 0.7; }
 .url-join-area { width: 100%; display: none; }
 .url-join-area.open { display: block; }
-.url-input { width: 100%; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 10px 12px; font-size: 13px; color: var(--black); font-family: var(--font); background: var(--white); margin-bottom: 8px; outline: none; }
+.url-input { width: 100%; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 11px 12px; font-size: 14px; color: var(--black); font-family: var(--font); background: var(--white); margin-bottom: 8px; outline: none; }
 .url-input:focus { border-color: var(--black); }
 .url-input::placeholder { color: var(--gray2); }
 
@@ -74,154 +74,166 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 #screen-guide { overflow-y: auto; -webkit-overflow-scrolling: touch; }
 #screen-guide::-webkit-scrollbar { display: none; }
 .guide-body { padding: 40px 20px 40px; display: flex; flex-direction: column; align-items: center; }
-.guide-title { font-size: 16px; font-weight: 600; color: var(--black); margin-bottom: 24px; }
-.url-box { width: 100%; background: #f8f8f8; border: 0.5px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; }
-.url-text { font-size: 11px; color: #666; word-break: break-all; line-height: 1.6; }
-.copy-btn { width: 100%; border: 0.5px solid var(--gray3); border-radius: 10px; padding: 11px; font-size: 13px; color: #555; text-align: center; cursor: pointer; background: var(--white); font-family: var(--font); margin-bottom: 20px; }
+.guide-title { font-size: 18px; font-weight: 600; color: var(--black); margin-bottom: 24px; }
+.url-box { width: 100%; background: #f8f8f8; border: 0.5px solid var(--border); border-radius: 8px; padding: 11px 12px; margin-bottom: 8px; }
+.url-text { font-size: 12px; color: #666; word-break: break-all; line-height: 1.6; }
+.copy-btn { width: 100%; border: 0.5px solid var(--gray3); border-radius: 10px; padding: 12px; font-size: 14px; color: #555; text-align: center; cursor: pointer; background: var(--white); font-family: var(--font); margin-bottom: 20px; }
 .copy-btn:active { opacity: 0.7; }
-.steps-box { width: 100%; background: #f5f3ef; border-radius: 10px; padding: 12px 14px; margin-bottom: 20px; }
-.steps-title { font-size: 10px; color: var(--gray1); margin-bottom: 10px; }
+.steps-box { width: 100%; background: #f5f3ef; border-radius: 10px; padding: 13px 15px; margin-bottom: 20px; }
+.steps-title { font-size: 12px; color: var(--gray1); margin-bottom: 10px; }
 .step-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
 .step-row:last-child { margin-bottom: 0; }
-.step-num { width: 18px; height: 18px; border-radius: 50%; background: #ddd; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #777; flex-shrink: 0; font-weight: 600; }
-.step-text { font-size: 11px; color: #555; line-height: 1.6; }
+.step-num { width: 20px; height: 20px; border-radius: 50%; background: #ddd; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #777; flex-shrink: 0; font-weight: 600; }
+.step-text { font-size: 13px; color: #555; line-height: 1.6; }
 
 /* タブバー */
 #tab-bar { display: none; border-bottom: 0.5px solid var(--border); background: var(--white); flex-shrink: 0; }
 #tab-bar.visible { display: flex; }
-.tab { flex: 1; text-align: center; padding: 11px 0 9px; font-size: 13px; color: var(--gray2); border-bottom: 2px solid transparent; cursor: pointer; }
+.tab { flex: 1; text-align: center; padding: 12px 0 10px; font-size: 14px; color: var(--gray2); border-bottom: 2px solid transparent; cursor: pointer; }
 .tab.active { color: var(--black); border-bottom: 2px solid var(--black); font-weight: 500; }
 
 /* 入力画面 */
 #screen-input { overflow-y: auto; -webkit-overflow-scrolling: touch; }
 #screen-input::-webkit-scrollbar { display: none; }
 .input-body { padding: 14px 16px 30px; }
-.lbl-mini { font-size: 10px; color: var(--gray2); margin-bottom: 4px; margin-top: 10px; }
+.lbl-mini { font-size: 11px; color: var(--gray2); margin-bottom: 5px; margin-top: 11px; }
 .toggle-group { display: flex; gap: 4px; }
-.toggle-btn { flex: 1; padding: 9px 0; border-radius: 8px; border: 0.5px solid var(--gray3); font-size: 12px; text-align: center; background: var(--white); color: var(--gray1); cursor: pointer; font-family: var(--font); transition: all 0.1s; }
+.toggle-btn { flex: 1; padding: 10px 0; border-radius: 8px; border: 0.5px solid var(--gray3); font-size: 13px; text-align: center; background: var(--white); color: var(--gray1); cursor: pointer; font-family: var(--font); transition: all 0.1s; }
 .toggle-btn.active { border: 1.5px solid var(--black); color: var(--black); font-weight: 500; background: #fafafa; }
-.divider { height: 0.5px; background: #f0f0f0; margin: 10px 0; }
-.text-input { width: 100%; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 10px 12px; font-size: 14px; color: var(--black); font-family: var(--font); background: var(--white); outline: none; }
+.divider { height: 0.5px; background: #f0f0f0; margin: 11px 0; }
+.text-input { width: 100%; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 11px 12px; font-size: 15px; color: var(--black); font-family: var(--font); background: var(--white); outline: none; }
 .text-input:focus { border-color: var(--black); }
 .text-input::placeholder { color: var(--gray2); }
-.amount-row { display: flex; align-items: center; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 9px 12px; gap: 8px; margin-top: 8px; cursor: pointer; }
-.currency-badge { font-size: 14px; color: #666; padding: 2px 6px; border-radius: 5px; border: 0.5px solid var(--border); font-weight: 500; flex-shrink: 0; }
-.amount-display { font-size: 18px; font-weight: 500; color: var(--black); flex: 1; }
+.amount-row { display: flex; align-items: center; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 10px 12px; gap: 8px; margin-top: 8px; cursor: pointer; }
+.currency-badge { font-size: 15px; color: #666; padding: 2px 7px; border-radius: 5px; border: 0.5px solid var(--border); font-weight: 500; flex-shrink: 0; }
+.amount-display { font-size: 20px; font-weight: 500; color: var(--black); flex: 1; }
 .amount-display.placeholder { color: var(--gray2); }
-.date-row { display: flex; justify-content: space-between; align-items: center; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 10px 12px; font-size: 13px; color: #555; cursor: pointer; }
+.date-row { display: flex; justify-content: space-between; align-items: center; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #555; cursor: pointer; }
 .input-cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; width: 100%; }
-.input-cat-btn { padding: 8px 0; border-radius: 7px; border: 0.5px solid var(--gray3); font-size: 11px; text-align: center; background: var(--white); color: var(--gray2); cursor: pointer; font-family: var(--font); transition: all 0.1s; }
+.input-cat-btn { padding: 9px 0; border-radius: 7px; border: 0.5px solid var(--gray3); font-size: 12px; text-align: center; background: var(--white); color: var(--gray2); cursor: pointer; font-family: var(--font); transition: all 0.1s; }
 .input-cat-btn.active { border: 1.5px solid var(--black); color: var(--black); font-weight: 500; background: #fafafa; }
-.cat-edit-link { text-align: center; font-size: 10px; color: var(--gray2); padding: 6px 0 2px; cursor: pointer; }
+.cat-edit-link { text-align: center; font-size: 12px; color: var(--gray2); padding: 7px 0 2px; cursor: pointer; }
 
-/* 集計画面 */
+/* ===== 集計画面 ===== */
 .month-nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 0.5px solid var(--border); flex-shrink: 0; background: var(--white); }
-.month-nav-title { font-size: 14px; font-weight: 500; }
-.month-nav-arrow { font-size: 18px; color: var(--gray2); cursor: pointer; padding: 4px 8px; }
+.month-nav-title { font-size: 15px; font-weight: 500; }
+.month-nav-arrow { font-size: 20px; color: var(--gray2); cursor: pointer; padding: 4px 8px; }
+
+/* 集計ヘッダー（フィルター＋明細ボタン） */
+.summary-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; position: relative; }
+.filter-wrap { position: relative; }
+.filter-btn { font-size: 13px; color: #444; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 6px 14px; background: var(--white); cursor: pointer; display: flex; align-items: center; gap: 5px; }
+.filter-btn-arrow { font-size: 10px; color: var(--gray2); }
+.filter-dropdown { display: none; position: absolute; top: calc(100% + 4px); left: 0; background: var(--white); border: 0.5px solid var(--border); border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); z-index: 100; min-width: 130px; overflow: hidden; }
+.filter-dropdown.open { display: block; }
+.filter-option { padding: 11px 16px; font-size: 14px; color: var(--black); cursor: pointer; }
+.filter-option:not(:last-child) { border-bottom: 0.5px solid #f5f5f5; }
+.filter-option:active { background: #f8f8f8; }
+.filter-option.selected { font-weight: 600; color: var(--black); }
+.detail-nav-btn { font-size: 13px; color: #555; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 6px 14px; background: var(--white); cursor: pointer; }
+.detail-nav-btn:active { opacity: 0.7; }
+
 .summary-scroll { flex: 1; overflow-y: auto; padding: 10px 14px 40px; -webkit-overflow-scrolling: touch; }
 .summary-scroll::-webkit-scrollbar { display: none; }
-.filter-wrap { margin-bottom: 6px; }
-.filter-btn { font-size: 11px; color: #666; border: 0.5px solid var(--gray3); border-radius: 99px; padding: 4px 12px; background: var(--white); cursor: pointer; display: inline-block; }
-.chart-area { display: flex; justify-content: center; margin: 6px 0 8px; position: relative; }
+.chart-area { display: flex; justify-content: center; margin: 2px 0 10px; position: relative; }
 .chart-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; }
-.chart-center-lbl { font-size: 9px; color: var(--gray1); white-space: nowrap; }
-.chart-center-amt { font-size: 14px; font-weight: 600; color: var(--black); }
-.cat-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 0.5px solid #f5f5f5; cursor: pointer; }
-.cat-left { display: flex; align-items: center; gap: 7px; }
-.color-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-.cat-name-lbl { font-size: 12px; color: #333; }
+.chart-center-lbl { font-size: 10px; color: var(--gray1); white-space: nowrap; }
+.chart-center-amt { font-size: 16px; font-weight: 600; color: var(--black); }
+.cat-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 0.5px solid #f0f0f0; cursor: pointer; }
+.cat-row:active { background: #fafafa; margin: 0 -4px; padding-left: 4px; padding-right: 4px; }
+.cat-left { display: flex; align-items: center; gap: 8px; }
+.color-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.cat-name-lbl { font-size: 14px; color: #222; }
 .cat-right { display: flex; align-items: center; gap: 8px; }
-.diff-up { font-size: 10px; color: #c0392b; }
-.diff-dn { font-size: 10px; color: #27ae60; }
-.diff-eq { font-size: 10px; color: var(--gray2); }
-.cat-amt-lbl { font-size: 12px; font-weight: 500; color: var(--black); }
-.fx-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; }
-.fx-edit { font-size: 11px; color: #888; border-bottom: 0.5px solid var(--gray3); cursor: pointer; }
-.settle-box { background: #f5f3ef; border-radius: 10px; padding: 10px 12px; margin-top: 6px; }
-.settle-lbl { font-size: 10px; color: var(--gray1); margin-bottom: 5px; }
-.settle-main { font-size: 13px; font-weight: 500; color: var(--black); margin-bottom: 8px; line-height: 1.5; }
-.settle-detail-btn { text-align: center; font-size: 11px; color: #666; border: 0.5px solid var(--gray3); border-radius: 7px; padding: 6px; cursor: pointer; background: var(--white); }
-.loan-btn { text-align: center; font-size: 11px; color: #666; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 8px; margin-top: 8px; cursor: pointer; }
-.list-link { text-align: center; font-size: 11px; color: var(--gray1); padding: 10px 0 4px; cursor: pointer; }
-.share-link { text-align: center; font-size: 11px; color: var(--gray1); padding: 4px 0; cursor: pointer; }
-.csv-btn { text-align: center; font-size: 11px; color: #666; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 8px; margin-top: 4px; margin-bottom: 8px; cursor: pointer; }
+.diff-up { font-size: 11px; color: #c0392b; }
+.diff-dn { font-size: 11px; color: #27ae60; }
+.diff-eq { font-size: 11px; color: var(--gray2); }
+.cat-amt-lbl { font-size: 14px; font-weight: 500; color: var(--black); }
+.fx-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
+.fx-edit { font-size: 12px; color: #888; border-bottom: 0.5px solid var(--gray3); cursor: pointer; }
+.settle-box { background: #f5f3ef; border-radius: 10px; padding: 11px 13px; margin-top: 8px; }
+.settle-lbl { font-size: 11px; color: var(--gray1); margin-bottom: 6px; }
+.settle-main { font-size: 14px; font-weight: 500; color: var(--black); margin-bottom: 9px; line-height: 1.5; }
+.settle-detail-btn { text-align: center; font-size: 13px; color: #555; border: 0.5px solid var(--gray3); border-radius: 7px; padding: 7px; cursor: pointer; background: var(--white); }
+.loan-btn { text-align: center; font-size: 13px; color: #555; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 10px; margin-top: 10px; cursor: pointer; }
+.share-link { text-align: center; font-size: 12px; color: var(--gray1); padding: 10px 0 4px; cursor: pointer; }
+.csv-btn { text-align: center; font-size: 12px; color: #666; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 9px; margin-top: 6px; margin-bottom: 8px; cursor: pointer; }
 
-/* ===== 一覧画面 ===== */
+/* ===== 一覧・明細画面 ===== */
 #screen-list { display: none; flex-direction: column; flex: 1; overflow: hidden; }
 #screen-list.active { display: flex; }
-.list-nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 0.5px solid var(--border); flex-shrink: 0; background: var(--white); }
-.list-nav-title { font-size: 14px; font-weight: 500; }
-.list-nav-back { font-size: 13px; color: var(--gray1); cursor: pointer; padding: 4px 0; }
-.list-nav-arrow { font-size: 18px; color: var(--gray2); cursor: pointer; padding: 4px 8px; }
+.list-nav { display: flex; align-items: center; justify-content: space-between; padding: 11px 16px; border-bottom: 0.5px solid var(--border); flex-shrink: 0; background: var(--white); }
+.list-nav-title { font-size: 15px; font-weight: 500; }
+.list-nav-back { font-size: 14px; color: var(--gray1); cursor: pointer; padding: 4px 0; }
+.list-nav-arrow { font-size: 20px; color: var(--gray2); cursor: pointer; padding: 4px 8px; }
 .list-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .list-scroll::-webkit-scrollbar { display: none; }
-.date-group-header { padding: 5px 16px 4px; font-size: 10px; color: var(--gray1); background: #f8f8f8; border-bottom: 0.5px solid #f0f0f0; }
-.record-row { display: flex; align-items: center; padding: 10px 16px; border-bottom: 0.5px solid #f5f5f5; gap: 8px; cursor: pointer; }
+.date-group-header { padding: 6px 16px 5px; font-size: 11px; color: var(--gray1); background: #f8f8f8; border-bottom: 0.5px solid #f0f0f0; }
+.record-row { display: flex; align-items: center; padding: 12px 16px; border-bottom: 0.5px solid #f0f0f0; gap: 10px; cursor: pointer; }
 .record-row:active { background: #f8f8f8; }
-.cat-badge { font-size: 10px; padding: 2px 7px; border-radius: 99px; background: #f5f5f5; color: #666; white-space: nowrap; border: 0.5px solid var(--border); flex-shrink: 0; }
+.cat-badge { font-size: 11px; padding: 3px 8px; border-radius: 99px; background: #f5f5f5; color: #666; white-space: nowrap; border: 0.5px solid var(--border); flex-shrink: 0; }
 .record-main { flex: 1; min-width: 0; }
-.record-memo { font-size: 12px; color: var(--black); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.record-sub { font-size: 10px; color: var(--gray1); margin-top: 2px; }
+.record-memo { font-size: 14px; color: var(--black); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.record-sub { font-size: 11px; color: var(--gray1); margin-top: 3px; }
 .record-right { text-align: right; white-space: nowrap; flex-shrink: 0; }
-.record-amount { font-size: 13px; font-weight: 500; color: var(--black); }
-.record-method { font-size: 10px; color: var(--gray1); margin-top: 2px; }
-.list-empty { padding: 40px 20px; text-align: center; font-size: 13px; color: var(--gray1); }
+.record-amount { font-size: 15px; font-weight: 500; color: var(--black); }
+.record-method { font-size: 11px; color: var(--gray1); margin-top: 2px; }
+.list-empty { padding: 40px 20px; text-align: center; font-size: 14px; color: var(--gray1); }
 
 /* モーダル共通 */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 500; flex-direction: column; justify-content: flex-end; max-width: 430px; margin: 0 auto; }
 .modal-overlay.open { display: flex; }
-.modal-sheet { background: var(--white); border-radius: 20px 20px 0 0; padding: 16px 16px 32px; overflow-y: auto; max-height: 85vh; }
+.modal-sheet { background: var(--white); border-radius: 20px 20px 0 0; padding: 17px 17px 34px; overflow-y: auto; max-height: 85vh; }
 .modal-sheet::-webkit-scrollbar { display: none; }
-.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-.modal-title { font-size: 14px; font-weight: 600; color: var(--black); }
-.modal-sub { font-size: 11px; color: var(--gray1); }
-.modal-close-btn { text-align: center; font-size: 12px; color: var(--gray1); margin-top: 12px; padding-top: 12px; border-top: 0.5px solid #f0f0f0; cursor: pointer; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.modal-title { font-size: 15px; font-weight: 600; color: var(--black); }
+.modal-sub { font-size: 12px; color: var(--gray1); }
+.modal-close-btn { text-align: center; font-size: 13px; color: var(--gray1); margin-top: 13px; padding-top: 13px; border-top: 0.5px solid #f0f0f0; cursor: pointer; }
 
 /* 精算詳細モーダル */
 .settle-chart-area { display: flex; justify-content: center; margin: 4px 0 8px; position: relative; }
 .legend-row { display: flex; justify-content: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
-.legend-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: #555; }
-.legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.section-lbl { font-size: 10px; color: var(--gray1); margin: 8px 0 5px; }
-.detail-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 7px 0; border-bottom: 0.5px solid #f5f5f5; }
-.detail-left { font-size: 12px; color: #444; line-height: 1.5; }
-.detail-sub { font-size: 10px; color: var(--gray1); }
-.detail-right { font-size: 12px; font-weight: 500; color: var(--black); white-space: nowrap; }
-.sum-row { display: flex; justify-content: space-between; padding: 9px 0; border-top: 0.5px solid var(--border); margin-top: 6px; }
-.sum-lbl { font-size: 13px; font-weight: 600; color: var(--black); }
-.sum-val { font-size: 13px; font-weight: 600; color: var(--black); }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #444; }
+.legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.section-lbl { font-size: 11px; color: var(--gray1); margin: 9px 0 6px; }
+.detail-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 0.5px solid #f5f5f5; }
+.detail-left { font-size: 13px; color: #333; line-height: 1.5; }
+.detail-sub { font-size: 11px; color: var(--gray1); }
+.detail-right { font-size: 13px; font-weight: 500; color: var(--black); white-space: nowrap; }
+.sum-row { display: flex; justify-content: space-between; padding: 10px 0; border-top: 0.5px solid var(--border); margin-top: 6px; }
+.sum-lbl { font-size: 14px; font-weight: 600; color: var(--black); }
+.sum-val { font-size: 14px; font-weight: 600; color: var(--black); }
 
 /* カテゴリ編集モーダル */
-.cat-edit-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; border: 0.5px solid #eee; margin-bottom: 4px; }
-.cat-edit-input { border: none; outline: none; font-size: 13px; color: var(--black); background: transparent; flex: 1; border-bottom: 0.5px solid var(--gray3); padding-bottom: 2px; font-family: var(--font); }
-.cat-add-btn { text-align: center; font-size: 12px; color: #666; border: 0.5px dashed var(--gray3); border-radius: 8px; padding: 10px; margin-top: 4px; cursor: pointer; }
+.cat-edit-item { display: flex; align-items: center; gap: 9px; padding: 9px 11px; border-radius: 8px; border: 0.5px solid #eee; margin-bottom: 5px; }
+.cat-edit-input { border: none; outline: none; font-size: 14px; color: var(--black); background: transparent; flex: 1; border-bottom: 0.5px solid var(--gray3); padding-bottom: 2px; font-family: var(--font); }
+.cat-add-btn { text-align: center; font-size: 13px; color: #666; border: 0.5px dashed var(--gray3); border-radius: 8px; padding: 11px; margin-top: 5px; cursor: pointer; }
 
 /* 為替レートモーダル */
-.fx-modal-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 0.5px solid #f5f5f5; }
-.fx-modal-lbl { font-size: 13px; color: #444; }
-.fx-modal-input { border: 0.5px solid var(--gray3); border-radius: 6px; padding: 6px 10px; font-size: 13px; color: var(--black); font-family: var(--font); width: 110px; text-align: right; outline: none; }
+.fx-modal-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 0.5px solid #f5f5f5; }
+.fx-modal-lbl { font-size: 14px; color: #333; }
+.fx-modal-input { border: 0.5px solid var(--gray3); border-radius: 6px; padding: 7px 11px; font-size: 14px; color: var(--black); font-family: var(--font); width: 120px; text-align: right; outline: none; }
 .fx-modal-input:focus { border-color: var(--black); }
 
-/* ===== 編集モーダル ===== */
-.edit-modal-date { font-size: 11px; color: var(--gray1); margin-bottom: 14px; }
-.delete-btn { width: 100%; border: 0.5px solid #e0a0a0; border-radius: 10px; padding: 12px; font-size: 14px; color: #c0392b; text-align: center; cursor: pointer; background: #fff8f8; font-family: var(--font); margin-top: 4px; }
+/* 編集モーダル */
+.delete-btn { width: 100%; border: 0.5px solid #e0a0a0; border-radius: 10px; padding: 13px; font-size: 15px; color: #c0392b; text-align: center; cursor: pointer; background: #fff8f8; font-family: var(--font); margin-top: 5px; }
 .delete-btn:active { opacity: 0.7; }
 
-/* トースト（取り消し付き） */
-.toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); background: rgba(20,20,20,0.88); color: #fff; padding: 11px 18px; border-radius: 22px; font-size: 13px; z-index: 9999; pointer-events: none; opacity: 0; transition: opacity 0.2s; display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+/* トースト */
+.toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); background: rgba(20,20,20,0.88); color: #fff; padding: 12px 20px; border-radius: 24px; font-size: 14px; z-index: 9999; pointer-events: none; opacity: 0; transition: opacity 0.2s; display: flex; align-items: center; gap: 14px; white-space: nowrap; }
 .toast.show { opacity: 1; pointer-events: auto; }
-.toast-undo { font-size: 13px; color: #f0c060; font-weight: 600; cursor: pointer; border-left: 1px solid rgba(255,255,255,0.25); padding-left: 12px; }
+.toast-undo { font-size: 14px; color: #f0c060; font-weight: 600; cursor: pointer; border-left: 1px solid rgba(255,255,255,0.25); padding-left: 14px; }
 
 /* 数字キーボード */
 .numpad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 1000; align-items: flex-end; }
 .numpad-overlay.open { display: flex; }
-.numpad-sheet { width: 100%; max-width: 430px; margin: 0 auto; background: #f2f2f7; border-radius: 16px 16px 0 0; padding: 12px 8px 20px; }
-.numpad-display { text-align: right; font-size: 28px; font-weight: 500; color: var(--black); padding: 6px 16px 10px; min-height: 50px; }
+.numpad-sheet { width: 100%; max-width: 430px; margin: 0 auto; background: #f2f2f7; border-radius: 16px 16px 0 0; padding: 12px 8px 24px; }
+.numpad-display { text-align: right; font-size: 30px; font-weight: 500; color: var(--black); padding: 6px 18px 10px; min-height: 52px; }
 .numpad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.numpad-key { background: var(--white); border-radius: 10px; padding: 16px 0; font-size: 20px; font-weight: 400; text-align: center; cursor: pointer; color: var(--black); box-shadow: 0 1px 0 rgba(0,0,0,0.15); user-select: none; }
+.numpad-key { background: var(--white); border-radius: 10px; padding: 17px 0; font-size: 22px; font-weight: 400; text-align: center; cursor: pointer; color: var(--black); box-shadow: 0 1px 0 rgba(0,0,0,0.15); user-select: none; }
 .numpad-key:active { opacity: 0.6; }
-.numpad-key.dark { background: #aeb4bc; font-size: 16px; }
-.numpad-key.done { background: var(--black); color: var(--white); font-size: 15px; font-weight: 600; }
+.numpad-key.dark { background: #aeb4bc; font-size: 17px; }
+.numpad-key.done { background: var(--black); color: var(--white); font-size: 16px; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -231,7 +243,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
   <!-- ローディング -->
   <div id="screen-loading" class="screen active">
     <div class="loading-icon">
-      <svg width="34" height="34" viewBox="0 0 32 32">
+      <svg width="36" height="36" viewBox="0 0 32 32">
         <path d="M16 24C16 24 6 18 6 12C6 8.5 9 6 12.5 7C14.5 7.8 15.5 9.8 16 11C16.5 9.8 17.5 7.8 19.5 7C23 6 26 8.5 26 12C26 18 16 24 16 24Z" fill="#c97a7a" opacity="0.35"/>
         <text x="16" y="21" font-family="-apple-system,sans-serif" font-size="15" font-weight="500" fill="#b8962e" text-anchor="middle">¥</text>
       </svg>
@@ -248,7 +260,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
   <div id="screen-top" class="screen">
     <div class="top-body">
       <div class="app-icon">
-        <svg width="34" height="34" viewBox="0 0 32 32">
+        <svg width="36" height="36" viewBox="0 0 32 32">
           <path d="M16 24C16 24 6 18 6 12C6 8.5 9 6 12.5 7C14.5 7.8 15.5 9.8 16 11C16.5 9.8 17.5 7.8 19.5 7C23 6 26 8.5 26 12C26 18 16 24 16 24Z" fill="#c97a7a" opacity="0.35"/>
           <text x="16" y="21" font-family="-apple-system,sans-serif" font-size="15" font-weight="500" fill="#b8962e" text-anchor="middle">¥</text>
         </svg>
@@ -282,7 +294,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
   <div id="screen-guide" class="screen">
     <div class="guide-body">
       <div class="app-icon">
-        <svg width="34" height="34" viewBox="0 0 32 32">
+        <svg width="36" height="36" viewBox="0 0 32 32">
           <path d="M16 24C16 24 6 18 6 12C6 8.5 9 6 12.5 7C14.5 7.8 15.5 9.8 16 11C16.5 9.8 17.5 7.8 19.5 7C23 6 26 8.5 26 12C26 18 16 24 16 24Z" fill="#c97a7a" opacity="0.35"/>
           <text x="16" y="21" font-family="-apple-system,sans-serif" font-size="15" font-weight="500" fill="#b8962e" text-anchor="middle">¥</text>
         </svg>
@@ -301,7 +313,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     <div class="input-body">
       <div class="date-row" id="input-date-row">
         <span id="input-date-display"></span>
-        <span style="color:var(--gray2);font-size:11px;">▼</span>
+        <span style="color:var(--gray2);font-size:12px;">▼</span>
       </div>
       <div class="lbl-mini">誰が</div>
       <div class="toggle-group" id="toggle-paid-by">
@@ -317,7 +329,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
       </div>
       <div class="divider"></div>
       <input class="text-input" id="input-memo" placeholder="例：長浜ラーメン" maxlength="30" />
-      <div class="toggle-group" style="margin-top:8px;" id="toggle-method">
+      <div class="toggle-group" style="margin-top:9px;" id="toggle-method">
         <div class="toggle-btn" data-value="barcode">バーコード</div>
         <div class="toggle-btn active" data-value="card">カード</div>
         <div class="toggle-btn" data-value="cash">現金</div>
@@ -329,7 +341,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
       <div class="divider"></div>
       <div class="input-cat-grid" id="input-cat-grid"></div>
       <div class="cat-edit-link" id="btn-cat-edit-input">カテゴリを編集</div>
-      <button class="primary-btn" id="btn-add-expense" style="margin-top:10px;">追加する</button>
+      <button class="primary-btn" id="btn-add-expense" style="margin-top:11px;">追加する</button>
     </div>
   </div>
 
@@ -341,8 +353,16 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
       <div class="month-nav-arrow" id="btn-next-month">▶</div>
     </div>
     <div class="summary-scroll">
-      <div class="filter-wrap">
-        <div class="filter-btn" id="filter-btn">全て ▾</div>
+      <!-- フィルター＋明細ボタン -->
+      <div class="summary-header">
+        <div class="filter-wrap">
+          <div class="filter-btn" id="filter-btn">
+            <span id="filter-label">全て</span>
+            <span class="filter-btn-arrow">▾</span>
+          </div>
+          <div class="filter-dropdown" id="filter-dropdown"></div>
+        </div>
+        <div class="detail-nav-btn" id="btn-go-list">明細</div>
       </div>
       <div class="chart-area">
         <canvas id="summary-chart" width="160" height="160" style="max-width:160px;max-height:160px;"></canvas>
@@ -361,13 +381,12 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
         <div class="settle-detail-btn" id="btn-settle-detail">詳細 →</div>
       </div>
       <div class="loan-btn" id="btn-add-loan">＋ 貸し借りを追加</div>
-      <div class="list-link" id="btn-go-list">一覧を見る →</div>
       <div class="share-link" id="btn-share-url">URLを共有 / ホーム画面に追加</div>
       <div class="csv-btn" id="btn-csv">データを出力する（CSV）</div>
     </div>
   </div>
 
-  <!-- 一覧画面 -->
+  <!-- 明細画面 -->
   <div id="screen-list" class="screen">
     <div class="list-nav">
       <div class="list-nav-back" id="btn-list-back">← 集計</div>
@@ -393,7 +412,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
       <canvas id="settle-chart" width="120" height="120" style="max-width:120px;max-height:120px;"></canvas>
       <div class="chart-center" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">
         <div class="chart-center-lbl">合計</div>
-        <div class="chart-center-amt" id="settle-chart-total" style="font-size:12px;"></div>
+        <div class="chart-center-amt" id="settle-chart-total" style="font-size:13px;"></div>
       </div>
     </div>
     <div class="legend-row" id="settle-legend"></div>
@@ -419,7 +438,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     <div class="modal-header"><span class="modal-title">カテゴリを編集</span></div>
     <div id="cat-edit-list"></div>
     <div class="cat-add-btn" id="btn-cat-add">＋ カテゴリを追加（あと<span id="cat-add-remain">0</span>個）</div>
-    <button class="primary-btn" id="btn-cat-save" style="margin-top:10px;">保存する</button>
+    <button class="primary-btn" id="btn-cat-save" style="margin-top:11px;">保存する</button>
     <div class="modal-close-btn" id="btn-cat-cancel">キャンセル</div>
   </div>
 </div>
@@ -431,9 +450,9 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
       <span class="modal-title">為替レートを入力</span>
       <span class="modal-sub" id="fx-modal-month"></span>
     </div>
-    <p style="font-size:11px;color:var(--gray1);margin-bottom:12px;">外貨の記録があります。集計のため1外貨あたりの円レートを入力してください。</p>
+    <p style="font-size:13px;color:var(--gray1);margin-bottom:13px;">外貨の記録があります。集計のため1外貨あたりの円レートを入力してください。</p>
     <div id="fx-input-rows"></div>
-    <button class="primary-btn" id="btn-fx-save" style="margin-top:12px;">保存する</button>
+    <button class="primary-btn" id="btn-fx-save" style="margin-top:13px;">保存する</button>
   </div>
 </div>
 
@@ -457,19 +476,19 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
       <div class="toggle-btn" data-value="person2" id="edit-for-p2">-</div>
     </div>
     <div class="divider"></div>
-    <input class="text-input" id="edit-memo" placeholder="何に使ったか" maxlength="30" style="margin-bottom:8px;" />
+    <input class="text-input" id="edit-memo" placeholder="何に使ったか" maxlength="30" style="margin-bottom:9px;" />
     <div class="toggle-group" id="edit-toggle-method">
       <div class="toggle-btn" data-value="barcode">バーコード</div>
       <div class="toggle-btn active" data-value="card">カード</div>
       <div class="toggle-btn" data-value="cash">現金</div>
     </div>
-    <div class="amount-row" id="edit-amount-row" style="margin-top:8px;">
+    <div class="amount-row" id="edit-amount-row" style="margin-top:9px;">
       <div class="currency-badge" id="edit-currency-badge">¥</div>
       <div class="amount-display" id="edit-amount-display">0</div>
     </div>
     <div class="divider"></div>
     <div class="input-cat-grid" id="edit-cat-grid"></div>
-    <button class="primary-btn" id="btn-edit-save" style="margin-top:12px;">保存する</button>
+    <button class="primary-btn" id="btn-edit-save" style="margin-top:13px;">保存する</button>
     <div class="delete-btn" id="btn-edit-delete">この記録を削除する</div>
     <div class="modal-close-btn" id="btn-edit-cancel">キャンセル</div>
   </div>
@@ -524,13 +543,13 @@ const state = {
   roomId: null, meta: null,
   expenses: {}, loans: {}, fxRates: {},
   summary: { yearMonth: currentYearMonth(), filter: "all" },
-  list: { yearMonth: currentYearMonth() },
+  list: { yearMonth: currentYearMonth(), filterCategory: null },
   input: { date: todayString(), paidBy: "both", forWhom: "both", memo: "", method: "card", amount: 0, currency: "JPY", category: null }
 };
 
 let summaryChart = null, settleChart = null;
 let editingExpenseId = null, editState = {};
-let numpadValue = "0", numpadTarget = "input"; // "input" | "edit"
+let numpadValue = "0", numpadTarget = "input";
 let deleteUndoTimer = null, deleteUndoData = null;
 
 // ===== ユーティリティ =====
@@ -570,17 +589,13 @@ function fmtAmt(n) { return "¥" + Math.abs(Math.round(n)).toLocaleString(); }
 
 function showToast(msg, withUndo = false, duration = 3000) {
   const el = document.getElementById("toast");
-  const msgEl = document.getElementById("toast-msg");
-  const undoEl = document.getElementById("toast-undo");
-  msgEl.textContent = msg;
-  undoEl.style.display = withUndo ? "inline" : "none";
+  document.getElementById("toast-msg").textContent = msg;
+  document.getElementById("toast-undo").style.display = withUndo ? "inline" : "none";
   el.classList.add("show");
   if (el._timer) clearTimeout(el._timer);
   el._timer = setTimeout(() => {
     el.classList.remove("show");
-    if (!withUndo) return;
-    // タイマー切れたら削除確定
-    if (deleteUndoTimer) { commitDelete(); }
+    if (withUndo && deleteUndoTimer) commitDelete();
   }, duration);
 }
 
@@ -595,21 +610,53 @@ function showScreen(id) {
   document.getElementById(id).classList.add("active");
   const showTab = id === "screen-input" || id === "screen-summary";
   document.getElementById("tab-bar").classList.toggle("visible", showTab);
-  if (showTab) {
-    document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === id.replace("screen-","")));
-  }
+  if (showTab) document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === id.replace("screen-","")));
   if (id === "screen-summary") renderSummary();
   if (id === "screen-list") renderList();
+  // フィルタードロップダウンを閉じる
+  document.getElementById("filter-dropdown").classList.remove("open");
 }
 
 // モーダルの背景タップで閉じる
-function setupModalBackgroundClose(modalId) {
-  const overlay = document.getElementById(modalId);
-  overlay.addEventListener("click", e => {
-    if (e.target === overlay) overlay.classList.remove("open");
+["modal-settle","modal-cat-edit","modal-fx","modal-edit"].forEach(modalId => {
+  document.getElementById(modalId).addEventListener("click", e => {
+    if (e.target === document.getElementById(modalId)) document.getElementById(modalId).classList.remove("open");
+  });
+});
+
+// ===== フィルタードロップダウン =====
+function renderFilterDropdown() {
+  const p1 = state.meta?.person1 || "一人目";
+  const p2 = state.meta?.person2 || "二人目";
+  const options = [
+    { value: "all", label: "全て" },
+    { value: "both", label: "共通費" },
+    { value: "person1", label: p1 },
+    { value: "person2", label: p2 },
+  ];
+  const dropdown = document.getElementById("filter-dropdown");
+  dropdown.innerHTML = "";
+  options.forEach(opt => {
+    const el = document.createElement("div");
+    el.className = "filter-option" + (state.summary.filter === opt.value ? " selected" : "");
+    el.textContent = opt.label;
+    el.addEventListener("click", () => {
+      state.summary.filter = opt.value;
+      document.getElementById("filter-label").textContent = opt.label;
+      dropdown.classList.remove("open");
+      renderSummary();
+    });
+    dropdown.appendChild(el);
   });
 }
-["modal-settle","modal-cat-edit","modal-fx","modal-edit"].forEach(setupModalBackgroundClose);
+
+document.getElementById("filter-btn").addEventListener("click", e => {
+  e.stopPropagation();
+  document.getElementById("filter-dropdown").classList.toggle("open");
+});
+document.addEventListener("click", () => {
+  document.getElementById("filter-dropdown").classList.remove("open");
+});
 
 // ===== カテゴリ =====
 const DEFAULT_CATS = ["食費","外食","医療","交通","日用品","衣類","固定費","旅行"];
@@ -766,6 +813,8 @@ function calcSettle(expenses, loans, fxRates, ym) {
 function renderSummary() {
   const ym = state.summary.yearMonth;
   document.getElementById("summary-month-title").textContent = formatYearMonthJP(ym);
+  renderFilterDropdown();
+
   const expenses = state.expenses || {};
   const filter = state.summary.filter;
   const filtered = getFilteredExpenses(expenses, ym, filter);
@@ -801,6 +850,12 @@ function renderSummary() {
     const row = document.createElement("div");
     row.className = "cat-row";
     row.innerHTML = `<div class="cat-left"><div class="color-dot" style="background:${CAT_COLORS[i]};"></div><span class="cat-name-lbl">${cat}</span></div><div class="cat-right">${diffHtml}<span class="cat-amt-lbl">${fmtAmt(amt)}</span></div>`;
+    // カテゴリ行タップで該当カテゴリの明細へ
+    row.addEventListener("click", () => {
+      state.list.yearMonth = ym;
+      state.list.filterCategory = cat;
+      showScreen("screen-list");
+    });
     listEl.appendChild(row);
   });
 
@@ -812,7 +867,7 @@ function renderSummary() {
     let html = "";
     currencies.forEach(cur => {
       const rate = monthFx[cur];
-      html += `<div class="fx-row"><span style="font-size:11px;color:var(--gray1);">1${cur} = ${rate ? rate + "円" : "未設定"}</span><span class="fx-edit" id="fx-edit-trigger">編集</span></div>`;
+      html += `<div class="fx-row"><span style="font-size:12px;color:var(--gray1);">1${cur} = ${rate ? rate + "円" : "未設定"}</span><span class="fx-edit" id="fx-edit-trigger">編集</span></div>`;
     });
     html += '<div class="divider"></div>';
     fxArea.innerHTML = html;
@@ -934,22 +989,11 @@ document.getElementById("btn-fx-save").addEventListener("click", async () => {
 document.getElementById("btn-prev-month").addEventListener("click", () => { state.summary.yearMonth = prevYearMonth(state.summary.yearMonth); renderSummary(); });
 document.getElementById("btn-next-month").addEventListener("click", () => { state.summary.yearMonth = nextYearMonth(state.summary.yearMonth); renderSummary(); });
 
-// ===== フィルター =====
-document.getElementById("filter-btn").addEventListener("click", () => {
-  const filters = ["all","both","person1","person2"];
-  const p1 = state.meta?.person1 || "一人目";
-  const p2 = state.meta?.person2 || "二人目";
-  const labels = { all:"全て", both:"共通費", person1:p1, person2:p2 };
-  const next = filters[(filters.indexOf(state.summary.filter) + 1) % filters.length];
-  state.summary.filter = next;
-  document.getElementById("filter-btn").textContent = labels[next] + " ▾";
-  renderSummary();
-});
-
 // ===== 各種ボタン =====
 document.getElementById("btn-add-loan").addEventListener("click", () => showToast("貸し借り入力は近日実装予定です"));
 document.getElementById("btn-go-list").addEventListener("click", () => {
   state.list.yearMonth = state.summary.yearMonth;
+  state.list.filterCategory = null;
   showScreen("screen-list");
 });
 document.getElementById("btn-share-url").addEventListener("click", () => {
@@ -958,16 +1002,20 @@ document.getElementById("btn-share-url").addEventListener("click", () => {
 });
 document.getElementById("btn-csv").addEventListener("click", () => showToast("CSV出力は近日実装予定です"));
 
-// ===== 一覧画面 =====
+// ===== 明細画面 =====
 function renderList() {
   const ym = state.list.yearMonth;
-  document.getElementById("list-title").textContent = formatYearMonthJP(ym) + "　一覧";
+  const catFilter = state.list.filterCategory;
+  const title = catFilter ? `${formatYearMonthJP(ym)}　${catFilter}` : `${formatYearMonthJP(ym)}　明細`;
+  document.getElementById("list-title").textContent = title;
 
   const expenses = state.expenses || {};
   const fxRates = state.fxRates || {};
-  const exps = Object.entries(expenses)
+  let exps = Object.entries(expenses)
     .filter(([, e]) => e.date.startsWith(ym))
     .sort(([, a], [, b]) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
+
+  if (catFilter) exps = exps.filter(([, e]) => e.category === catFilter);
 
   const scroll = document.getElementById("list-scroll");
   scroll.innerHTML = "";
@@ -979,7 +1027,6 @@ function renderList() {
 
   const p1 = state.meta?.person1 || "一人目";
   const p2 = state.meta?.person2 || "二人目";
-
   const paidByLabel = v => v === "both" ? "二人" : v === "person1" ? p1 : p2;
   const forWhomLabel = v => v === "both" ? "二人分" : v === "person1" ? `${p1}の分` : `${p2}の分`;
   const methodLabel = v => v === "barcode" ? "バーコード" : v === "card" ? "カード" : "現金";
@@ -993,17 +1040,12 @@ function renderList() {
       scroll.appendChild(header);
       lastDate = e.date;
     }
-
     const row = document.createElement("div");
     row.className = "record-row";
-
     const cats = state.meta?.categories || [];
     const catIdx = cats.indexOf(e.category);
     const catColor = catIdx >= 0 ? CAT_COLORS[catIdx] : "#aaa";
-    const amtDisplay = e.currency && e.currency !== "JPY"
-      ? `${e.currency} ${e.amount.toLocaleString()}`
-      : fmtAmt(e.amount);
-
+    const amtDisplay = e.currency && e.currency !== "JPY" ? `${e.currency} ${e.amount.toLocaleString()}` : fmtAmt(e.amount);
     row.innerHTML = `
       <span class="cat-badge" style="border-color:${catColor};color:${catColor};">${e.category || "?"}</span>
       <div class="record-main">
@@ -1014,21 +1056,25 @@ function renderList() {
         <div class="record-amount">${amtDisplay}</div>
         <div class="record-method">${methodLabel(e.method)}</div>
       </div>`;
-
     row.addEventListener("click", () => openEditModal(id, e));
     scroll.appendChild(row);
   });
 }
 
 document.getElementById("btn-list-back").addEventListener("click", () => showScreen("screen-summary"));
-document.getElementById("btn-list-prev").addEventListener("click", () => { state.list.yearMonth = prevYearMonth(state.list.yearMonth); renderList(); });
-document.getElementById("btn-list-next").addEventListener("click", () => { state.list.yearMonth = nextYearMonth(state.list.yearMonth); renderList(); });
+document.getElementById("btn-list-prev").addEventListener("click", () => {
+  state.list.yearMonth = prevYearMonth(state.list.yearMonth);
+  renderList();
+});
+document.getElementById("btn-list-next").addEventListener("click", () => {
+  state.list.yearMonth = nextYearMonth(state.list.yearMonth);
+  renderList();
+});
 
 // ===== 編集モーダル =====
 function openEditModal(id, expense) {
   editingExpenseId = id;
   editState = { ...expense };
-
   const p1 = state.meta?.person1 || "一人目";
   const p2 = state.meta?.person2 || "二人目";
   document.getElementById("edit-paid-p1").textContent = p1;
@@ -1037,27 +1083,19 @@ function openEditModal(id, expense) {
   document.getElementById("edit-for-p2").textContent = p2;
   document.getElementById("edit-modal-date").textContent = formatDateJP(expense.date);
   document.getElementById("edit-memo").value = expense.memo || "";
-
-  // トグル設定
   setEditToggle("edit-toggle-paid-by", expense.paidBy);
   setEditToggle("edit-toggle-for-whom", expense.forWhom);
   setEditToggle("edit-toggle-method", expense.method);
-
-  // 金額
   document.getElementById("edit-amount-display").textContent = expense.amount.toLocaleString();
   document.getElementById("edit-currency-badge").textContent = expense.currency === "JPY" ? "¥" : expense.currency;
-
   renderEditCatGrid();
   document.getElementById("modal-edit").classList.add("open");
 }
 
 function setEditToggle(groupId, value) {
-  document.querySelectorAll(`#${groupId} .toggle-btn`).forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.value === value);
-  });
+  document.querySelectorAll(`#${groupId} .toggle-btn`).forEach(btn => btn.classList.toggle("active", btn.dataset.value === value));
 }
 
-// 編集トグル
 ["edit-toggle-paid-by","edit-toggle-for-whom","edit-toggle-method"].forEach(groupId => {
   document.getElementById(groupId).addEventListener("click", e => {
     const btn = e.target.closest(".toggle-btn");
@@ -1070,7 +1108,6 @@ function setEditToggle(groupId, value) {
 });
 
 document.getElementById("edit-memo").addEventListener("input", e => { editState.memo = e.target.value; });
-
 document.getElementById("edit-amount-row").addEventListener("click", () => {
   numpadTarget = "edit";
   numpadValue = editState.amount > 0 ? String(editState.amount) : "0";
@@ -1084,12 +1121,8 @@ document.getElementById("btn-edit-save").addEventListener("click", async () => {
   if (!editState.category) { showToast("カテゴリを選択してください"); return; }
   try {
     await update(ref(db, `rooms/${state.roomId}/expenses/${editingExpenseId}`), {
-      memo: editState.memo.trim(),
-      paidBy: editState.paidBy,
-      forWhom: editState.forWhom,
-      method: editState.method,
-      amount: editState.amount,
-      category: editState.category,
+      memo: editState.memo.trim(), paidBy: editState.paidBy, forWhom: editState.forWhom,
+      method: editState.method, amount: editState.amount, category: editState.category,
     });
     document.getElementById("modal-edit").classList.remove("open");
     showToast("更新しました ✓");
@@ -1097,28 +1130,18 @@ document.getElementById("btn-edit-save").addEventListener("click", async () => {
     if (document.getElementById("screen-summary").classList.contains("active")) renderSummary();
   } catch(e) { showToast("保存に失敗しました"); }
 });
-
 document.getElementById("btn-edit-cancel").addEventListener("click", () => { document.getElementById("modal-edit").classList.remove("open"); });
 
 // ===== 削除（取り消し付き） =====
 document.getElementById("btn-edit-delete").addEventListener("click", () => {
   const id = editingExpenseId;
   const data = { ...state.expenses[id] };
-
   document.getElementById("modal-edit").classList.remove("open");
-
-  // ローカルから先に消す（見た目を即座に更新）
   delete state.expenses[id];
   renderList();
   if (document.getElementById("screen-summary").classList.contains("active")) renderSummary();
-
-  // 取り消しデータを保存
   deleteUndoData = { id, data };
-
-  // 取り消しトースト表示
   showToast("削除しました", true, 4000);
-
-  // 4秒後に本当に削除
   if (deleteUndoTimer) clearTimeout(deleteUndoTimer);
   deleteUndoTimer = setTimeout(commitDelete, 4000);
 });
@@ -1126,17 +1149,12 @@ document.getElementById("btn-edit-delete").addEventListener("click", () => {
 async function commitDelete() {
   if (!deleteUndoData) return;
   const { id } = deleteUndoData;
-  deleteUndoData = null;
-  deleteUndoTimer = null;
-  try {
-    await remove(ref(db, `rooms/${state.roomId}/expenses/${id}`));
-  } catch(e) { console.error("削除失敗", e); }
+  deleteUndoData = null; deleteUndoTimer = null;
+  try { await remove(ref(db, `rooms/${state.roomId}/expenses/${id}`)); } catch(e) { console.error(e); }
 }
 
-// 取り消しボタン
 document.getElementById("toast-undo").addEventListener("click", () => {
   if (!deleteUndoData) return;
-  // ローカルに戻す
   state.expenses[deleteUndoData.id] = deleteUndoData.data;
   deleteUndoData = null;
   if (deleteUndoTimer) { clearTimeout(deleteUndoTimer); deleteUndoTimer = null; }
@@ -1164,7 +1182,6 @@ function setupToggleGroup(groupId, stateKey) {
   });
 }
 
-// 数字キーボード
 function openNumpad() {
   numpadTarget = "input";
   numpadValue = state.input.amount > 0 ? String(state.input.amount) : "0";
@@ -1179,13 +1196,8 @@ document.querySelectorAll(".numpad-key").forEach(key => {
     const k = key.dataset.key;
     if (k === "done") {
       const val = parseInt(numpadValue) || 0;
-      if (numpadTarget === "input") {
-        state.input.amount = val;
-        updateAmountDisplay();
-      } else {
-        editState.amount = val;
-        document.getElementById("edit-amount-display").textContent = val.toLocaleString();
-      }
+      if (numpadTarget === "input") { state.input.amount = val; updateAmountDisplay(); }
+      else { editState.amount = val; document.getElementById("edit-amount-display").textContent = val.toLocaleString(); }
       closeNumpad();
     } else if (k === "del") {
       numpadValue = numpadValue.length > 1 ? numpadValue.slice(0,-1) : "0";
