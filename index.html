@@ -99,9 +99,9 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .toggle-group { display: flex; gap: 4px; }
 .toggle-btn {
   flex: 1; padding: 10px 0; border-radius: 8px;
-  border: 1px solid #bbb; /* 未選択でも見やすい枠線 */
+  border: 1px solid #bbb;
   font-size: 13px; text-align: center;
-  background: var(--white); color: #777; /* 未選択文字を濃く */
+  background: var(--white); color: #777;
   cursor: pointer; font-family: var(--font); transition: all 0.1s;
 }
 .toggle-btn.active {
@@ -113,9 +113,9 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .text-input::placeholder { color: #bbb; }
 .amount-row { display: flex; align-items: center; border: 1px solid #bbb; border-radius: 8px; padding: 10px 12px; gap: 8px; margin-top: 8px; }
 .currency-badge {
-  font-size: 15px; color: #444; padding: 3px 8px; border-radius: 5px;
+  font-size: 14px; color: #444; padding: 3px 8px; border-radius: 5px;
   border: 1px solid #999; font-weight: 500; flex-shrink: 0;
-  cursor: pointer; background: #f8f8f8;
+  cursor: pointer; background: #f8f8f8; min-width: 36px; text-align: center;
 }
 .currency-badge:active { opacity: 0.7; }
 .amount-display { font-size: 20px; font-weight: 500; color: var(--black); flex: 1; cursor: pointer; }
@@ -126,15 +126,30 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .input-cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; width: 100%; }
 .input-cat-btn {
   padding: 9px 0; border-radius: 7px;
-  border: 1px solid #bbb; /* 未選択も見やすく */
+  border: 1px solid #bbb;
   font-size: 12px; text-align: center;
-  background: var(--white); color: #777; /* 未選択文字を濃く */
+  background: var(--white); color: #777;
   cursor: pointer; font-family: var(--font); transition: all 0.1s;
 }
 .input-cat-btn.active {
   border: 2px solid var(--black); color: var(--black); font-weight: 600; background: #f5f5f5;
 }
 .cat-edit-link { text-align: center; font-size: 12px; color: #666; padding: 7px 0 2px; cursor: pointer; font-weight: 500; }
+
+/* ===== 通貨選択モーダル（修正版） ===== */
+.currency-option {
+  display: flex; align-items: center;
+  padding: 13px 12px; border-bottom: 0.5px solid #ececec; cursor: pointer;
+  border-radius: 8px; margin-bottom: 2px; gap: 10px;
+}
+.currency-option:last-child { border-bottom: none; }
+.currency-option:active { background: #f0f0f0; }
+.currency-option.selected { background: #f5f3ef; }
+.currency-check { width: 18px; height: 18px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.currency-check-mark { font-size: 15px; color: var(--black); font-weight: 700; }
+.currency-option-name { font-size: 15px; color: var(--black); flex: 1; }
+.currency-option.selected .currency-option-name { font-weight: 600; }
+.currency-option-symbol { font-size: 14px; color: #888; min-width: 32px; text-align: right; }
 
 /* ===== 集計画面 ===== */
 .month-nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 0.5px solid var(--border); flex-shrink: 0; background: var(--white); }
@@ -176,12 +191,12 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .fx-edit { font-size: 12px; color: #555; border-bottom: 1px solid #999; cursor: pointer; font-weight: 500; }
 .fx-usage { font-size: 12px; color: #666; padding: 2px 0 0; }
 
-/* カテゴリ編集リンク（集計画面） */
 .cat-edit-link-summary { text-align: center; font-size: 12px; color: #555; padding: 7px 0 2px; cursor: pointer; font-weight: 500; }
 
 .settle-box { background: #f5f3ef; border-radius: 10px; padding: 11px 13px; margin-top: 8px; }
 .settle-lbl { font-size: 11px; color: var(--gray1); margin-bottom: 6px; }
-.settle-main { font-size: 14px; font-weight: 500; color: var(--black); margin-bottom: 9px; line-height: 1.5; }
+.settle-main { font-size: 14px; font-weight: 500; color: var(--black); margin-bottom: 4px; line-height: 1.6; }
+.settle-sub { font-size: 12px; color: #666; margin-bottom: 9px; line-height: 1.6; }
 .settle-detail-btn { text-align: center; font-size: 13px; color: #555; border: 0.5px solid var(--gray3); border-radius: 7px; padding: 7px; cursor: pointer; background: var(--white); }
 .loan-btn { text-align: center; font-size: 13px; color: #555; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 10px; margin-top: 10px; cursor: pointer; }
 .share-btn { text-align: center; font-size: 12px; color: #555; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 9px; margin-top: 6px; cursor: pointer; }
@@ -197,8 +212,25 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .list-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .list-scroll::-webkit-scrollbar { display: none; }
 .date-group-header { padding: 6px 16px 5px; font-size: 11px; color: var(--gray1); background: #f8f8f8; border-bottom: 0.5px solid #ececec; }
-.record-row { display: flex; align-items: center; padding: 12px 16px; border-bottom: 0.5px solid #ececec; gap: 10px; cursor: pointer; }
+
+/* スワイプ削除 */
+.record-row-wrap { position: relative; overflow: hidden; }
+.record-row {
+  display: flex; align-items: center; padding: 12px 16px;
+  border-bottom: 0.5px solid #ececec; gap: 10px; cursor: pointer;
+  background: var(--white);
+  transform: translateX(0);
+  transition: transform 0.2s ease;
+  position: relative; z-index: 1;
+}
 .record-row:active { background: #f8f8f8; }
+.swipe-delete-btn {
+  position: absolute; right: 0; top: 0; bottom: 0;
+  width: 80px; background: #e74c3c; color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  z-index: 0;
+}
 .cat-badge { font-size: 11px; padding: 3px 8px; border-radius: 99px; background: #f5f5f5; color: #555; white-space: nowrap; border: 0.5px solid #ccc; flex-shrink: 0; }
 .record-main { flex: 1; min-width: 0; }
 .record-memo { font-size: 14px; color: var(--black); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -228,9 +260,14 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .detail-left { font-size: 13px; color: #333; line-height: 1.5; }
 .detail-sub { font-size: 11px; color: var(--gray1); }
 .detail-right { font-size: 13px; font-weight: 500; color: var(--black); white-space: nowrap; }
-.sum-row { display: flex; justify-content: space-between; padding: 10px 0; border-top: 0.5px solid var(--border); margin-top: 6px; }
+.sum-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 0 4px; border-top: 0.5px solid var(--border); margin-top: 6px; }
 .sum-lbl { font-size: 14px; font-weight: 600; color: var(--black); }
-.sum-val { font-size: 14px; font-weight: 600; color: var(--black); }
+.sum-val-wrap { text-align: right; }
+.sum-val { font-size: 14px; font-weight: 600; color: var(--black); display: block; }
+.sum-formula { font-size: 11px; color: #888; margin-top: 3px; line-height: 1.6; }
+/* 共通口座表示 */
+.settle-alt { font-size: 12px; color: #666; margin-top: 5px; padding: 7px 10px; background: #f8f6f2; border-radius: 7px; line-height: 1.6; }
+.settle-alt-lbl { font-size: 10px; color: #aaa; margin-bottom: 2px; }
 
 /* カテゴリ編集モーダル */
 .cat-edit-item { display: flex; align-items: center; gap: 9px; padding: 9px 11px; border-radius: 8px; border: 0.5px solid #e0e0e0; margin-bottom: 5px; }
@@ -242,15 +279,6 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .fx-modal-lbl { font-size: 14px; color: #333; }
 .fx-modal-input { border: 0.5px solid var(--gray3); border-radius: 6px; padding: 7px 11px; font-size: 14px; color: var(--black); font-family: var(--font); width: 120px; text-align: right; outline: none; }
 .fx-modal-input:focus { border-color: var(--black); }
-
-/* 通貨選択モーダル */
-.currency-option { display: flex; align-items: center; justify-content: space-between; padding: 13px 4px; border-bottom: 0.5px solid #ececec; cursor: pointer; }
-.currency-option:last-child { border-bottom: none; }
-.currency-option:active { background: #f8f8f8; }
-.currency-option-name { font-size: 15px; color: var(--black); }
-.currency-option-symbol { font-size: 14px; color: #888; }
-.currency-option.selected .currency-option-name { font-weight: 600; }
-.currency-option.selected::after { content: "✓"; font-size: 16px; color: var(--black); }
 
 /* 編集モーダル */
 .delete-btn { width: 100%; border: 0.5px solid #e0a0a0; border-radius: 10px; padding: 13px; font-size: 15px; color: #c0392b; text-align: center; cursor: pointer; background: #fff8f8; font-family: var(--font); margin-top: 5px; }
@@ -365,14 +393,12 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
         <div class="toggle-btn" data-value="person2" id="toggle-for-p2">-</div>
       </div>
       <div class="divider"></div>
-      <!-- 支払方法を上に -->
       <div class="lbl-mini" style="margin-top:0;">支払方法</div>
       <div class="toggle-group" id="toggle-method">
         <div class="toggle-btn" data-value="barcode">バーコード</div>
         <div class="toggle-btn active" data-value="card">カード</div>
         <div class="toggle-btn" data-value="cash">現金</div>
       </div>
-      <!-- メモを下に -->
       <input class="text-input" id="input-memo" placeholder="例：長浜ラーメン" maxlength="30" style="margin-top:9px;" />
       <div class="amount-row" id="amount-row" style="margin-top:8px;">
         <div class="currency-badge" id="currency-badge">¥</div>
@@ -417,6 +443,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
       <div class="settle-box">
         <div class="settle-lbl">精算</div>
         <div class="settle-main" id="settle-main-text">計算中...</div>
+        <div class="settle-sub" id="settle-sub-text" style="display:none;"></div>
         <div class="settle-detail-btn" id="btn-settle-detail">詳細 →</div>
       </div>
       <div class="loan-btn" id="btn-add-loan">＋ 貸し借りを追加</div>
@@ -429,7 +456,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
   <!-- 明細画面 -->
   <div id="screen-list" class="screen">
     <div class="list-nav">
-      <div class="list-nav-back" id="btn-list-back">← 集計</div>
+      <div class="list-nav-back" id="btn-list-back">← 戻る</div>
       <div class="list-nav-title" id="list-title"></div>
       <div style="display:flex;gap:0;">
         <div class="list-nav-arrow" id="btn-list-prev">◀</div>
@@ -456,7 +483,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
       </div>
     </div>
     <div class="legend-row" id="settle-legend"></div>
-    <div class="section-lbl">共通費の差額</div>
+    <div class="section-lbl">共通費</div>
     <div id="settle-common-rows"></div>
     <div style="height:0.5px;background:#e0e0e0;margin:6px 0;"></div>
     <div class="section-lbl">立替</div>
@@ -466,7 +493,11 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     <div id="settle-loan-row"></div>
     <div class="sum-row">
       <span class="sum-lbl">最終精算</span>
-      <span class="sum-val" id="settle-final-text"></span>
+      <div class="sum-val-wrap">
+        <span class="sum-val" id="settle-final-text"></span>
+        <span class="sum-formula" id="settle-formula"></span>
+        <div id="settle-common-account-alt"></div>
+      </div>
     </div>
     <div class="modal-close-btn" id="btn-settle-close">閉じる</div>
   </div>
@@ -538,8 +569,8 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     </div>
     <div style="height:0.5px;background:#e0e0e0;margin:11px 0;"></div>
     <div class="input-cat-grid" id="edit-cat-grid"></div>
-    <button class="primary-btn" id="btn-edit-save" style="margin-top:13px;">保存する</button>
-    <div class="delete-btn" id="btn-edit-delete">この記録を削除する</div>
+    <button class="primary-btn" id="btn-edit-save" style="margin-top:13px;">保存</button>
+    <div class="delete-btn" id="btn-edit-delete">削除</div>
     <div class="modal-close-btn" id="btn-edit-cancel">キャンセル</div>
   </div>
 </div>
@@ -581,7 +612,7 @@ const firebaseConfig = {
   databaseURL: "https://kakei-513dd-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "kakei-513dd",
   storageBucket: "kakei-513dd.firebasestorage.app",
-  messagingSenderId: "845734241488",
+  messagingSenderId: "845734241688",
   appId: "1:845734241488:web:636b8a06483666b441aad5"
 };
 const firebaseApp = initializeApp(firebaseConfig);
@@ -589,14 +620,14 @@ const db = getDatabase(firebaseApp);
 
 const CAT_COLORS = ["#c4846a","#b8962e","#7a9abf","#8fba8f","#a0889e","#7aab9e","#888780","#c9a87c"];
 
-// 通貨マスタ
+// 通貨マスタ（CNYの記号を「元」に修正）
 const CURRENCIES = [
   { code: "JPY", symbol: "¥", name: "円" },
   { code: "KRW", symbol: "₩", name: "ウォン" },
   { code: "USD", symbol: "$", name: "ドル" },
   { code: "EUR", symbol: "€", name: "ユーロ" },
   { code: "GBP", symbol: "£", name: "ポンド" },
-  { code: "CNY", symbol: "¥", name: "元" },
+  { code: "CNY", symbol: "元", name: "元" },
   { code: "TWD", symbol: "NT$", name: "台湾ドル" },
 ];
 
@@ -619,7 +650,9 @@ let summaryChart = null, settleChart = null;
 let editingExpenseId = null, editState = {};
 let numpadValue = "0", numpadTarget = "input";
 let deleteUndoTimer = null, deleteUndoData = null;
-let currencyTarget = "input"; // "input" | "edit"
+let currencyTarget = "input";
+// 月切り替えアニメーション制御フラグ
+let isMonthNavigation = false;
 
 // ===== ユーティリティ =====
 function todayString() {
@@ -680,7 +713,10 @@ function showScreen(id) {
   const showTab = id === "screen-input" || id === "screen-summary";
   document.getElementById("tab-bar").classList.toggle("visible", showTab);
   if (showTab) document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === id.replace("screen-","")));
-  if (id === "screen-summary") renderSummary();
+  if (id === "screen-summary") {
+    isMonthNavigation = false;
+    renderSummary();
+  }
   if (id === "screen-list") renderList();
   document.getElementById("filter-dropdown").classList.remove("open");
 }
@@ -692,7 +728,7 @@ function showScreen(id) {
   });
 });
 
-// ===== 通貨選択モーダル =====
+// ===== 通貨選択モーダル（修正版） =====
 function openCurrencyModal(target) {
   currencyTarget = target;
   const currentCode = target === "input" ? state.input.currency : editState.currency;
@@ -701,14 +737,17 @@ function openCurrencyModal(target) {
   CURRENCIES.forEach(cur => {
     const el = document.createElement("div");
     el.className = "currency-option" + (cur.code === currentCode ? " selected" : "");
-    el.innerHTML = `<span class="currency-option-name">${cur.name}</span><span class="currency-option-symbol">${cur.symbol}</span>`;
+    el.innerHTML = `
+      <div class="currency-check">${cur.code === currentCode ? '<span class="currency-check-mark">✓</span>' : ''}</div>
+      <span class="currency-option-name">${cur.name}</span>
+      <span class="currency-option-symbol">${cur.symbol}</span>`;
     el.addEventListener("click", () => {
       if (currencyTarget === "input") {
         state.input.currency = cur.code;
-        document.getElementById("currency-badge").textContent = cur.code === "JPY" ? "¥" : cur.symbol;
+        document.getElementById("currency-badge").textContent = getCurrencySymbol(cur.code);
       } else {
         editState.currency = cur.code;
-        document.getElementById("edit-currency-badge").textContent = cur.code === "JPY" ? "¥" : cur.symbol;
+        document.getElementById("edit-currency-badge").textContent = getCurrencySymbol(cur.code);
       }
       document.getElementById("modal-currency").classList.remove("open");
     });
@@ -904,6 +943,19 @@ function calcSettle(expenses, loans, fxRates, ym) {
   return { total, commonNet, commonAccountNet, advanceNet, loanNet, p1PaidBoth, p2PaidBoth, p1PaidForP2, p2PaidForP1, bothPaidForP1, bothPaidForP2, hasBothPayer };
 }
 
+// 計算式テキスト生成
+function buildFormula(settle) {
+  const parts = [];
+  const c = Math.round(settle.commonNet);
+  const a = Math.round(settle.advanceNet);
+  const l = Math.round(settle.loanNet);
+  if (c !== 0) parts.push(`共通費 ${c > 0 ? "+" : ""}${c.toLocaleString()}`);
+  if (a !== 0) parts.push(`立替 ${a > 0 ? "+" : ""}${a.toLocaleString()}`);
+  if (l !== 0) parts.push(`貸し借り ${l > 0 ? "+" : ""}${l.toLocaleString()}`);
+  if (parts.length <= 1) return "";
+  return parts.join(" ＋ ") + ` ＝ ${Math.round(settle.total).toLocaleString()}円`;
+}
+
 // ===== 集計画面 =====
 function renderSummary() {
   const ym = state.summary.yearMonth;
@@ -934,7 +986,8 @@ function renderSummary() {
 
   const total = Object.values(catTotals).reduce((a, b) => a + b, 0);
   document.getElementById("chart-total").textContent = fmtAmt(total);
-  renderDonutChart("summary-chart", cats.map(c => catTotals[c]), cats.map((_, i) => CAT_COLORS[i]));
+  // 月切り替え時はアニメーションなし
+  renderDonutChart("summary-chart", cats.map(c => catTotals[c]), cats.map((_, i) => CAT_COLORS[i]), isMonthNavigation ? 0 : 400);
 
   const listEl = document.getElementById("cat-list");
   listEl.innerHTML = "";
@@ -986,16 +1039,35 @@ function renderSummary() {
     fxArea.innerHTML = "";
   }
 
+  // 精算エリア
   const settle = calcSettle(expenses, state.loans, fxRates, ym);
   const p1 = state.meta?.person1 || "一人目";
   const p2 = state.meta?.person2 || "二人目";
-  let settleText = "精算なし（ちょうど同額）";
-  if (settle.total > 0) settleText = `${p1} → ${p2} へ ${fmtAmt(settle.total)} 渡す`;
-  else if (settle.total < 0) settleText = `${p2} → ${p1} へ ${fmtAmt(settle.total)} 渡す`;
-  document.getElementById("settle-main-text").textContent = settleText;
+  const tot = settle.total;
+  const hasBothPayer = settle.hasBothPayer;
+
+  let settleMainText = "精算なし（ちょうど同額）";
+  let settleSubText = "";
+
+  if (tot > 0) {
+    settleMainText = `${p1} → ${p2} へ ${fmtAmt(tot)}`;
+    if (hasBothPayer) settleSubText = `または：${p1} が共通口座に ${fmtAmt(Math.abs(tot) * 2)}`;
+  } else if (tot < 0) {
+    settleMainText = `${p2} → ${p1} へ ${fmtAmt(tot)}`;
+    if (hasBothPayer) settleSubText = `または：${p2} が共通口座に ${fmtAmt(Math.abs(tot) * 2)}`;
+  }
+
+  document.getElementById("settle-main-text").textContent = settleMainText;
+  const subEl = document.getElementById("settle-sub-text");
+  if (settleSubText) {
+    subEl.textContent = settleSubText;
+    subEl.style.display = "block";
+  } else {
+    subEl.style.display = "none";
+  }
 }
 
-function renderDonutChart(canvasId, data, colors) {
+function renderDonutChart(canvasId, data, colors, animDuration = 400) {
   const canvas = document.getElementById(canvasId);
   if (!canvas) return;
   const total = data.reduce((a, b) => a + b, 0);
@@ -1006,7 +1078,7 @@ function renderDonutChart(canvasId, data, colors) {
   const chart = new Chart(canvas, {
     type: "doughnut",
     data: { datasets: [{ data: chartData, backgroundColor: chartColors, borderWidth: 0 }] },
-    options: { cutout: "62%", plugins: { legend: { display: false }, tooltip: { enabled: false } }, animation: { duration: 400 } }
+    options: { cutout: "62%", plugins: { legend: { display: false }, tooltip: { enabled: false } }, animation: { duration: animDuration } }
   });
   if (canvasId === "summary-chart") summaryChart = chart;
   if (canvasId === "settle-chart") settleChart = chart;
@@ -1035,27 +1107,58 @@ document.getElementById("btn-settle-detail").addEventListener("click", () => {
     <div class="legend-item"><div class="legend-dot" style="background:#7a9abf;"></div>共通費 ${fmtAmt(bothTotal)}</div>
     <div class="legend-item"><div class="legend-dot" style="background:#c4846a;"></div>${p1} ${fmtAmt(p1Total)}</div>
     <div class="legend-item"><div class="legend-dot" style="background:#8fba8f;"></div>${p2} ${fmtAmt(p2Total)}</div>`;
+
   const settle = calcSettle(expenses, state.loans, fxRates, ym);
   const p1PaidCount = exps.filter(e => e.paidBy === "person1" && e.forWhom === "both").length;
   const p2PaidCount = exps.filter(e => e.paidBy === "person2" && e.forWhom === "both").length;
+
+  // 共通費セクション
   document.getElementById("settle-common-rows").innerHTML = `
-    <div class="detail-row"><div class="detail-left">${p1}が支払った共通費<div class="detail-sub">${p1PaidCount}件</div></div><div class="detail-right">${fmtAmt(settle.p1PaidBoth)}</div></div>
-    <div class="detail-row" style="border:none;"><div class="detail-left">${p2}が支払った共通費<div class="detail-sub">${p2PaidCount}件</div></div><div class="detail-right">${fmtAmt(settle.p2PaidBoth)}</div></div>`;
+    <div class="detail-row"><div class="detail-left">${p1}支払<div class="detail-sub">${p1PaidCount}件</div></div><div class="detail-right">${fmtAmt(settle.p1PaidBoth)}</div></div>
+    <div class="detail-row" style="border:none;"><div class="detail-left">${p2}支払<div class="detail-sub">${p2PaidCount}件</div></div><div class="detail-right">${fmtAmt(settle.p2PaidBoth)}</div></div>`;
+
+  // 立替セクション（視点を変えた表現）
   const adv = settle.advanceNet;
-  let advText = "立替なし";
-  if (adv > 0) advText = `差し引き：${p1} → ${p2} へ ${fmtAmt(adv)}`;
-  else if (adv < 0) advText = `差し引き：${p2} → ${p1} へ ${fmtAmt(adv)}`;
-  document.getElementById("settle-advance-row").innerHTML = `<div class="detail-row" style="border:none;"><div class="detail-left">${advText}</div></div>`;
+  let advHtml = '<div class="detail-row" style="border:none;"><div class="detail-left">立替なし</div></div>';
+  if (adv > 0) {
+    // p1 → p2 方向の差し引き = p1がp2分を余計に支払っている
+    advHtml = `<div class="detail-row" style="border:none;"><div class="detail-left">${p1}が${p2}分を支払<div class="detail-sub">差し引き後</div></div><div class="detail-right">${fmtAmt(adv)}</div></div>`;
+  } else if (adv < 0) {
+    advHtml = `<div class="detail-row" style="border:none;"><div class="detail-left">${p2}が${p1}分を支払<div class="detail-sub">差し引き後</div></div><div class="detail-right">${fmtAmt(adv)}</div></div>`;
+  }
+  document.getElementById("settle-advance-row").innerHTML = advHtml;
+
+  // 貸し借りセクション
   const loan = settle.loanNet;
-  let loanText = "貸し借りなし";
-  if (loan > 0) loanText = `差し引き：${p1} → ${p2} へ ${fmtAmt(loan)}`;
-  else if (loan < 0) loanText = `差し引き：${p2} → ${p1} へ ${fmtAmt(loan)}`;
-  document.getElementById("settle-loan-row").innerHTML = `<div class="detail-row" style="border:none;"><div class="detail-left">${loanText}</div></div>`;
+  let loanHtml = '<div class="detail-row" style="border:none;"><div class="detail-left">貸し借りなし</div></div>';
+  if (loan > 0) {
+    loanHtml = `<div class="detail-row" style="border:none;"><div class="detail-left">${p1}が${p2}分を支払<div class="detail-sub">差し引き後</div></div><div class="detail-right">${fmtAmt(loan)}</div></div>`;
+  } else if (loan < 0) {
+    loanHtml = `<div class="detail-row" style="border:none;"><div class="detail-left">${p2}が${p1}分を支払<div class="detail-sub">差し引き後</div></div><div class="detail-right">${fmtAmt(loan)}</div></div>`;
+  }
+  document.getElementById("settle-loan-row").innerHTML = loanHtml;
+
+  // 最終精算
   const tot = settle.total;
   let finalText = "精算なし";
   if (tot > 0) finalText = `${p1} → ${p2} へ ${fmtAmt(tot)}`;
   else if (tot < 0) finalText = `${p2} → ${p1} へ ${fmtAmt(tot)}`;
   document.getElementById("settle-final-text").textContent = finalText;
+
+  // 計算式
+  const formula = buildFormula(settle);
+  document.getElementById("settle-formula").textContent = formula;
+
+  // 共通口座バージョン（hasBothPayerの月のみ）
+  const altEl = document.getElementById("settle-common-account-alt");
+  if (settle.hasBothPayer && tot !== 0) {
+    const payer = tot > 0 ? p1 : p2;
+    const altAmt = Math.abs(tot) * 2;
+    altEl.innerHTML = `<div class="settle-alt"><div class="settle-alt-lbl">または（共通口座に入れる場合）</div>${payer} が共通口座に ${fmtAmt(altAmt)}</div>`;
+  } else {
+    altEl.innerHTML = "";
+  }
+
   document.getElementById("modal-settle").classList.add("open");
 });
 document.getElementById("btn-settle-close").addEventListener("click", () => { document.getElementById("modal-settle").classList.remove("open"); });
@@ -1095,9 +1198,17 @@ document.getElementById("btn-fx-save").addEventListener("click", async () => {
   } catch(e) { showToast("保存に失敗しました"); }
 });
 
-// ===== 月ナビ =====
-document.getElementById("btn-prev-month").addEventListener("click", () => { state.summary.yearMonth = prevYearMonth(state.summary.yearMonth); renderSummary(); });
-document.getElementById("btn-next-month").addEventListener("click", () => { state.summary.yearMonth = nextYearMonth(state.summary.yearMonth); renderSummary(); });
+// ===== 月ナビ（アニメーションなしフラグ付き） =====
+document.getElementById("btn-prev-month").addEventListener("click", () => {
+  isMonthNavigation = true;
+  state.summary.yearMonth = prevYearMonth(state.summary.yearMonth);
+  renderSummary();
+});
+document.getElementById("btn-next-month").addEventListener("click", () => {
+  isMonthNavigation = true;
+  state.summary.yearMonth = nextYearMonth(state.summary.yearMonth);
+  renderSummary();
+});
 
 // ===== 各種ボタン =====
 document.getElementById("btn-add-loan").addEventListener("click", () => showToast("貸し借り入力は近日実装予定です"));
@@ -1119,7 +1230,8 @@ document.getElementById("btn-csv").addEventListener("click", () => showToast("CS
 function renderList() {
   const ym = state.list.yearMonth;
   const catFilter = state.list.filterCategory;
-  document.getElementById("list-title").textContent = catFilter ? `${formatYearMonthJP(ym)}　${catFilter}` : `${formatYearMonthJP(ym)}　明細`;
+  // タイトルは年月のみ（カテゴリ絞り込み時はカテゴリ名も）
+  document.getElementById("list-title").textContent = catFilter ? `${formatYearMonthJP(ym)}　${catFilter}` : formatYearMonthJP(ym);
 
   const expenses = state.expenses || {};
   let exps = Object.entries(expenses)
@@ -1146,6 +1258,19 @@ function renderList() {
       scroll.appendChild(header);
       lastDate = e.date;
     }
+
+    // スワイプ削除用ラッパー
+    const wrap = document.createElement("div");
+    wrap.className = "record-row-wrap";
+
+    // 削除ボタン（背面）
+    const delBtn = document.createElement("div");
+    delBtn.className = "swipe-delete-btn";
+    delBtn.textContent = "削除";
+    delBtn.addEventListener("click", () => {
+      triggerSwipeDelete(id, wrap);
+    });
+
     const row = document.createElement("div");
     row.className = "record-row";
     const cats = state.meta?.categories || [];
@@ -1164,9 +1289,69 @@ function renderList() {
         <div class="record-amount">${amtDisplay}</div>
         <div class="record-method">${methodLabel(e.method)}</div>
       </div>`;
-    row.addEventListener("click", () => openEditModal(id, e));
-    scroll.appendChild(row);
+    row.addEventListener("click", () => {
+      // スワイプ中なら編集モーダルを開かない
+      if (row.style.transform && row.style.transform !== "translateX(0px)" && row.style.transform !== "translateX(0)") return;
+      openEditModal(id, e);
+    });
+
+    // スワイプ処理
+    setupSwipe(row, delBtn, wrap);
+
+    wrap.appendChild(delBtn);
+    wrap.appendChild(row);
+    scroll.appendChild(wrap);
   });
+}
+
+// スワイプ削除のセットアップ
+function setupSwipe(row, delBtn, wrap) {
+  let startX = 0, startY = 0, isDragging = false, isHorizontal = null;
+  const THRESHOLD = 60;
+
+  row.addEventListener("touchstart", e => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    isDragging = true;
+    isHorizontal = null;
+  }, { passive: true });
+
+  row.addEventListener("touchmove", e => {
+    if (!isDragging) return;
+    const dx = e.touches[0].clientX - startX;
+    const dy = e.touches[0].clientY - startY;
+    if (isHorizontal === null) {
+      isHorizontal = Math.abs(dx) > Math.abs(dy);
+    }
+    if (!isHorizontal) return;
+    e.preventDefault();
+    const clamped = Math.max(-80, Math.min(0, dx));
+    row.style.transition = "none";
+    row.style.transform = `translateX(${clamped}px)`;
+  }, { passive: false });
+
+  row.addEventListener("touchend", e => {
+    if (!isDragging || !isHorizontal) { isDragging = false; return; }
+    isDragging = false;
+    const dx = e.changedTouches[0].clientX - startX;
+    row.style.transition = "transform 0.2s ease";
+    if (dx < -THRESHOLD) {
+      row.style.transform = "translateX(-80px)";
+    } else {
+      row.style.transform = "translateX(0)";
+    }
+  });
+}
+
+function triggerSwipeDelete(id, wrap) {
+  const data = { ...state.expenses[id] };
+  delete state.expenses[id];
+  wrap.remove();
+  if (document.getElementById("screen-summary").classList.contains("active")) renderSummary();
+  deleteUndoData = { id, data };
+  showToast("削除しました", true, 4000);
+  if (deleteUndoTimer) clearTimeout(deleteUndoTimer);
+  deleteUndoTimer = setTimeout(commitDelete, 4000);
 }
 
 document.getElementById("btn-list-back").addEventListener("click", () => showScreen("screen-summary"));
@@ -1189,7 +1374,7 @@ function openEditModal(id, expense) {
   setEditToggle("edit-toggle-for-whom", expense.forWhom);
   setEditToggle("edit-toggle-method", expense.method);
   document.getElementById("edit-amount-display").textContent = expense.amount.toLocaleString();
-  document.getElementById("edit-currency-badge").textContent = expense.currency === "JPY" ? "¥" : getCurrencySymbol(expense.currency);
+  document.getElementById("edit-currency-badge").textContent = getCurrencySymbol(expense.currency || "JPY");
   renderEditCatGrid();
   document.getElementById("modal-edit").classList.add("open");
 }
@@ -1211,7 +1396,6 @@ function setEditToggle(groupId, value) {
 
 document.getElementById("edit-memo").addEventListener("input", e => { editState.memo = e.target.value; });
 document.getElementById("edit-amount-row").addEventListener("click", e => {
-  // バッジ以外をタップしたら数字キーボード
   if (e.target.id === "edit-currency-badge") return;
   numpadTarget = "edit";
   numpadValue = editState.amount > 0 ? String(editState.amount) : "0";
@@ -1286,13 +1470,11 @@ function setupToggleGroup(groupId, stateKey) {
   });
 }
 
-// メモ入力後に自動で数字キーボードを開く
 document.getElementById("input-memo").addEventListener("input", e => { state.input.memo = e.target.value; });
 document.getElementById("input-memo").addEventListener("keydown", e => {
   if (e.key === "Enter") {
     e.preventDefault();
     e.target.blur();
-    // 少し遅延して数字キーボードを開く
     setTimeout(() => {
       numpadTarget = "input";
       numpadValue = state.input.amount > 0 ? String(state.input.amount) : "0";
@@ -1302,10 +1484,8 @@ document.getElementById("input-memo").addEventListener("keydown", e => {
   }
 });
 document.getElementById("input-memo").addEventListener("blur", e => {
-  // メモに何か入力済みの場合のみ自動で金額入力へ
   if (state.input.memo.trim() && state.input.amount === 0) {
     setTimeout(() => {
-      // 他の要素にフォーカスが移っていないかチェック
       if (!document.activeElement || document.activeElement.tagName !== "INPUT") {
         numpadTarget = "input";
         numpadValue = "0";
@@ -1349,7 +1529,6 @@ function updateAmountDisplay() {
   else { el.textContent = state.input.amount.toLocaleString(); el.classList.remove("placeholder"); }
 }
 
-// 金額エリア（数字部分）タップで数字キーボード
 document.getElementById("amount-row").addEventListener("click", e => {
   if (e.target.id === "currency-badge") return;
   openNumpad();
