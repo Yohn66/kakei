@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="ふたりの家計簿">
-<title>ふたりの家計簿</title>
+<meta name="apple-mobile-web-app-title" content="Kake.">
+<title>Kake.</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
 <style>
@@ -260,9 +260,21 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
   <!-- ローディング -->
   <div id="screen-loading" class="screen active">
     <div class="loading-icon">
-      <svg width="36" height="36" viewBox="0 0 32 32">
-        <path d="M16 24C16 24 6 18 6 12C6 8.5 9 6 12.5 7C14.5 7.8 15.5 9.8 16 11C16.5 9.8 17.5 7.8 19.5 7C23 6 26 8.5 26 12C26 18 16 24 16 24Z" fill="#c97a7a" opacity="0.35"/>
-        <text x="16" y="21" font-family="-apple-system,sans-serif" font-size="15" font-weight="500" fill="#b8962e" text-anchor="middle">¥</text>
+      <svg width="44" height="44" viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="gradLogo" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#c9a84c"/>
+            <stop offset="50%" stop-color="#b07850"/>
+            <stop offset="100%" stop-color="#9a5050"/>
+          </linearGradient>
+        </defs>
+        <g transform="translate(45,45)">
+          <path d="M0,28 C-36,8 -46,-12 -34,-24 C-25,-33 -10,-30 0,-16 C10,-30 25,-33 34,-24 C46,-12 36,8 0,28 Z" fill="none" stroke="url(#gradLogo)" stroke-width="5"/>
+          <ellipse cx="0" cy="30" rx="5" ry="3.5" fill="#9a5050"/>
+          <line x1="0" y1="33" x2="0" y2="54" stroke="#9a5050" stroke-width="5" stroke-linecap="round"/>
+          <line x1="-20" y1="41" x2="20" y2="41" stroke="#b8962e" stroke-width="5.5" stroke-linecap="round"/>
+          <line x1="-15" y1="50" x2="15" y2="50" stroke="#b8962e" stroke-width="5.5" stroke-linecap="round"/>
+        </g>
       </svg>
     </div>
   </div>
@@ -277,13 +289,25 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
   <div id="screen-top" class="screen">
     <div class="top-body">
       <div class="app-icon">
-        <svg width="36" height="36" viewBox="0 0 32 32">
-          <path d="M16 24C16 24 6 18 6 12C6 8.5 9 6 12.5 7C14.5 7.8 15.5 9.8 16 11C16.5 9.8 17.5 7.8 19.5 7C23 6 26 8.5 26 12C26 18 16 24 16 24Z" fill="#c97a7a" opacity="0.35"/>
-          <text x="16" y="21" font-family="-apple-system,sans-serif" font-size="15" font-weight="500" fill="#b8962e" text-anchor="middle">¥</text>
+        <svg width="44" height="44" viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="gradLogo2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#c9a84c"/>
+              <stop offset="50%" stop-color="#b07850"/>
+              <stop offset="100%" stop-color="#9a5050"/>
+            </linearGradient>
+          </defs>
+          <g transform="translate(45,45)">
+            <path d="M0,28 C-36,8 -46,-12 -34,-24 C-25,-33 -10,-30 0,-16 C10,-30 25,-33 34,-24 C46,-12 36,8 0,28 Z" fill="none" stroke="url(#gradLogo2)" stroke-width="5"/>
+            <ellipse cx="0" cy="30" rx="5" ry="3.5" fill="#9a5050"/>
+            <line x1="0" y1="33" x2="0" y2="54" stroke="#9a5050" stroke-width="5" stroke-linecap="round"/>
+            <line x1="-20" y1="41" x2="20" y2="41" stroke="#b8962e" stroke-width="5.5" stroke-linecap="round"/>
+            <line x1="-15" y1="50" x2="15" y2="50" stroke="#b8962e" stroke-width="5.5" stroke-linecap="round"/>
+          </g>
         </svg>
       </div>
-      <div class="app-name">ふたりの家計簿</div>
-      <div class="app-sub">二人の生活費をいっしょに管理</div>
+      <div class="app-name">Kake.</div>
+      <div class="app-sub">ふたりの生活費をいっしょに管理</div>
       <div style="width:100%;margin-bottom:4px;">
         <div class="section-label">お二人の名前</div>
         <input class="name-input" id="input-person1" placeholder="一人目の名前" maxlength="10" />
@@ -309,12 +333,24 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
   <div id="screen-guide" class="screen">
     <div class="guide-body">
       <div class="app-icon">
-        <svg width="36" height="36" viewBox="0 0 32 32">
-          <path d="M16 24C16 24 6 18 6 12C6 8.5 9 6 12.5 7C14.5 7.8 15.5 9.8 16 11C16.5 9.8 17.5 7.8 19.5 7C23 6 26 8.5 26 12C26 18 16 24 16 24Z" fill="#c97a7a" opacity="0.35"/>
-          <text x="16" y="21" font-family="-apple-system,sans-serif" font-size="15" font-weight="500" fill="#b8962e" text-anchor="middle">¥</text>
+        <svg width="44" height="44" viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="gradLogo3" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#c9a84c"/>
+              <stop offset="50%" stop-color="#b07850"/>
+              <stop offset="100%" stop-color="#9a5050"/>
+            </linearGradient>
+          </defs>
+          <g transform="translate(45,45)">
+            <path d="M0,28 C-36,8 -46,-12 -34,-24 C-25,-33 -10,-30 0,-16 C10,-30 25,-33 34,-24 C46,-12 36,8 0,28 Z" fill="none" stroke="url(#gradLogo3)" stroke-width="5"/>
+            <ellipse cx="0" cy="30" rx="5" ry="3.5" fill="#9a5050"/>
+            <line x1="0" y1="33" x2="0" y2="54" stroke="#9a5050" stroke-width="5" stroke-linecap="round"/>
+            <line x1="-20" y1="41" x2="20" y2="41" stroke="#b8962e" stroke-width="5.5" stroke-linecap="round"/>
+            <line x1="-15" y1="50" x2="15" y2="50" stroke="#b8962e" stroke-width="5.5" stroke-linecap="round"/>
+          </g>
         </svg>
       </div>
-      <div class="guide-title">家計簿ができました</div>
+      <div class="guide-title">Kake. ができました</div>
       <div class="section-label" style="margin-bottom:6px;">パートナーと共有するURL</div>
       <div class="url-box"><div class="url-text" id="guide-url-text"></div></div>
       <div class="copy-btn" id="btn-copy-url">URLをコピー</div>
