@@ -17,10 +17,9 @@
   --white: #ffffff;
   --black: #111111;
   --gray1: #aaaaaa;
-  --gray2: #cccccc;
-  --gray3: #dddddd;
-  --gray4: #f5f5f5;
-  --border: #e0e0e0;
+  --gray2: #bbbbbb;
+  --gray3: #cccccc;
+  --border: #d0d0d0;
   --font: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
 }
 
@@ -55,7 +54,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .cat-limit { font-size: 12px; color: var(--gray2); }
 .cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; width: 100%; margin-bottom: 6px; }
 .cat-btn { padding: 9px 0; border-radius: 7px; border: 1.5px solid var(--black); font-size: 12px; text-align: center; background: #fafafa; color: var(--black); font-weight: 500; cursor: pointer; user-select: none; }
-.cat-btn.off { border: 0.5px solid var(--gray3); background: var(--white); color: var(--gray2); font-weight: 400; }
+.cat-btn.off { border: 0.5px solid #bbb; background: var(--white); color: #888; font-weight: 400; }
 .cat-hint { font-size: 11px; color: var(--gray2); align-self: flex-start; margin-bottom: 20px; }
 .primary-btn { width: 100%; background: var(--black); color: var(--white); border-radius: 10px; padding: 14px; font-size: 15px; font-weight: 600; text-align: center; cursor: pointer; border: none; font-family: var(--font); margin-bottom: 14px; }
 .primary-btn:active { opacity: 0.7; }
@@ -92,34 +91,55 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .tab { flex: 1; text-align: center; padding: 12px 0 10px; font-size: 14px; color: var(--gray2); border-bottom: 2px solid transparent; cursor: pointer; }
 .tab.active { color: var(--black); border-bottom: 2px solid var(--black); font-weight: 500; }
 
-/* 入力画面 */
+/* ===== 入力画面 ===== */
 #screen-input { overflow-y: auto; -webkit-overflow-scrolling: touch; }
 #screen-input::-webkit-scrollbar { display: none; }
 .input-body { padding: 14px 16px 30px; }
-.lbl-mini { font-size: 11px; color: var(--gray2); margin-bottom: 5px; margin-top: 11px; }
+.lbl-mini { font-size: 12px; color: #666; margin-bottom: 5px; margin-top: 11px; font-weight: 500; }
 .toggle-group { display: flex; gap: 4px; }
-.toggle-btn { flex: 1; padding: 10px 0; border-radius: 8px; border: 0.5px solid var(--gray3); font-size: 13px; text-align: center; background: var(--white); color: var(--gray1); cursor: pointer; font-family: var(--font); transition: all 0.1s; }
-.toggle-btn.active { border: 1.5px solid var(--black); color: var(--black); font-weight: 500; background: #fafafa; }
-.divider { height: 0.5px; background: #f0f0f0; margin: 11px 0; }
-.text-input { width: 100%; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 11px 12px; font-size: 15px; color: var(--black); font-family: var(--font); background: var(--white); outline: none; }
-.text-input:focus { border-color: var(--black); }
-.text-input::placeholder { color: var(--gray2); }
-.amount-row { display: flex; align-items: center; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 10px 12px; gap: 8px; margin-top: 8px; cursor: pointer; }
-.currency-badge { font-size: 15px; color: #666; padding: 2px 7px; border-radius: 5px; border: 0.5px solid var(--border); font-weight: 500; flex-shrink: 0; }
-.amount-display { font-size: 20px; font-weight: 500; color: var(--black); flex: 1; }
-.amount-display.placeholder { color: var(--gray2); }
-.date-row { display: flex; justify-content: space-between; align-items: center; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #555; cursor: pointer; }
+.toggle-btn {
+  flex: 1; padding: 10px 0; border-radius: 8px;
+  border: 1px solid #bbb; /* 未選択でも見やすい枠線 */
+  font-size: 13px; text-align: center;
+  background: var(--white); color: #777; /* 未選択文字を濃く */
+  cursor: pointer; font-family: var(--font); transition: all 0.1s;
+}
+.toggle-btn.active {
+  border: 2px solid var(--black); color: var(--black); font-weight: 600; background: #f5f5f5;
+}
+.divider { height: 0.5px; background: #e0e0e0; margin: 11px 0; }
+.text-input { width: 100%; border: 1px solid #bbb; border-radius: 8px; padding: 11px 12px; font-size: 15px; color: var(--black); font-family: var(--font); background: var(--white); outline: none; }
+.text-input:focus { border-color: var(--black); border-width: 1.5px; }
+.text-input::placeholder { color: #bbb; }
+.amount-row { display: flex; align-items: center; border: 1px solid #bbb; border-radius: 8px; padding: 10px 12px; gap: 8px; margin-top: 8px; }
+.currency-badge {
+  font-size: 15px; color: #444; padding: 3px 8px; border-radius: 5px;
+  border: 1px solid #999; font-weight: 500; flex-shrink: 0;
+  cursor: pointer; background: #f8f8f8;
+}
+.currency-badge:active { opacity: 0.7; }
+.amount-display { font-size: 20px; font-weight: 500; color: var(--black); flex: 1; cursor: pointer; }
+.amount-display.placeholder { color: #bbb; }
+.date-row { display: flex; justify-content: space-between; align-items: center; border: 1px solid #bbb; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #444; cursor: pointer; }
+
+/* カテゴリボタン（入力画面・編集モーダル） */
 .input-cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; width: 100%; }
-.input-cat-btn { padding: 9px 0; border-radius: 7px; border: 0.5px solid var(--gray3); font-size: 12px; text-align: center; background: var(--white); color: var(--gray2); cursor: pointer; font-family: var(--font); transition: all 0.1s; }
-.input-cat-btn.active { border: 1.5px solid var(--black); color: var(--black); font-weight: 500; background: #fafafa; }
-.cat-edit-link { text-align: center; font-size: 12px; color: var(--gray2); padding: 7px 0 2px; cursor: pointer; }
+.input-cat-btn {
+  padding: 9px 0; border-radius: 7px;
+  border: 1px solid #bbb; /* 未選択も見やすく */
+  font-size: 12px; text-align: center;
+  background: var(--white); color: #777; /* 未選択文字を濃く */
+  cursor: pointer; font-family: var(--font); transition: all 0.1s;
+}
+.input-cat-btn.active {
+  border: 2px solid var(--black); color: var(--black); font-weight: 600; background: #f5f5f5;
+}
+.cat-edit-link { text-align: center; font-size: 12px; color: #666; padding: 7px 0 2px; cursor: pointer; font-weight: 500; }
 
 /* ===== 集計画面 ===== */
 .month-nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 0.5px solid var(--border); flex-shrink: 0; background: var(--white); }
 .month-nav-title { font-size: 15px; font-weight: 500; }
 .month-nav-arrow { font-size: 20px; color: var(--gray2); cursor: pointer; padding: 4px 8px; }
-
-/* 集計ヘッダー（フィルター＋明細ボタン） */
 .summary-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; position: relative; }
 .filter-wrap { position: relative; }
 .filter-btn { font-size: 13px; color: #444; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 6px 14px; background: var(--white); cursor: pointer; display: flex; align-items: center; gap: 5px; }
@@ -129,17 +149,16 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .filter-option { padding: 11px 16px; font-size: 14px; color: var(--black); cursor: pointer; }
 .filter-option:not(:last-child) { border-bottom: 0.5px solid #f5f5f5; }
 .filter-option:active { background: #f8f8f8; }
-.filter-option.selected { font-weight: 600; color: var(--black); }
+.filter-option.selected { font-weight: 600; }
 .detail-nav-btn { font-size: 13px; color: #555; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 6px 14px; background: var(--white); cursor: pointer; }
 .detail-nav-btn:active { opacity: 0.7; }
-
 .summary-scroll { flex: 1; overflow-y: auto; padding: 10px 14px 40px; -webkit-overflow-scrolling: touch; }
 .summary-scroll::-webkit-scrollbar { display: none; }
 .chart-area { display: flex; justify-content: center; margin: 2px 0 10px; position: relative; }
 .chart-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; }
 .chart-center-lbl { font-size: 10px; color: var(--gray1); white-space: nowrap; }
 .chart-center-amt { font-size: 16px; font-weight: 600; color: var(--black); }
-.cat-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 0.5px solid #f0f0f0; cursor: pointer; }
+.cat-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 0.5px solid #e8e8e8; cursor: pointer; }
 .cat-row:active { background: #fafafa; margin: 0 -4px; padding-left: 4px; padding-right: 4px; }
 .cat-left { display: flex; align-items: center; gap: 8px; }
 .color-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
@@ -149,17 +168,26 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .diff-dn { font-size: 11px; color: #27ae60; }
 .diff-eq { font-size: 11px; color: var(--gray2); }
 .cat-amt-lbl { font-size: 14px; font-weight: 500; color: var(--black); }
-.fx-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
-.fx-edit { font-size: 12px; color: #888; border-bottom: 0.5px solid var(--gray3); cursor: pointer; }
+
+/* 為替エリア */
+.fx-area-box { background: #f8f6f2; border-radius: 8px; padding: 9px 12px; margin-bottom: 4px; }
+.fx-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; }
+.fx-label { font-size: 13px; color: #444; }
+.fx-edit { font-size: 12px; color: #555; border-bottom: 1px solid #999; cursor: pointer; font-weight: 500; }
+.fx-usage { font-size: 12px; color: #666; padding: 2px 0 0; }
+
+/* カテゴリ編集リンク（集計画面） */
+.cat-edit-link-summary { text-align: center; font-size: 12px; color: #555; padding: 7px 0 2px; cursor: pointer; font-weight: 500; }
+
 .settle-box { background: #f5f3ef; border-radius: 10px; padding: 11px 13px; margin-top: 8px; }
 .settle-lbl { font-size: 11px; color: var(--gray1); margin-bottom: 6px; }
 .settle-main { font-size: 14px; font-weight: 500; color: var(--black); margin-bottom: 9px; line-height: 1.5; }
 .settle-detail-btn { text-align: center; font-size: 13px; color: #555; border: 0.5px solid var(--gray3); border-radius: 7px; padding: 7px; cursor: pointer; background: var(--white); }
 .loan-btn { text-align: center; font-size: 13px; color: #555; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 10px; margin-top: 10px; cursor: pointer; }
-.share-link { text-align: center; font-size: 12px; color: var(--gray1); padding: 10px 0 4px; cursor: pointer; }
-.csv-btn { text-align: center; font-size: 12px; color: #666; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 9px; margin-top: 6px; margin-bottom: 8px; cursor: pointer; }
+.share-btn { text-align: center; font-size: 12px; color: #555; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 9px; margin-top: 6px; cursor: pointer; }
+.csv-btn { text-align: center; font-size: 12px; color: #555; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 9px; margin-top: 6px; margin-bottom: 8px; cursor: pointer; }
 
-/* ===== 一覧・明細画面 ===== */
+/* ===== 明細画面 ===== */
 #screen-list { display: none; flex-direction: column; flex: 1; overflow: hidden; }
 #screen-list.active { display: flex; }
 .list-nav { display: flex; align-items: center; justify-content: space-between; padding: 11px 16px; border-bottom: 0.5px solid var(--border); flex-shrink: 0; background: var(--white); }
@@ -168,16 +196,16 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .list-nav-arrow { font-size: 20px; color: var(--gray2); cursor: pointer; padding: 4px 8px; }
 .list-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .list-scroll::-webkit-scrollbar { display: none; }
-.date-group-header { padding: 6px 16px 5px; font-size: 11px; color: var(--gray1); background: #f8f8f8; border-bottom: 0.5px solid #f0f0f0; }
-.record-row { display: flex; align-items: center; padding: 12px 16px; border-bottom: 0.5px solid #f0f0f0; gap: 10px; cursor: pointer; }
+.date-group-header { padding: 6px 16px 5px; font-size: 11px; color: var(--gray1); background: #f8f8f8; border-bottom: 0.5px solid #ececec; }
+.record-row { display: flex; align-items: center; padding: 12px 16px; border-bottom: 0.5px solid #ececec; gap: 10px; cursor: pointer; }
 .record-row:active { background: #f8f8f8; }
-.cat-badge { font-size: 11px; padding: 3px 8px; border-radius: 99px; background: #f5f5f5; color: #666; white-space: nowrap; border: 0.5px solid var(--border); flex-shrink: 0; }
+.cat-badge { font-size: 11px; padding: 3px 8px; border-radius: 99px; background: #f5f5f5; color: #555; white-space: nowrap; border: 0.5px solid #ccc; flex-shrink: 0; }
 .record-main { flex: 1; min-width: 0; }
 .record-memo { font-size: 14px; color: var(--black); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.record-sub { font-size: 11px; color: var(--gray1); margin-top: 3px; }
+.record-sub { font-size: 11px; color: #888; margin-top: 3px; }
 .record-right { text-align: right; white-space: nowrap; flex-shrink: 0; }
 .record-amount { font-size: 15px; font-weight: 500; color: var(--black); }
-.record-method { font-size: 11px; color: var(--gray1); margin-top: 2px; }
+.record-method { font-size: 11px; color: #888; margin-top: 2px; }
 .list-empty { padding: 40px 20px; text-align: center; font-size: 14px; color: var(--gray1); }
 
 /* モーダル共通 */
@@ -188,7 +216,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 .modal-title { font-size: 15px; font-weight: 600; color: var(--black); }
 .modal-sub { font-size: 12px; color: var(--gray1); }
-.modal-close-btn { text-align: center; font-size: 13px; color: var(--gray1); margin-top: 13px; padding-top: 13px; border-top: 0.5px solid #f0f0f0; cursor: pointer; }
+.modal-close-btn { text-align: center; font-size: 13px; color: var(--gray1); margin-top: 13px; padding-top: 13px; border-top: 0.5px solid #ececec; cursor: pointer; }
 
 /* 精算詳細モーダル */
 .settle-chart-area { display: flex; justify-content: center; margin: 4px 0 8px; position: relative; }
@@ -196,7 +224,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #444; }
 .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 .section-lbl { font-size: 11px; color: var(--gray1); margin: 9px 0 6px; }
-.detail-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 0.5px solid #f5f5f5; }
+.detail-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 0.5px solid #ececec; }
 .detail-left { font-size: 13px; color: #333; line-height: 1.5; }
 .detail-sub { font-size: 11px; color: var(--gray1); }
 .detail-right { font-size: 13px; font-weight: 500; color: var(--black); white-space: nowrap; }
@@ -205,15 +233,24 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .sum-val { font-size: 14px; font-weight: 600; color: var(--black); }
 
 /* カテゴリ編集モーダル */
-.cat-edit-item { display: flex; align-items: center; gap: 9px; padding: 9px 11px; border-radius: 8px; border: 0.5px solid #eee; margin-bottom: 5px; }
-.cat-edit-input { border: none; outline: none; font-size: 14px; color: var(--black); background: transparent; flex: 1; border-bottom: 0.5px solid var(--gray3); padding-bottom: 2px; font-family: var(--font); }
-.cat-add-btn { text-align: center; font-size: 13px; color: #666; border: 0.5px dashed var(--gray3); border-radius: 8px; padding: 11px; margin-top: 5px; cursor: pointer; }
+.cat-edit-item { display: flex; align-items: center; gap: 9px; padding: 9px 11px; border-radius: 8px; border: 0.5px solid #e0e0e0; margin-bottom: 5px; }
+.cat-edit-input { border: none; outline: none; font-size: 14px; color: var(--black); background: transparent; flex: 1; border-bottom: 0.5px solid #ccc; padding-bottom: 2px; font-family: var(--font); }
+.cat-add-btn { text-align: center; font-size: 13px; color: #555; border: 0.5px dashed #bbb; border-radius: 8px; padding: 11px; margin-top: 5px; cursor: pointer; }
 
 /* 為替レートモーダル */
-.fx-modal-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 0.5px solid #f5f5f5; }
+.fx-modal-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 0.5px solid #ececec; }
 .fx-modal-lbl { font-size: 14px; color: #333; }
 .fx-modal-input { border: 0.5px solid var(--gray3); border-radius: 6px; padding: 7px 11px; font-size: 14px; color: var(--black); font-family: var(--font); width: 120px; text-align: right; outline: none; }
 .fx-modal-input:focus { border-color: var(--black); }
+
+/* 通貨選択モーダル */
+.currency-option { display: flex; align-items: center; justify-content: space-between; padding: 13px 4px; border-bottom: 0.5px solid #ececec; cursor: pointer; }
+.currency-option:last-child { border-bottom: none; }
+.currency-option:active { background: #f8f8f8; }
+.currency-option-name { font-size: 15px; color: var(--black); }
+.currency-option-symbol { font-size: 14px; color: #888; }
+.currency-option.selected .currency-option-name { font-weight: 600; }
+.currency-option.selected::after { content: "✓"; font-size: 16px; color: var(--black); }
 
 /* 編集モーダル */
 .delete-btn { width: 100%; border: 0.5px solid #e0a0a0; border-radius: 10px; padding: 13px; font-size: 15px; color: #c0392b; text-align: center; cursor: pointer; background: #fff8f8; font-family: var(--font); margin-top: 5px; }
@@ -313,7 +350,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     <div class="input-body">
       <div class="date-row" id="input-date-row">
         <span id="input-date-display"></span>
-        <span style="color:var(--gray2);font-size:12px;">▼</span>
+        <span style="color:#999;font-size:12px;">▼</span>
       </div>
       <div class="lbl-mini">誰が</div>
       <div class="toggle-group" id="toggle-paid-by">
@@ -328,13 +365,16 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
         <div class="toggle-btn" data-value="person2" id="toggle-for-p2">-</div>
       </div>
       <div class="divider"></div>
-      <input class="text-input" id="input-memo" placeholder="例：長浜ラーメン" maxlength="30" />
-      <div class="toggle-group" style="margin-top:9px;" id="toggle-method">
+      <!-- 支払方法を上に -->
+      <div class="lbl-mini" style="margin-top:0;">支払方法</div>
+      <div class="toggle-group" id="toggle-method">
         <div class="toggle-btn" data-value="barcode">バーコード</div>
         <div class="toggle-btn active" data-value="card">カード</div>
         <div class="toggle-btn" data-value="cash">現金</div>
       </div>
-      <div class="amount-row" id="amount-row">
+      <!-- メモを下に -->
+      <input class="text-input" id="input-memo" placeholder="例：長浜ラーメン" maxlength="30" style="margin-top:9px;" />
+      <div class="amount-row" id="amount-row" style="margin-top:8px;">
         <div class="currency-badge" id="currency-badge">¥</div>
         <div class="amount-display placeholder" id="amount-display">0</div>
       </div>
@@ -353,7 +393,6 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
       <div class="month-nav-arrow" id="btn-next-month">▶</div>
     </div>
     <div class="summary-scroll">
-      <!-- フィルター＋明細ボタン -->
       <div class="summary-header">
         <div class="filter-wrap">
           <div class="filter-btn" id="filter-btn">
@@ -372,8 +411,8 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
         </div>
       </div>
       <div id="cat-list"></div>
-      <div class="cat-edit-link" id="btn-cat-edit-summary">カテゴリを編集</div>
-      <div class="divider"></div>
+      <div class="cat-edit-link-summary" id="btn-cat-edit-summary">カテゴリを編集</div>
+      <div style="height:0.5px;background:#e0e0e0;margin:8px 0;"></div>
       <div id="fx-area"></div>
       <div class="settle-box">
         <div class="settle-lbl">精算</div>
@@ -381,7 +420,8 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
         <div class="settle-detail-btn" id="btn-settle-detail">詳細 →</div>
       </div>
       <div class="loan-btn" id="btn-add-loan">＋ 貸し借りを追加</div>
-      <div class="share-link" id="btn-share-url">URLを共有 / ホーム画面に追加</div>
+      <div class="share-btn" id="btn-share-url">URLを共有する</div>
+      <div class="share-btn" id="btn-add-home" style="margin-top:6px;">ホーム画面に追加する</div>
       <div class="csv-btn" id="btn-csv">データを出力する（CSV）</div>
     </div>
   </div>
@@ -418,10 +458,10 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     <div class="legend-row" id="settle-legend"></div>
     <div class="section-lbl">共通費の差額</div>
     <div id="settle-common-rows"></div>
-    <div class="divider" style="margin:6px 0;"></div>
+    <div style="height:0.5px;background:#e0e0e0;margin:6px 0;"></div>
     <div class="section-lbl">立替</div>
     <div id="settle-advance-row"></div>
-    <div class="divider" style="margin:6px 0;"></div>
+    <div style="height:0.5px;background:#e0e0e0;margin:6px 0;"></div>
     <div class="section-lbl">貸し借り</div>
     <div id="settle-loan-row"></div>
     <div class="sum-row">
@@ -450,9 +490,18 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
       <span class="modal-title">為替レートを入力</span>
       <span class="modal-sub" id="fx-modal-month"></span>
     </div>
-    <p style="font-size:13px;color:var(--gray1);margin-bottom:13px;">外貨の記録があります。集計のため1外貨あたりの円レートを入力してください。</p>
+    <p style="font-size:13px;color:#888;margin-bottom:13px;">外貨の記録があります。集計のため1外貨あたりの円レートを入力してください。</p>
     <div id="fx-input-rows"></div>
     <button class="primary-btn" id="btn-fx-save" style="margin-top:13px;">保存する</button>
+  </div>
+</div>
+
+<!-- 通貨選択モーダル -->
+<div class="modal-overlay" id="modal-currency">
+  <div class="modal-sheet">
+    <div class="modal-header"><span class="modal-title">通貨を選択</span></div>
+    <div id="currency-options"></div>
+    <div class="modal-close-btn" id="btn-currency-cancel">キャンセル</div>
   </div>
 </div>
 
@@ -475,18 +524,19 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
       <div class="toggle-btn" data-value="person1" id="edit-for-p1">-</div>
       <div class="toggle-btn" data-value="person2" id="edit-for-p2">-</div>
     </div>
-    <div class="divider"></div>
-    <input class="text-input" id="edit-memo" placeholder="何に使ったか" maxlength="30" style="margin-bottom:9px;" />
+    <div style="height:0.5px;background:#e0e0e0;margin:11px 0;"></div>
+    <div class="lbl-mini" style="margin-top:0;">支払方法</div>
     <div class="toggle-group" id="edit-toggle-method">
       <div class="toggle-btn" data-value="barcode">バーコード</div>
       <div class="toggle-btn active" data-value="card">カード</div>
       <div class="toggle-btn" data-value="cash">現金</div>
     </div>
+    <input class="text-input" id="edit-memo" placeholder="何に使ったか" maxlength="30" style="margin-top:9px;margin-bottom:0px;" />
     <div class="amount-row" id="edit-amount-row" style="margin-top:9px;">
       <div class="currency-badge" id="edit-currency-badge">¥</div>
       <div class="amount-display" id="edit-amount-display">0</div>
     </div>
-    <div class="divider"></div>
+    <div style="height:0.5px;background:#e0e0e0;margin:11px 0;"></div>
     <div class="input-cat-grid" id="edit-cat-grid"></div>
     <button class="primary-btn" id="btn-edit-save" style="margin-top:13px;">保存する</button>
     <div class="delete-btn" id="btn-edit-delete">この記録を削除する</div>
@@ -539,6 +589,24 @@ const db = getDatabase(firebaseApp);
 
 const CAT_COLORS = ["#c4846a","#b8962e","#7a9abf","#8fba8f","#a0889e","#7aab9e","#888780","#c9a87c"];
 
+// 通貨マスタ
+const CURRENCIES = [
+  { code: "JPY", symbol: "¥", name: "円" },
+  { code: "KRW", symbol: "₩", name: "ウォン" },
+  { code: "USD", symbol: "$", name: "ドル" },
+  { code: "EUR", symbol: "€", name: "ユーロ" },
+  { code: "GBP", symbol: "£", name: "ポンド" },
+  { code: "CNY", symbol: "¥", name: "元" },
+  { code: "TWD", symbol: "NT$", name: "台湾ドル" },
+];
+
+function getCurrencySymbol(code) {
+  return CURRENCIES.find(c => c.code === code)?.symbol || code;
+}
+function getCurrencyName(code) {
+  return CURRENCIES.find(c => c.code === code)?.name || code;
+}
+
 const state = {
   roomId: null, meta: null,
   expenses: {}, loans: {}, fxRates: {},
@@ -551,6 +619,7 @@ let summaryChart = null, settleChart = null;
 let editingExpenseId = null, editState = {};
 let numpadValue = "0", numpadTarget = "input";
 let deleteUndoTimer = null, deleteUndoData = null;
+let currencyTarget = "input"; // "input" | "edit"
 
 // ===== ユーティリティ =====
 function todayString() {
@@ -613,16 +682,44 @@ function showScreen(id) {
   if (showTab) document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === id.replace("screen-","")));
   if (id === "screen-summary") renderSummary();
   if (id === "screen-list") renderList();
-  // フィルタードロップダウンを閉じる
   document.getElementById("filter-dropdown").classList.remove("open");
 }
 
-// モーダルの背景タップで閉じる
-["modal-settle","modal-cat-edit","modal-fx","modal-edit"].forEach(modalId => {
+// モーダル背景タップで閉じる
+["modal-settle","modal-cat-edit","modal-fx","modal-edit","modal-currency"].forEach(modalId => {
   document.getElementById(modalId).addEventListener("click", e => {
     if (e.target === document.getElementById(modalId)) document.getElementById(modalId).classList.remove("open");
   });
 });
+
+// ===== 通貨選択モーダル =====
+function openCurrencyModal(target) {
+  currencyTarget = target;
+  const currentCode = target === "input" ? state.input.currency : editState.currency;
+  const container = document.getElementById("currency-options");
+  container.innerHTML = "";
+  CURRENCIES.forEach(cur => {
+    const el = document.createElement("div");
+    el.className = "currency-option" + (cur.code === currentCode ? " selected" : "");
+    el.innerHTML = `<span class="currency-option-name">${cur.name}</span><span class="currency-option-symbol">${cur.symbol}</span>`;
+    el.addEventListener("click", () => {
+      if (currencyTarget === "input") {
+        state.input.currency = cur.code;
+        document.getElementById("currency-badge").textContent = cur.code === "JPY" ? "¥" : cur.symbol;
+      } else {
+        editState.currency = cur.code;
+        document.getElementById("edit-currency-badge").textContent = cur.code === "JPY" ? "¥" : cur.symbol;
+      }
+      document.getElementById("modal-currency").classList.remove("open");
+    });
+    container.appendChild(el);
+  });
+  document.getElementById("modal-currency").classList.add("open");
+}
+
+document.getElementById("btn-currency-cancel").addEventListener("click", () => { document.getElementById("modal-currency").classList.remove("open"); });
+document.getElementById("currency-badge").addEventListener("click", () => openCurrencyModal("input"));
+document.getElementById("edit-currency-badge").addEventListener("click", () => openCurrencyModal("edit"));
 
 // ===== フィルタードロップダウン =====
 function renderFilterDropdown() {
@@ -654,9 +751,7 @@ document.getElementById("filter-btn").addEventListener("click", e => {
   e.stopPropagation();
   document.getElementById("filter-dropdown").classList.toggle("open");
 });
-document.addEventListener("click", () => {
-  document.getElementById("filter-dropdown").classList.remove("open");
-});
+document.addEventListener("click", () => { document.getElementById("filter-dropdown").classList.remove("open"); });
 
 // ===== カテゴリ =====
 const DEFAULT_CATS = ["食費","外食","医療","交通","日用品","衣類","固定費","旅行"];
@@ -730,7 +825,7 @@ function renderCatEditList() {
     const item = document.createElement("div");
     item.className = "cat-edit-item";
     const dot = document.createElement("div");
-    dot.className = "color-dot"; dot.style.background = CAT_COLORS[i]; dot.style.flexShrink = "0";
+    dot.className = "color-dot"; dot.style.background = CAT_COLORS[i]; dot.style.flexShrink = "0"; dot.style.width = "10px"; dot.style.height = "10px"; dot.style.borderRadius = "50%";
     const input = document.createElement("input");
     input.className = "cat-edit-input"; input.value = cat; input.maxLength = 10;
     input.addEventListener("input", e => { catEditValues[i] = e.target.value; });
@@ -850,7 +945,6 @@ function renderSummary() {
     const row = document.createElement("div");
     row.className = "cat-row";
     row.innerHTML = `<div class="cat-left"><div class="color-dot" style="background:${CAT_COLORS[i]};"></div><span class="cat-name-lbl">${cat}</span></div><div class="cat-right">${diffHtml}<span class="cat-amt-lbl">${fmtAmt(amt)}</span></div>`;
-    // カテゴリ行タップで該当カテゴリの明細へ
     row.addEventListener("click", () => {
       state.list.yearMonth = ym;
       state.list.filterCategory = cat;
@@ -859,20 +953,35 @@ function renderSummary() {
     listEl.appendChild(row);
   });
 
+  // 為替エリア
   const fxArea = document.getElementById("fx-area");
-  const hasFx = filtered.some(e => e.currency && e.currency !== "JPY");
-  if (hasFx) {
-    const currencies = [...new Set(filtered.filter(e => e.currency !== "JPY").map(e => e.currency))];
+  const allExps = Object.values(expenses).filter(e => e.date.startsWith(ym));
+  const fxCurrencies = [...new Set(allExps.filter(e => e.currency && e.currency !== "JPY").map(e => e.currency))];
+
+  if (fxCurrencies.length > 0) {
     const monthFx = fxRates[ym] || {};
-    let html = "";
-    currencies.forEach(cur => {
+    let html = '<div class="fx-area-box">';
+    fxCurrencies.forEach(cur => {
       const rate = monthFx[cur];
-      html += `<div class="fx-row"><span style="font-size:12px;color:var(--gray1);">1${cur} = ${rate ? rate + "円" : "未設定"}</span><span class="fx-edit" id="fx-edit-trigger">編集</span></div>`;
+      const totalForeign = allExps.filter(e => e.currency === cur).reduce((s, e) => s + e.amount, 0);
+      const totalJPY = rate ? Math.round(totalForeign * rate) : null;
+      const curName = getCurrencyName(cur);
+      const rateText = rate ? `${rate}円` : "未設定";
+      const usageText = rate && totalJPY !== null
+        ? `今月：${totalForeign.toLocaleString()}${curName} = ${totalJPY.toLocaleString()}円`
+        : `今月：${totalForeign.toLocaleString()}${curName}（レート未設定）`;
+      html += `<div class="fx-row">
+        <span class="fx-label">1${curName} = ${rateText}</span>
+        <span class="fx-edit" data-cur="${cur}">編集</span>
+      </div>
+      <div class="fx-usage">${usageText}</div>`;
     });
-    html += '<div class="divider"></div>';
+    html += '</div><div style="height:0.5px;background:#e0e0e0;margin:8px 0;"></div>';
     fxArea.innerHTML = html;
-    document.getElementById("fx-edit-trigger")?.addEventListener("click", openFxModal);
-    if (currencies.some(cur => !monthFx[cur])) openFxModal();
+    fxArea.querySelectorAll(".fx-edit").forEach(el => {
+      el.addEventListener("click", openFxModal);
+    });
+    if (fxCurrencies.some(cur => !monthFx[cur])) openFxModal();
   } else {
     fxArea.innerHTML = "";
   }
@@ -958,9 +1067,10 @@ function openFxModal() {
   const exps = Object.values(state.expenses || {}).filter(e => e.date.startsWith(ym) && e.currency && e.currency !== "JPY");
   const currencies = [...new Set(exps.map(e => e.currency))];
   const monthFx = state.fxRates[ym] || {};
-  document.getElementById("fx-input-rows").innerHTML = currencies.map(cur =>
-    `<div class="fx-modal-row"><span class="fx-modal-lbl">1${cur} = ?円</span><input class="fx-modal-input" id="fx-input-${cur}" type="number" step="0.001" placeholder="例: 0.105" value="${monthFx[cur] || ""}" /></div>`
-  ).join("");
+  document.getElementById("fx-input-rows").innerHTML = currencies.map(cur => {
+    const curName = getCurrencyName(cur);
+    return `<div class="fx-modal-row"><span class="fx-modal-lbl">1${curName} = ?円</span><input class="fx-modal-input" id="fx-input-${cur}" type="number" step="0.001" placeholder="例: 0.105" value="${monthFx[cur] || ""}" /></div>`;
+  }).join("");
   document.getElementById("modal-fx").classList.add("open");
 }
 document.getElementById("btn-fx-save").addEventListener("click", async () => {
@@ -1000,30 +1110,26 @@ document.getElementById("btn-share-url").addEventListener("click", () => {
   if (navigator.share) navigator.share({ url: getRoomUrl(state.roomId) });
   else navigator.clipboard.writeText(getRoomUrl(state.roomId)).then(() => showToast("URLをコピーしました"));
 });
+document.getElementById("btn-add-home").addEventListener("click", () => {
+  showToast("ブラウザの「ホーム画面に追加」からどうぞ");
+});
 document.getElementById("btn-csv").addEventListener("click", () => showToast("CSV出力は近日実装予定です"));
 
 // ===== 明細画面 =====
 function renderList() {
   const ym = state.list.yearMonth;
   const catFilter = state.list.filterCategory;
-  const title = catFilter ? `${formatYearMonthJP(ym)}　${catFilter}` : `${formatYearMonthJP(ym)}　明細`;
-  document.getElementById("list-title").textContent = title;
+  document.getElementById("list-title").textContent = catFilter ? `${formatYearMonthJP(ym)}　${catFilter}` : `${formatYearMonthJP(ym)}　明細`;
 
   const expenses = state.expenses || {};
-  const fxRates = state.fxRates || {};
   let exps = Object.entries(expenses)
     .filter(([, e]) => e.date.startsWith(ym))
     .sort(([, a], [, b]) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
-
   if (catFilter) exps = exps.filter(([, e]) => e.category === catFilter);
 
   const scroll = document.getElementById("list-scroll");
   scroll.innerHTML = "";
-
-  if (exps.length === 0) {
-    scroll.innerHTML = '<div class="list-empty">この月の記録はありません</div>';
-    return;
-  }
+  if (exps.length === 0) { scroll.innerHTML = '<div class="list-empty">この月の記録はありません</div>'; return; }
 
   const p1 = state.meta?.person1 || "一人目";
   const p2 = state.meta?.person2 || "二人目";
@@ -1045,7 +1151,9 @@ function renderList() {
     const cats = state.meta?.categories || [];
     const catIdx = cats.indexOf(e.category);
     const catColor = catIdx >= 0 ? CAT_COLORS[catIdx] : "#aaa";
-    const amtDisplay = e.currency && e.currency !== "JPY" ? `${e.currency} ${e.amount.toLocaleString()}` : fmtAmt(e.amount);
+    const amtDisplay = e.currency && e.currency !== "JPY"
+      ? `${getCurrencySymbol(e.currency)}${e.amount.toLocaleString()}`
+      : fmtAmt(e.amount);
     row.innerHTML = `
       <span class="cat-badge" style="border-color:${catColor};color:${catColor};">${e.category || "?"}</span>
       <div class="record-main">
@@ -1062,14 +1170,8 @@ function renderList() {
 }
 
 document.getElementById("btn-list-back").addEventListener("click", () => showScreen("screen-summary"));
-document.getElementById("btn-list-prev").addEventListener("click", () => {
-  state.list.yearMonth = prevYearMonth(state.list.yearMonth);
-  renderList();
-});
-document.getElementById("btn-list-next").addEventListener("click", () => {
-  state.list.yearMonth = nextYearMonth(state.list.yearMonth);
-  renderList();
-});
+document.getElementById("btn-list-prev").addEventListener("click", () => { state.list.yearMonth = prevYearMonth(state.list.yearMonth); renderList(); });
+document.getElementById("btn-list-next").addEventListener("click", () => { state.list.yearMonth = nextYearMonth(state.list.yearMonth); renderList(); });
 
 // ===== 編集モーダル =====
 function openEditModal(id, expense) {
@@ -1087,7 +1189,7 @@ function openEditModal(id, expense) {
   setEditToggle("edit-toggle-for-whom", expense.forWhom);
   setEditToggle("edit-toggle-method", expense.method);
   document.getElementById("edit-amount-display").textContent = expense.amount.toLocaleString();
-  document.getElementById("edit-currency-badge").textContent = expense.currency === "JPY" ? "¥" : expense.currency;
+  document.getElementById("edit-currency-badge").textContent = expense.currency === "JPY" ? "¥" : getCurrencySymbol(expense.currency);
   renderEditCatGrid();
   document.getElementById("modal-edit").classList.add("open");
 }
@@ -1108,7 +1210,9 @@ function setEditToggle(groupId, value) {
 });
 
 document.getElementById("edit-memo").addEventListener("input", e => { editState.memo = e.target.value; });
-document.getElementById("edit-amount-row").addEventListener("click", () => {
+document.getElementById("edit-amount-row").addEventListener("click", e => {
+  // バッジ以外をタップしたら数字キーボード
+  if (e.target.id === "edit-currency-badge") return;
   numpadTarget = "edit";
   numpadValue = editState.amount > 0 ? String(editState.amount) : "0";
   document.getElementById("numpad-display").textContent = Number(numpadValue).toLocaleString();
@@ -1182,6 +1286,36 @@ function setupToggleGroup(groupId, stateKey) {
   });
 }
 
+// メモ入力後に自動で数字キーボードを開く
+document.getElementById("input-memo").addEventListener("input", e => { state.input.memo = e.target.value; });
+document.getElementById("input-memo").addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    e.target.blur();
+    // 少し遅延して数字キーボードを開く
+    setTimeout(() => {
+      numpadTarget = "input";
+      numpadValue = state.input.amount > 0 ? String(state.input.amount) : "0";
+      document.getElementById("numpad-display").textContent = Number(numpadValue).toLocaleString();
+      document.getElementById("numpad-overlay").classList.add("open");
+    }, 100);
+  }
+});
+document.getElementById("input-memo").addEventListener("blur", e => {
+  // メモに何か入力済みの場合のみ自動で金額入力へ
+  if (state.input.memo.trim() && state.input.amount === 0) {
+    setTimeout(() => {
+      // 他の要素にフォーカスが移っていないかチェック
+      if (!document.activeElement || document.activeElement.tagName !== "INPUT") {
+        numpadTarget = "input";
+        numpadValue = "0";
+        document.getElementById("numpad-display").textContent = "0";
+        document.getElementById("numpad-overlay").classList.add("open");
+      }
+    }, 150);
+  }
+});
+
 function openNumpad() {
   numpadTarget = "input";
   numpadValue = state.input.amount > 0 ? String(state.input.amount) : "0";
@@ -1214,7 +1348,12 @@ function updateAmountDisplay() {
   if (state.input.amount === 0) { el.textContent = "0"; el.classList.add("placeholder"); }
   else { el.textContent = state.input.amount.toLocaleString(); el.classList.remove("placeholder"); }
 }
-document.getElementById("amount-row").addEventListener("click", openNumpad);
+
+// 金額エリア（数字部分）タップで数字キーボード
+document.getElementById("amount-row").addEventListener("click", e => {
+  if (e.target.id === "currency-badge") return;
+  openNumpad();
+});
 
 function updateDateDisplay() { document.getElementById("input-date-display").textContent = formatDateJP(state.input.date); }
 document.getElementById("input-date-row").addEventListener("click", () => {
@@ -1228,7 +1367,9 @@ document.getElementById("input-date-row").addEventListener("click", () => {
 
 function resetInputForm() {
   state.input.date = todayString(); state.input.amount = 0; state.input.memo = "";
+  state.input.currency = "JPY";
   document.getElementById("input-memo").value = "";
+  document.getElementById("currency-badge").textContent = "¥";
   updateDateDisplay(); updateAmountDisplay();
 }
 
@@ -1251,7 +1392,6 @@ document.getElementById("btn-add-expense").addEventListener("click", async () =>
   } catch(e) { showToast("保存に失敗しました"); }
 });
 
-document.getElementById("input-memo").addEventListener("input", e => { state.input.memo = e.target.value; });
 setupToggleGroup("toggle-paid-by", "paidBy");
 setupToggleGroup("toggle-for-whom", "forWhom");
 setupToggleGroup("toggle-method", "method");
