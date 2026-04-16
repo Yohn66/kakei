@@ -778,7 +778,7 @@ document.getElementById("currency-badge").addEventListener("click",()=>openCurre
 document.getElementById("edit-currency-badge").addEventListener("click",()=>openCurrencyModal("edit"));
 
 // ===== カテゴリ =====
-const DEFAULT_CATS=["食費","外食・買い食い","医療","交通","日用品","光熱費・通信","旅行・娯楽","その他"];
+const DEFAULT_CATS=["食費","外食・軽食","医療","交通","日用品","通信・光熱費","旅行・娯楽","その他"];
 let topSelectedCats=[...DEFAULT_CATS];
 function renderTopCatGrid(){
   const grid=document.getElementById("top-cat-grid");grid.innerHTML="";
