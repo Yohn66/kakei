@@ -573,6 +573,14 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
   </div>
 </div>
 
+<!-- ホーム画面追加モーダル -->
+<div class="modal-overlay" id="modal-add-home">
+  <div class="modal-sheet">
+    <div class="modal-header"><span class="modal-title">ホーム画面への追加方法</span></div>
+    <div id="add-home-steps"></div>
+    <div class="modal-close-btn" id="btn-add-home-close">閉じる</div>
+  </div>
+</div>
 <!-- 数字キーボード -->
 <div class="numpad-overlay" id="numpad-overlay">
   <div class="numpad-sheet">
@@ -1054,7 +1062,26 @@ document.getElementById("btn-next-month").addEventListener("click",()=>{isMonthN
 document.getElementById("btn-add-loan").addEventListener("click",()=>showToast("貸し借り入力は近日実装予定です"));
 document.getElementById("btn-go-list").addEventListener("click",()=>{state.list.yearMonth=state.summary.yearMonth;state.list.filterCategory=null;showScreen("screen-list");});
 document.getElementById("btn-share-url").addEventListener("click",()=>{if(navigator.share)navigator.share({url:getRoomUrl(state.roomId)});else navigator.clipboard.writeText(getRoomUrl(state.roomId)).then(()=>showToast("URLをコピーしました"));});
-document.getElementById("btn-add-home").addEventListener("click",()=>showToast("ブラウザの「ホーム画面に追加」からどうぞ"));
+document.getElementById("btn-add-home").addEventListener("click",()=>{
+  const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent);
+  const isChromeOniOS=isIOS&&/CriOS/.test(navigator.userAgent);
+  const isAndroid=/Android/.test(navigator.userAgent);
+  const s=(n,t,sub)=>`<div class="step-row"><div class="step-num">${n}</div><div class="step-text">${t}${sub?`<br><span style="font-size:11px;color:#aaa;">${sub}</span>`:''}</div></div>`;
+  let html='';
+  if(isChromeOniOS){
+    html+=`<div class="steps-box"><div class="steps-title" style="color:#c0392b;font-weight:600;">⚠️ SafariでURLを開いてください</div>${s(1,'このURLをコピーする','集計画面「URLを共有する」からコピーできます')}${s(2,'Safariを開いてURLを貼り付けて開く','ChromeではホームAn画面に追加できません')}${s(3,'画面下部の共有ボタン（□↑）をタップ','')}${s(4,'「ホーム画面に追加」→「追加」をタップ','')}</div>`;
+  } else if(isIOS){
+    html+=`<div class="steps-box"><div class="steps-title">iPhone / iPad（Safari）</div>${s(1,'このページをSafariで開いている','✓ すでにSafariで開いています')}${s(2,'画面下部の共有ボタンをタップ','□に↑が入ったアイコンです')}${s(3,'「ホーム画面に追加」をタップ','リストをスクロールすると見つかります')}${s(4,'右上の「追加」をタップ','アイコン名はそのままでOKです')}</div>`;
+  } else if(isAndroid){
+    html+=`<div class="steps-box"><div class="steps-title">Android（Chrome）</div>${s(1,'画面上部または下部に案内が出たら','「インストール」または「追加」をタップするだけ')}${s(2,'案内が出ない場合：右上の︙メニューをタップ','')}${s(3,'「アプリをインストール」または「ホーム画面に追加」をタップ','')}${s(4,'「インストール」をタップ','')}</div>`;
+  } else {
+    html+=`<div class="steps-box"><div class="steps-title">スマホで開いてください</div>${s(1,'このURLをコピーしてスマホに送る','')}${s(2,'iPhoneの場合：Safariで開く','ChromeではなくSafariで開いてください')}${s(3,'Androidの場合：Chromeで開く','')}${s(4,'ブラウザのメニューから「ホーム画面に追加」','')}</div>`;
+  }
+  document.getElementById("add-home-steps").innerHTML=html;
+  document.getElementById("modal-add-home").classList.add("open");
+});
+document.getElementById("btn-add-home-close").addEventListener("click",()=>document.getElementById("modal-add-home").classList.remove("open"));
+document.getElementById("modal-add-home").addEventListener("click",e=>{if(e.target===document.getElementById("modal-add-home"))document.getElementById("modal-add-home").classList.remove("open");});
 document.getElementById("btn-csv").addEventListener("click",()=>showToast("CSV出力は近日実装予定です"));
 
 // ===== 明細画面 =====
