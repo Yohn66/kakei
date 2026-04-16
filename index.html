@@ -7,6 +7,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Kake.">
 <title>Kake.</title>
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ede5d8">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
 <style>
@@ -1210,12 +1213,20 @@ document.getElementById("tab-bar").addEventListener("click",e=>{const tab=e.targ
 // URL案内
 function renderGuideScreen(roomId){
   const url=getRoomUrl(roomId);document.getElementById("guide-url-text").textContent=url;
-  const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent);const isAndroid=/Android/.test(navigator.userAgent);
-  const s=(n,t)=>`<div class="step-row"><div class="step-num">${n}</div><div class="step-text">${t}</div></div>`;
-  let html='<div class="steps-title">';
-  if(isIOS){html+='ホーム画面に追加する方法（Safari）</div>'+s(1,"Safariでこのページを開く")+s(2,"下部の共有ボタン（□↑）をタップ")+s(3,"「ホーム画面に追加」を選ぶ");}
-  else if(isAndroid){html+='ホーム画面に追加する方法（Chrome）</div>'+s(1,"Chromeでこのページを開く")+s(2,"右上のメニューボタン（︙）をタップ")+s(3,"「ホーム画面に追加」を選ぶ");}
-  else{html+='スマホでURLを開いてください</div>'+s(1,"上のURLをコピーしてスマホに送る")+s(2,"スマホのブラウザでURLを開く")+s(3,"「ホーム画面に追加」で便利に使えます");}
+  const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent);
+  const isAndroid=/Android/.test(navigator.userAgent);
+  const isChromeOniOS=isIOS&&/CriOS/.test(navigator.userAgent);
+  const s=(n,t,sub)=>`<div class="step-row"><div class="step-num">${n}</div><div class="step-text">${t}${sub?`<br><span style="font-size:11px;color:#aaa;">${sub}</span>`:''}</div></div>`;
+  let html='';
+  if(isChromeOniOS){
+    html+=`<div class="steps-box"><div class="steps-title" style="color:#c0392b;font-weight:600;">⚠️ SafariでURLを開いてください</div>${s(1,'このURLをコピーする','下のボタンでコピーできます')}${s(2,'Safariを開いてURLを貼り付ける','ChromeではホームAn画面に追加できません')}${s(3,'Safari下部の共有ボタン（□↑）をタップ','')}${s(4,'「ホーム画面に追加」を選ぶ','')}</div>`;
+  } else if(isIOS){
+    html+=`<div class="steps-box"><div class="steps-title">ホーム画面に追加する方法（Safari）</div>${s(1,'このページをSafariで開いている','✓ すでにSafariで開いています')}${s(2,'画面下部の共有ボタンをタップ','□に↑が入ったアイコンです')}${s(3,'「ホーム画面に追加」をタップ','リストをスクロールすると見つかります')}${s(4,'右上の「追加」をタップ','アイコン名はそのままでOKです')}</div>`;
+  } else if(isAndroid){
+    html+=`<div class="steps-box"><div class="steps-title">ホーム画面に追加する方法（Chrome）</div>${s(1,'画面上部または下部に案内が出たら','「インストール」または「追加」をタップするだけ')}${s(2,'案内が出ない場合：右上の︙メニューをタップ','')}${s(3,'「アプリをインストール」または「ホーム画面に追加」をタップ','')}${s(4,'「インストール」をタップ','')}</div>`;
+  } else {
+    html+=`<div class="steps-box"><div class="steps-title">スマホでURLを開いてください</div>${s(1,'上のURLをコピーしてスマホに送る','')}${s(2,'iPhoneの場合：Safariで開く','ChromeではなくSafariで開いてください')}${s(3,'Androidの場合：Chromeで開く','')}${s(4,'ブラウザのメニューから「ホーム画面に追加」','')}</div>`;
+  }
   document.getElementById("guide-steps").innerHTML=html;
 }
 document.getElementById("btn-copy-url").addEventListener("click",()=>navigator.clipboard.writeText(document.getElementById("guide-url-text").textContent).then(()=>showToast("URLをコピーしました")).catch(()=>showToast("コピーできませんでした")));
