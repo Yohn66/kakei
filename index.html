@@ -254,6 +254,11 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .numpad-key:active { opacity: 0.6; }
 .numpad-key.dark { background: #aeb4bc; font-size: 17px; }
 .numpad-key.done { background: var(--black); color: var(--white); font-size: 16px; font-weight: 600; }
+
+/* 下部ボタン3列 */
+.bottom-btns { display: flex; gap: 6px; margin-top: 6px; margin-bottom: 8px; }
+.bottom-btn-sm { flex: 1; text-align: center; font-size: 11px; color: #555; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 10px 4px; background: var(--white); cursor: pointer; line-height: 1.6; }
+.bottom-btn-sm:active { opacity: 0.7; }
 </style>
 </head>
 <body>
@@ -434,10 +439,12 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
         <div class="settle-main" id="settle-main-text">計算中...</div>
         <div class="settle-detail-btn" id="btn-settle-detail">詳細 →</div>
       </div>
-      <div class="loan-btn" id="btn-add-loan">＋ 貸し借りを追加</div>
-      <div class="share-btn" id="btn-share-url">URLを共有する</div>
-      <div class="share-btn" id="btn-add-home" style="margin-top:6px;">ホーム画面に追加する</div>
-      <div class="csv-btn" id="btn-csv">データを出力する（CSV）</div>
+     <div class="loan-btn" id="btn-add-loan" style="background:#f5f3ef;border-color:#d0c8bc;">＋ 貸し借りを追加</div>
+     <div class="bottom-btns">
+       <div class="bottom-btn-sm" id="btn-share-url">URL<br>共有</div>
+       <div class="bottom-btn-sm" id="btn-add-home">ホーム画面<br>追加</div>
+       <div class="bottom-btn-sm" id="btn-csv">CSV<br>出力</div>
+     </div>
     </div>
   </div>
 
@@ -497,7 +504,15 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     </div>
     <div class="list-scroll" id="paid-list-scroll"></div>
   </div>
-
+ <!-- 貸し借り一覧画面 -->
+ <div id="screen-loan-list" class="screen">
+  <div class="list-nav">
+    <div class="list-nav-back" id="btn-loan-list-back">← 戻る</div>
+    <div class="list-nav-title" id="loan-list-title"></div>
+    <div style="width:48px;"></div>
+  </div>
+  <div class="list-scroll" id="loan-list-scroll"></div>
+</div>
 </div><!-- #app -->
 
 <!-- カテゴリ編集モーダル -->
@@ -569,6 +584,30 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     <button class="primary-btn" id="btn-edit-save" style="margin-top:13px;">保存</button>
     <div class="delete-btn" id="btn-edit-delete">削除</div>
     <div class="modal-close-btn" id="btn-edit-cancel">キャンセル</div>
+  </div>
+</div>
+
+<!-- 貸し借り入力モーダル -->
+<div class="modal-overlay" id="modal-loan">
+  <div class="modal-sheet">
+    <div class="modal-header"><span class="modal-title">貸し借りを追加</span></div>
+    <div class="lbl-mini" style="margin-top:0;">方向</div>
+    <div class="toggle-group" id="loan-toggle-direction">
+      <div class="toggle-btn active" data-value="p1top2" id="loan-dir-p1p2">よう → よしみ</div>
+      <div class="toggle-btn" data-value="p2top1" id="loan-dir-p2p1">よしみ → よう</div>
+    </div>
+    <div class="lbl-mini">金額</div>
+    <div class="amount-row" id="loan-amount-row">
+      <div class="currency-badge" style="cursor:default;">¥</div>
+      <div class="amount-display placeholder" id="loan-amount-display">0</div>
+    </div>
+    <input class="text-input" id="loan-memo" placeholder="メモ（任意）" maxlength="30" style="margin-top:9px;" />
+    <div class="date-row" id="loan-date-row" style="margin-top:9px;">
+      <span id="loan-date-display"></span>
+      <span style="color:#999;font-size:12px;">▼</span>
+    </div>
+    <button class="primary-btn" id="btn-loan-save" style="margin-top:13px;">追加する</button>
+    <div class="modal-close-btn" id="btn-loan-cancel">キャンセル</div>
   </div>
 </div>
 
@@ -970,6 +1009,9 @@ function showSettleScreen(){
   if(loan>0)loanHtml=`<div class="detail-row" style="border:none;"><div class="detail-left">${p1}が${p2}分を支払<div class="detail-sub">差し引き後</div></div><div class="detail-right">${fmtAmt(loan)}</div></div>`;
   else if(loan<0)loanHtml=`<div class="detail-row" style="border:none;"><div class="detail-left">${p2}が${p1}分を支払<div class="detail-sub">差し引き後</div></div><div class="detail-right">${fmtAmt(loan)}</div></div>`;
   document.getElementById("settle-loan-row").innerHTML=loanHtml;
+  document.getElementById("settle-loan-row").querySelector(".detail-row")?.addEventListener("click",()=>{
+  if(Object.values(state.loans||{}).filter(l=>l.date&&l.date.startsWith(ym)).length>0)showLoanList(ym);
+});
   // 最終精算ボックス
   const tot=settle.total;
   const mainEl=document.getElementById("final-settle-main");
@@ -1058,7 +1100,99 @@ document.getElementById("btn-prev-month").addEventListener("click",()=>{isMonthN
 document.getElementById("btn-next-month").addEventListener("click",()=>{isMonthNavigation=true;state.summary.yearMonth=nextYM(state.summary.yearMonth);renderSummary();});
 
 // ===== 各種ボタン =====
-document.getElementById("btn-add-loan").addEventListener("click",()=>showToast("貸し借り入力は近日実装予定です"));
+// ===== 貸し借り =====
+let loanDate = todayString();
+let loanAmount = 0;
+let loanDirection = "p1top2";
+
+function updateLoanDirectionBtns(){
+  const p1=state.meta?.person1||"一人目";
+  const p2=state.meta?.person2||"二人目";
+  document.getElementById("loan-dir-p1p2").textContent=`${p1} → ${p2}`;
+  document.getElementById("loan-dir-p2p1").textContent=`${p2} → ${p1}`;
+}
+function updateLoanDateDisplay(){
+  document.getElementById("loan-date-display").textContent=formatDateJP(loanDate);
+}
+function updateLoanAmountDisplay(){
+  const el=document.getElementById("loan-amount-display");
+  if(loanAmount===0){el.textContent="0";el.classList.add("placeholder");}
+  else{el.textContent=loanAmount.toLocaleString();el.classList.remove("placeholder");}
+}
+
+document.getElementById("btn-add-loan").addEventListener("click",()=>{
+  loanDate=todayString(); loanAmount=0; loanDirection="p1top2";
+  updateLoanDirectionBtns(); updateLoanDateDisplay(); updateLoanAmountDisplay();
+  document.getElementById("loan-memo").value="";
+  document.querySelectorAll("#loan-toggle-direction .toggle-btn").forEach(b=>b.classList.toggle("active",b.dataset.value==="p1top2"));
+  document.getElementById("modal-loan").classList.add("open");
+});
+
+document.getElementById("loan-toggle-direction").addEventListener("click",e=>{
+  const btn=e.target.closest(".toggle-btn");if(!btn)return;
+  document.querySelectorAll("#loan-toggle-direction .toggle-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active"); loanDirection=btn.dataset.value;
+});
+
+document.getElementById("loan-amount-row").addEventListener("click",()=>{
+  numpadTarget="loan"; numpadValue=loanAmount>0?String(loanAmount):"0";
+  document.getElementById("numpad-display").textContent=Number(numpadValue).toLocaleString();
+  document.getElementById("numpad-overlay").classList.add("open");
+});
+
+document.getElementById("loan-date-row").addEventListener("click",()=>{
+  const inp=document.createElement("input");inp.type="date";inp.value=loanDate;
+  inp.style.cssText="position:fixed;opacity:0;top:0;left:0;width:1px;height:1px;";
+  document.body.appendChild(inp);inp.focus();inp.click();
+  inp.addEventListener("change",()=>{if(inp.value){loanDate=inp.value;updateLoanDateDisplay();}document.body.removeChild(inp);});
+  inp.addEventListener("blur",()=>{setTimeout(()=>{if(document.body.contains(inp))document.body.removeChild(inp);},300);});
+});
+
+document.getElementById("btn-loan-save").addEventListener("click",async()=>{
+  if(loanAmount<=0){showToast("金額を入力してください");return;}
+  const p1=state.meta?.person1||"一人目";
+  const p2=state.meta?.person2||"二人目";
+  const from=loanDirection==="p1top2"?"person1":"person2";
+  const to=loanDirection==="p1top2"?"person2":"person1";
+  const data={date:loanDate,from,to,amount:loanAmount,memo:document.getElementById("loan-memo").value.trim(),createdAt:Date.now()};
+  try{
+    await push(ref(db,`rooms/${state.roomId}/loans`),data);
+    document.getElementById("modal-loan").classList.remove("open");
+    showToast("追加しました ✓");
+    renderSummary();
+  }catch(e){showToast("保存に失敗しました");}
+});
+
+document.getElementById("btn-loan-cancel").addEventListener("click",()=>document.getElementById("modal-loan").classList.remove("open"));
+document.getElementById("modal-loan").addEventListener("click",e=>{if(e.target===document.getElementById("modal-loan"))document.getElementById("modal-loan").classList.remove("open");});
+
+// 貸し借り一覧画面
+function showLoanList(ym){
+  const p1=state.meta?.person1||"一人目";
+  const p2=state.meta?.person2||"二人目";
+  document.getElementById("loan-list-title").textContent="貸し借り";
+  const loans=Object.values(state.loans||{}).filter(l=>l.date&&l.date.startsWith(ym)).sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt-a.createdAt);
+  const scroll=document.getElementById("loan-list-scroll");scroll.innerHTML="";
+  if(loans.length===0){scroll.innerHTML='<div class="list-empty">この月の貸し借りはありません</div>';return;}
+  let ld="";
+  loans.forEach(l=>{
+    if(l.date!==ld){const h=document.createElement("div");h.className="date-group-header";h.textContent=formatDateJP(l.date);scroll.appendChild(h);ld=l.date;}
+    const fromName=l.from==="person1"?p1:p2;
+    const toName=l.to==="person1"?p1:p2;
+    const wrap=document.createElement("div");wrap.className="record-row-wrap";
+    const row=document.createElement("div");row.className="record-row";row.style.cursor="default";
+    row.innerHTML=`<div class="record-main"><div class="record-memo">${l.memo||"（メモなし）"}</div><div class="record-sub">${fromName} → ${toName}</div></div><div class="record-right"><div class="record-amount">${fmtAmt(l.amount)}</div></div>`;
+    wrap.appendChild(row);scroll.appendChild(wrap);
+  });
+  document.getElementById("btn-loan-list-back").onclick=()=>{
+    document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+    document.getElementById("screen-settle").classList.add("active");
+    document.getElementById("tab-bar").classList.remove("visible");
+  };
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById("screen-loan-list").classList.add("active");
+  document.getElementById("tab-bar").classList.remove("visible");
+}
 document.getElementById("btn-go-list").addEventListener("click",()=>{state.list.yearMonth=state.summary.yearMonth;state.list.filterCategory=null;showScreen("screen-list");});
 document.getElementById("btn-share-url").addEventListener("click",()=>{if(navigator.share)navigator.share({url:getRoomUrl(state.roomId)});else navigator.clipboard.writeText(getRoomUrl(state.roomId)).then(()=>showToast("URLをコピーしました"));});
 document.getElementById("btn-add-home").addEventListener("click",()=>{
@@ -1193,6 +1327,7 @@ function updatePersonToggles(){
   const p1=state.meta?.person1||"-";const p2=state.meta?.person2||"-";
   ["toggle-paid-p1","toggle-for-p1"].forEach(id=>document.getElementById(id).textContent=p1);
   ["toggle-paid-p2","toggle-for-p2"].forEach(id=>document.getElementById(id).textContent=p2);
+  updateLoanDirectionBtns();
 }
 function setupToggleGroup(gid,key){
   document.getElementById(gid).addEventListener("click",e=>{
@@ -1209,7 +1344,7 @@ document.getElementById("numpad-overlay").addEventListener("click",e=>{if(e.targ
 document.querySelectorAll(".numpad-key").forEach(key=>{
   key.addEventListener("click",()=>{
     const k=key.dataset.key;
-    if(k==="done"){const v=parseInt(numpadValue)||0;if(numpadTarget==="input"){state.input.amount=v;updateAmountDisplay();}else{editState.amount=v;document.getElementById("edit-amount-display").textContent=v.toLocaleString();}closeNumpad();}
+    if(k==="done"){const v=parseInt(numpadValue)||0;if(numpadTarget==="input"){state.input.amount=v;updateAmountDisplay();}else if(numpadTarget==="loan"){loanAmount=v;updateLoanAmountDisplay();}else{editState.amount=v;document.getElementById("edit-amount-display").textContent=v.toLocaleString();}closeNumpad();}
     else if(k==="del"){numpadValue=numpadValue.length>1?numpadValue.slice(0,-1):"0";}
     else{if(numpadValue==="0")numpadValue=k;else if(numpadValue.length<8)numpadValue+=k;}
     document.getElementById("numpad-display").textContent=Number(numpadValue).toLocaleString();
