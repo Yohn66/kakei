@@ -178,7 +178,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .record-row { display: flex; align-items: center; padding: 12px 16px; border-bottom: 0.5px solid #ececec; gap: 10px; cursor: pointer; background: var(--white); transform: translateX(0); transition: transform 0.2s ease; position: relative; z-index: 1; }
 .record-row:active { background: #f8f8f8; }
 .swipe-delete-btn { position: absolute; right: 0; top: 0; bottom: 0; width: 80px; background: #e74c3c; color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; cursor: pointer; z-index: 0; }
-.cat-badge { font-size: 11px; border: 1px solid; border-radius: 5px; padding: 2px 7px; white-space: nowrap; flex-shrink: 0; }
+.cat-badge { font-size: 11px; border: 1.5px solid; border-radius: 5px; padding: 3px 0; white-space: nowrap; flex-shrink: 0; width: 56px; text-align: center; font-weight: 600; }
 .record-main { flex: 1; min-width: 0; }
 .record-memo { font-size: 14px; color: var(--black); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .record-sub { font-size: 11px; color: var(--gray1); margin-top: 2px; }
@@ -324,7 +324,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
       </div>
       <div class="cat-header">
         <span class="cat-header-lbl">カテゴリ（後から変更できます）</span>
-        <span class="cat-limit">※上限8つ</span>
+        <span class="cat-limit">※上限9つ</span>
       </div>
       <div class="cat-grid" id="top-cat-grid"></div>
       <div class="cat-hint">タップで選択・解除、長押しで名前を変更</div>
@@ -371,9 +371,12 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
   <!-- 入力画面 -->
   <div id="screen-input" class="screen">
     <div class="input-body">
-      <div class="date-row" id="input-date-row">
-        <span id="input-date-display"></span>
-        <span style="color:#999;font-size:12px;">▼</span>
+      <div style="display:flex;gap:8px;align-items:stretch;">
+        <div class="date-row" id="input-date-row" style="flex:1;">
+          <span id="input-date-display"></span>
+          <span style="color:#999;font-size:12px;">▼</span>
+        </div>
+        <div id="btn-fixed-mode" style="border:1px solid #bbb;border-radius:8px;padding:11px 14px;font-size:13px;color:#999;cursor:pointer;white-space:nowrap;background:var(--white);font-family:var(--font);flex-shrink:0;">固定費</div>
       </div>
       <div class="lbl-mini">誰が</div>
       <div class="toggle-group" id="toggle-paid-by">
@@ -515,6 +518,16 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
       <div style="width:48px;"></div>
     </div>
     <div class="list-scroll" id="loan-list-scroll"></div>
+  </div>
+
+  <!-- 固定費管理画面 -->
+  <div id="screen-repeating" class="screen">
+    <div class="list-nav">
+      <div class="list-nav-back" id="btn-repeating-back">← 戻る</div>
+      <div class="list-nav-title">固定費</div>
+      <div style="width:48px;"></div>
+    </div>
+    <div class="list-scroll" id="repeating-scroll"></div>
   </div>
 
 </div><!-- #app -->
@@ -659,7 +672,8 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getDatabase(firebaseApp);
 
-const CAT_COLORS = ["#c4846a","#b8962e","#7a9abf","#8fba8f","#a0889e","#7aab9e","#888780","#c9a87c"];
+const CAT_COLORS = ["#c4846a","#b8962e","#7a9abf","#8fba8f","#a0889e","#7aab9e","#888780","#c9a87c","#9b7cb6"];
+const FIXED_CAT = "固定費";
 const CURRENCIES = [
   { code:"JPY", symbol:"¥",   name:"円"      },
   { code:"KRW", symbol:"₩",   name:"ウォン"  },
@@ -674,7 +688,7 @@ const getCurrencyName   = code => CURRENCIES.find(c=>c.code===code)?.name||code;
 
 const state = {
   roomId:null, meta:null,
-  expenses:{}, loans:{}, fxRates:{},
+  expenses:{}, loans:{}, fxRates:{}, repeating:{},
   summary:{ yearMonth:currentYearMonth(), filter:"all" },
   list:{ yearMonth:currentYearMonth(), filterCategory:null },
   input:{ date:todayString(), paidBy:"both", forWhom:"both", memo:"", method:"card", amount:0, currency:"JPY", category:null }
@@ -685,6 +699,7 @@ let numpadValue="0", numpadTarget="input";
 let deleteUndoTimer=null, deleteUndoData=null;
 let currencyTarget="input";
 let isMonthNavigation=false;
+let isFixedMode=false; // 固定費モードフラグ
 
 // ===== ユーティリティ =====
 function todayString(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
@@ -801,10 +816,14 @@ function renderTopCatGrid(){
 }
 function toggleTopCat(cat,btn){
   if(topSelectedCats.includes(cat)){if(topSelectedCats.length<=1)return;topSelectedCats=topSelectedCats.filter(c=>c!==cat);btn.classList.add("off");}
-  else{if(topSelectedCats.length>=8){showToast("カテゴリは最大8つです");return;}topSelectedCats.push(cat);btn.classList.remove("off");}
+  else{if(topSelectedCats.length>=9){showToast("カテゴリは最大9つです");return;}topSelectedCats.push(cat);btn.classList.remove("off");}
 }
 function renderInputCatGrid(){
-  const grid=document.getElementById("input-cat-grid");grid.innerHTML="";
+  const grid=document.getElementById("input-cat-grid");
+  const link=document.getElementById("btn-cat-edit-input");
+  if(isFixedMode){grid.style.display="none";link.style.display="none";return;}
+  grid.style.display="";link.style.display="";
+  grid.innerHTML="";
   (state.meta?.categories||[]).forEach(cat=>{
     const btn=document.createElement("div");btn.className="input-cat-btn"+(state.input.category===cat?" active":"");btn.textContent=cat;
     btn.addEventListener("click",()=>{state.input.category=cat;renderInputCatGrid();});grid.appendChild(btn);
@@ -843,12 +862,12 @@ function renderCatEditList(){
     delBtn.addEventListener("click",()=>confirmDeleteCategory(i));
     item.appendChild(dot);item.appendChild(inp);item.appendChild(delBtn);list.appendChild(item);
   });
-  const remain=8-catEditValues.length;
+  const remain=9-catEditValues.length;
   document.getElementById("cat-add-remain").textContent=remain;
   document.getElementById("btn-cat-add").style.display=remain>0?"block":"none";
 }
 
-document.getElementById("btn-cat-add").addEventListener("click",()=>{if(catEditValues.length>=8)return;catEditValues.push("新しいカテゴリ");renderCatEditList();});
+document.getElementById("btn-cat-add").addEventListener("click",()=>{if(catEditValues.length>=9)return;catEditValues.push("新しいカテゴリ");renderCatEditList();});
 
 // ★修正2: 空欄チェック + 既存支出のカテゴリ名一括更新
 document.getElementById("btn-cat-save").addEventListener("click",async()=>{
@@ -916,6 +935,68 @@ async function confirmDeleteCategory(index){
 
 document.getElementById("btn-cat-edit-input").addEventListener("click",openCatEditModal);
 document.getElementById("btn-cat-edit-summary").addEventListener("click",openCatEditModal);
+
+// ===== 固定費ボタン =====
+function updateFixedModeBtn(){
+  const btn=document.getElementById("btn-fixed-mode");
+  if(isFixedMode){
+    btn.style.background="#111";btn.style.color="#fff";btn.style.borderColor="#111";btn.style.fontWeight="600";
+  }else{
+    btn.style.background="var(--white)";btn.style.color="#999";btn.style.borderColor="#bbb";btn.style.fontWeight="400";
+  }
+}
+document.getElementById("btn-fixed-mode").addEventListener("click",()=>{
+  isFixedMode=!isFixedMode;
+  if(isFixedMode){
+    // 固定費モードオン：カテゴリを固定費に強制セット
+    state.input.category=FIXED_CAT;
+  }else{
+    // 固定費モードオフ：通常カテゴリに戻す
+    const cats=state.meta?.categories||[];
+    state.input.category=cats[0]||null;
+  }
+  updateFixedModeBtn();
+  renderInputCatGrid();
+});
+
+// ===== 固定費管理画面 =====
+function showRepeatingScreen(){
+  const scroll=document.getElementById("repeating-scroll");scroll.innerHTML="";
+  const items=Object.entries(state.repeating||{});
+  if(items.length===0){
+    scroll.innerHTML='<div class="list-empty">登録された固定費はありません<br><span style="font-size:12px;color:#bbb;margin-top:8px;display:block;">入力画面で「固定費」ボタンをオンにして追加してください</span></div>';
+  }else{
+    const p1=state.meta?.person1||"一人目";const p2=state.meta?.person2||"二人目";
+    const pl=v=>v==="both"?"二人":v==="person1"?p1:p2;
+    const fl=v=>v==="both"?"二人分":v==="person1"?`${p1}の分`:`${p2}の分`;
+    const ml=v=>v==="barcode"?"バーコード":v==="card"?"カード":"現金";
+    items.sort(([,a],[,b])=>b.createdAt-a.createdAt).forEach(([id,r])=>{
+      const wrap=document.createElement("div");wrap.className="record-row-wrap";
+      const row=document.createElement("div");row.className="record-row";row.style.cursor="default";
+      const catColor=CAT_COLORS[8]; // 固定費は9色目
+      row.innerHTML=`<span class="cat-badge" style="border-color:${catColor};color:${catColor};min-width:52px;text-align:center;">固定費</span><div class="record-main"><div class="record-memo">${r.memo||""}</div><div class="record-sub">${pl(r.paidBy)}・${fl(r.forWhom)}・${ml(r.method)}・毎月1日</div></div><div class="record-right"><div class="record-amount">${fmtAmt(r.amount)}</div></div>`;
+      // 削除ボタン
+      const del=document.createElement("div");del.className="swipe-delete-btn";del.textContent="削除";
+      del.addEventListener("click",async()=>{
+        if(!confirm(`「${r.memo||"固定費"}」の固定費登録を削除しますか？\n（過去の記録は残ります）`))return;
+        try{
+          await remove(ref(db,`rooms/${state.roomId}/repeating/${id}`));
+          delete state.repeating[id];
+          showRepeatingScreen();
+          showToast("削除しました ✓");
+        }catch(e){showToast("削除に失敗しました");}
+      });
+      wrap.appendChild(del);wrap.appendChild(row);
+      // スワイプ削除
+      setupSwipe(row,del,wrap);
+      scroll.appendChild(wrap);
+    });
+  }
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById("screen-repeating").classList.add("active");
+  document.getElementById("tab-bar").classList.remove("visible");
+}
+document.getElementById("btn-repeating-back").addEventListener("click",()=>showScreen("screen-summary"));
 
 // ===== 集計ロジック =====
 function getFilteredExpenses(expenses,ym,filter){
@@ -988,6 +1069,8 @@ function renderSummary(){
   const prevTotals={};cats.forEach(c=>prevTotals[c]=0);
   prevFiltered.forEach(e=>{const amt=toJPY(e.amount,e.currency,fxRates,pym);if(prevTotals[e.category]!==undefined)prevTotals[e.category]+=amt;});
   const total=Object.values(catTotals).reduce((a,b)=>a+b,0);
+  // 固定費の集計（repeatingで自動追加されたものもexpensesに含まれるのでcatTotalsで拾う）
+  const fixedTotal=Object.values(state.expenses||{}).filter(e=>e.date.startsWith(ym)&&e.category===FIXED_CAT).reduce((s,e)=>s+toJPY(e.amount,e.currency,fxRates,ym),0);
   document.getElementById("chart-total").textContent=fmtAmt(total);
   renderDonutChart("summary-chart",cats.map(c=>catTotals[c]),cats.map((_,i)=>CAT_COLORS[i]),isMonthNavigation?0:400);
   const listEl=document.getElementById("cat-list");listEl.innerHTML="";
@@ -999,6 +1082,19 @@ function renderSummary(){
     row.addEventListener("click",()=>{state.list.yearMonth=ym;state.list.filterCategory=cat;showScreen("screen-list");});
     listEl.appendChild(row);
   });
+
+  // 固定費行（9番目・カテゴリグリッドには出さないが集計画面には表示）
+  const prevFixedTotal=Object.values(state.expenses||{}).filter(e=>e.date.startsWith(pym)&&e.category===FIXED_CAT).reduce((s,e)=>s+toJPY(e.amount,e.currency,fxRates,pym),0);
+  const fixedFiltered=getFilteredExpenses(state.expenses||{},ym,filter).filter(e=>e.category===FIXED_CAT);
+  const fixedAmt=fixedFiltered.reduce((s,e)=>s+toJPY(e.amount,e.currency,fxRates,ym),0);
+  if(fixedAmt>0||Object.keys(state.repeating||{}).length>0){
+    const fixedDiff=fixedAmt-prevFixedTotal;
+    const fixedDiffHtml=fixedDiff===0?`<span class="diff-eq">±0</span>`:fixedDiff>0?`<span class="diff-up">+${fixedDiff.toLocaleString()}</span>`:`<span class="diff-dn">−${Math.abs(fixedDiff).toLocaleString()}</span>`;
+    const fixedRow=document.createElement("div");fixedRow.className="cat-row";
+    fixedRow.innerHTML=`<div class="cat-left"><div class="color-dot" style="background:${CAT_COLORS[8]};"></div><span class="cat-name-lbl">固定費</span></div><div class="cat-right">${fixedDiffHtml}<span class="cat-amt-lbl">${fmtAmt(fixedAmt)}</span></div>`;
+    fixedRow.addEventListener("click",()=>showRepeatingScreen());
+    listEl.appendChild(fixedRow);
+  }
 
   // ★修正4: 未知カテゴリの警告表示
   const unknownTotal={};
@@ -1055,7 +1151,7 @@ function renderDonutChart(canvasId,data,colors,animDuration=400){
   const cd=total===0?[1]:data;const cc=total===0?["#f0f0f0"]:colors;
   if(canvasId==="summary-chart"&&summaryChart){summaryChart.destroy();summaryChart=null;}
   if(canvasId==="settle-chart"&&settleChart){settleChart.destroy();settleChart=null;}
-  const chart=new Chart(canvas,{type:"doughnut",data:{datasets:[{data:cd,backgroundColor:cc,borderWidth:0}]},options:{cutout:"62%",plugins:{legend:{display:false},tooltip:{enabled:false}},animation:{duration:animDuration}}});
+  const chart=new Chart(canvas,{type:"doughnut",data:{datasets:[{data:cd,backgroundColor:cc,borderWidth:total===0?0:2,borderColor:"#ffffff"}]},options:{cutout:"62%",plugins:{legend:{display:false},tooltip:{enabled:false}},animation:{duration:animDuration}}});
   if(canvasId==="summary-chart")summaryChart=chart;
   if(canvasId==="settle-chart")settleChart=chart;
 }
@@ -1449,14 +1545,32 @@ document.getElementById("input-date-row").addEventListener("click",()=>{
   inp.addEventListener("change",()=>{if(inp.value){state.input.date=inp.value;updateDateDisplay();}document.body.removeChild(inp);});
   inp.addEventListener("blur",()=>{setTimeout(()=>{if(document.body.contains(inp))document.body.removeChild(inp);},300);});
 });
-function resetInputForm(){state.input.date=todayString();state.input.amount=0;state.input.memo="";state.input.currency="JPY";document.getElementById("input-memo").value="";document.getElementById("currency-badge").textContent="¥";updateDateDisplay();updateAmountDisplay();}
+function resetInputForm(){
+  state.input.date=todayString();state.input.amount=0;state.input.memo="";state.input.currency="JPY";
+  document.getElementById("input-memo").value="";document.getElementById("currency-badge").textContent="¥";
+  updateDateDisplay();updateAmountDisplay();
+  // 固定費モードをリセット
+  if(isFixedMode){isFixedMode=false;updateFixedModeBtn();renderInputCatGrid();}
+}
 document.getElementById("btn-add-expense").addEventListener("click",async()=>{
   if(!state.input.memo.trim()){showToast("「何に使ったか」を入力してください");return;}
   if(state.input.amount<=0){showToast("金額を入力してください");return;}
-  if(!state.input.category){showToast("カテゴリを選択してください");return;}
+  if(!isFixedMode&&!state.input.category){showToast("カテゴリを選択してください");return;}
   if(!state.roomId){showToast("エラー：ルームが見つかりません");return;}
-  const data={date:state.input.date,memo:state.input.memo.trim(),paidBy:state.input.paidBy,forWhom:state.input.forWhom,amount:state.input.amount,currency:state.input.currency,method:state.input.method,category:state.input.category,createdAt:Date.now()};
-  try{await push(ref(db,`rooms/${state.roomId}/expenses`),data);showToast("追加しました ✓");resetInputForm();}catch(e){showToast("保存に失敗しました");}
+  const category=isFixedMode?FIXED_CAT:state.input.category;
+  const data={date:state.input.date,memo:state.input.memo.trim(),paidBy:state.input.paidBy,forWhom:state.input.forWhom,amount:state.input.amount,currency:state.input.currency,method:state.input.method,category,createdAt:Date.now()};
+  try{
+    await push(ref(db,`rooms/${state.roomId}/expenses`),data);
+    // 固定費モードならrepeatingにも保存
+    if(isFixedMode){
+      const repData={memo:data.memo,paidBy:data.paidBy,forWhom:data.forWhom,amount:data.amount,currency:data.currency,method:data.method,category:FIXED_CAT,createdAt:Date.now(),lastAppliedYM:state.input.date.slice(0,7)};
+      await push(ref(db,`rooms/${state.roomId}/repeating`),repData);
+      showToast("固定費として登録しました ✓");
+    }else{
+      showToast("追加しました ✓");
+    }
+    resetInputForm();
+  }catch(e){showToast("保存に失敗しました");}
 });
 setupToggleGroup("toggle-paid-by","paidBy");setupToggleGroup("toggle-for-whom","forWhom");setupToggleGroup("toggle-method","method");
 document.getElementById("tab-bar").addEventListener("click",e=>{const tab=e.target.closest(".tab");if(!tab)return;showScreen(`screen-${tab.dataset.tab}`);});
@@ -1523,6 +1637,9 @@ function subscribeRoom(roomId){
     renderInputCatGrid();
     if(document.getElementById("screen-summary").classList.contains("active"))renderSummary();
   });
+  onValue(ref(db,`rooms/${roomId}/repeating`),snap=>{
+    state.repeating=snap.val()||{};
+  });
 }
 
 // 起動
@@ -1530,13 +1647,42 @@ async function init(){
   renderTopCatGrid();
   const hash=location.hash.replace("#","");
   if(hash&&/^[a-z0-9]{12}$/.test(hash)){
-    try{const snap=await get(ref(db,`rooms/${hash}/meta`));if(snap.exists()){state.roomId=hash;state.meta=snap.val();state.input.category=state.meta.categories[0];localStorage.setItem("kakei_room",hash);updatePersonToggles();renderInputCatGrid();updateDateDisplay();subscribeRoom(hash);showScreen("screen-input");return;}}catch(e){console.error(e);}
+    try{const snap=await get(ref(db,`rooms/${hash}/meta`));if(snap.exists()){state.roomId=hash;state.meta=snap.val();state.input.category=state.meta.categories[0];localStorage.setItem("kakei_room",hash);updatePersonToggles();renderInputCatGrid();updateDateDisplay();subscribeRoom(hash);await applyRepeating();showScreen("screen-input");return;}}catch(e){console.error(e);}
   }
   const saved=localStorage.getItem("kakei_room");
   if(saved){
-    try{const snap=await get(ref(db,`rooms/${saved}/meta`));if(snap.exists()){state.roomId=saved;state.meta=snap.val();state.input.category=state.meta.categories[0];location.hash=saved;updatePersonToggles();renderInputCatGrid();updateDateDisplay();subscribeRoom(saved);showScreen("screen-input");return;}}catch(e){console.error(e);}
+    try{const snap=await get(ref(db,`rooms/${saved}/meta`));if(snap.exists()){state.roomId=saved;state.meta=snap.val();state.input.category=state.meta.categories[0];location.hash=saved;updatePersonToggles();renderInputCatGrid();updateDateDisplay();subscribeRoom(saved);await applyRepeating();showScreen("screen-input");return;}}catch(e){console.error(e);}
   }
   showScreen("screen-top");
+}
+
+// 固定費の自動追加（起動時に未追加の月があれば1日付で追加）
+async function applyRepeating(){
+  try{
+    const repSnap=await get(ref(db,`rooms/${state.roomId}/repeating`));
+    if(!repSnap.exists())return;
+    const repeating=repSnap.val();
+    const currentYM=currentYearMonth();
+    const updates={};
+    const pushTasks=[];
+    for(const[id,r]of Object.entries(repeating)){
+      const lastYM=r.lastAppliedYM||"";
+      // lastAppliedYMが今月より前なら、今月分を追加
+      if(lastYM<currentYM){
+        const date=`${currentYM}-01`;
+        const data={date,memo:r.memo,paidBy:r.paidBy,forWhom:r.forWhom,amount:r.amount,currency:r.currency||"JPY",method:r.method,category:FIXED_CAT,createdAt:Date.now()};
+        pushTasks.push(push(ref(db,`rooms/${state.roomId}/expenses`),data));
+        updates[`rooms/${state.roomId}/repeating/${id}/lastAppliedYM`]=currentYM;
+      }
+    }
+    if(pushTasks.length>0){
+      await Promise.all(pushTasks);
+      await update(ref(db),updates);
+      // stateにも反映（subscribeRoomがすぐ拾うが念のため）
+      const expSnap=await get(ref(db,`rooms/${state.roomId}/expenses`));
+      if(expSnap.exists())state.expenses=expSnap.val();
+    }
+  }catch(e){console.error("applyRepeating error:",e);}
 }
 init();
 </script>
