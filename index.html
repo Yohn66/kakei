@@ -449,6 +449,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
        <div class="bottom-btn-sm" id="btn-share-url">URL<br>共有</div>
        <div class="bottom-btn-sm" id="btn-add-home">ホーム画面<br>追加</div>
        <div class="bottom-btn-sm" id="btn-csv">CSV<br>出力</div>
+       <div class="bottom-btn-sm" id="btn-reload">更新<br>再読込</div>
      </div>
     </div>
   </div>
@@ -1062,17 +1063,19 @@ function renderSummary(){
   const filtered=getFilteredExpenses(expenses,ym,filter);
   const cats=state.meta?.categories||[];
   const fxRates=state.fxRates||{};
-  const catTotals={};cats.forEach(c=>catTotals[c]=0);
+  // 通常カテゴリ＋固定費を含む全カテゴリで集計
+  const allCats=[...cats, FIXED_CAT];
+  const catTotals={};allCats.forEach(c=>catTotals[c]=0);
   filtered.forEach(e=>{const amt=toJPY(e.amount,e.currency,fxRates,ym);if(catTotals[e.category]!==undefined)catTotals[e.category]+=amt;});
   const pym=prevYM(ym);
   const prevFiltered=getFilteredExpenses(expenses,pym,filter);
-  const prevTotals={};cats.forEach(c=>prevTotals[c]=0);
+  const prevTotals={};allCats.forEach(c=>prevTotals[c]=0);
   prevFiltered.forEach(e=>{const amt=toJPY(e.amount,e.currency,fxRates,pym);if(prevTotals[e.category]!==undefined)prevTotals[e.category]+=amt;});
   const total=Object.values(catTotals).reduce((a,b)=>a+b,0);
-  // 固定費の集計（repeatingで自動追加されたものもexpensesに含まれるのでcatTotalsで拾う）
-  const fixedTotal=Object.values(state.expenses||{}).filter(e=>e.date.startsWith(ym)&&e.category===FIXED_CAT).reduce((s,e)=>s+toJPY(e.amount,e.currency,fxRates,ym),0);
   document.getElementById("chart-total").textContent=fmtAmt(total);
-  renderDonutChart("summary-chart",cats.map(c=>catTotals[c]),cats.map((_,i)=>CAT_COLORS[i]),isMonthNavigation?0:400);
+  // グラフ：通常カテゴリ＋固定費
+  const chartColors=[...cats.map((_,i)=>CAT_COLORS[i]), CAT_COLORS[8]];
+  renderDonutChart("summary-chart",allCats.map(c=>catTotals[c]),chartColors,isMonthNavigation?0:400);
   const listEl=document.getElementById("cat-list");listEl.innerHTML="";
   cats.forEach((cat,i)=>{
     const amt=catTotals[cat];const diff=amt-(prevTotals[cat]||0);
@@ -1084,9 +1087,8 @@ function renderSummary(){
   });
 
   // 固定費行（9番目・カテゴリグリッドには出さないが集計画面には表示）
-  const prevFixedTotal=Object.values(state.expenses||{}).filter(e=>e.date.startsWith(pym)&&e.category===FIXED_CAT).reduce((s,e)=>s+toJPY(e.amount,e.currency,fxRates,pym),0);
-  const fixedFiltered=getFilteredExpenses(state.expenses||{},ym,filter).filter(e=>e.category===FIXED_CAT);
-  const fixedAmt=fixedFiltered.reduce((s,e)=>s+toJPY(e.amount,e.currency,fxRates,ym),0);
+  const prevFixedTotal=prevTotals[FIXED_CAT]||0;
+  const fixedAmt=catTotals[FIXED_CAT]||0;
   if(fixedAmt>0||Object.keys(state.repeating||{}).length>0){
     const fixedDiff=fixedAmt-prevFixedTotal;
     const fixedDiffHtml=fixedDiff===0?`<span class="diff-eq">±0</span>`:fixedDiff>0?`<span class="diff-up">+${fixedDiff.toLocaleString()}</span>`:`<span class="diff-dn">−${Math.abs(fixedDiff).toLocaleString()}</span>`;
@@ -1099,7 +1101,7 @@ function renderSummary(){
   // ★修正4: 未知カテゴリの警告表示
   const unknownTotal={};
   filtered.forEach(e=>{
-    if(!cats.includes(e.category)){
+    if(!cats.includes(e.category)&&e.category!==FIXED_CAT){
       const c=e.category||"未分類";
       const amt=toJPY(e.amount,e.currency,fxRates,ym);
       unknownTotal[c]=(unknownTotal[c]||0)+amt;
@@ -1151,7 +1153,7 @@ function renderDonutChart(canvasId,data,colors,animDuration=400){
   const cd=total===0?[1]:data;const cc=total===0?["#f0f0f0"]:colors;
   if(canvasId==="summary-chart"&&summaryChart){summaryChart.destroy();summaryChart=null;}
   if(canvasId==="settle-chart"&&settleChart){settleChart.destroy();settleChart=null;}
-  const chart=new Chart(canvas,{type:"doughnut",data:{datasets:[{data:cd,backgroundColor:cc,borderWidth:total===0?0:2,borderColor:"#ffffff"}]},options:{cutout:"62%",plugins:{legend:{display:false},tooltip:{enabled:false}},animation:{duration:animDuration}}});
+  const chart=new Chart(canvas,{type:"doughnut",data:{datasets:[{data:cd,backgroundColor:cc,borderWidth:total===0?0:1,borderColor:"#ffffff"}]},options:{cutout:"62%",plugins:{legend:{display:false},tooltip:{enabled:false}},animation:{duration:animDuration}}});
   if(canvasId==="summary-chart")summaryChart=chart;
   if(canvasId==="settle-chart")settleChart=chart;
 }
@@ -1402,6 +1404,7 @@ document.getElementById("btn-add-home").addEventListener("click",()=>{
 document.getElementById("btn-add-home-close").addEventListener("click",()=>document.getElementById("modal-add-home").classList.remove("open"));
 document.getElementById("modal-add-home").addEventListener("click",e=>{if(e.target===document.getElementById("modal-add-home"))document.getElementById("modal-add-home").classList.remove("open");});
 document.getElementById("btn-csv").addEventListener("click",()=>showToast("CSV出力は近日実装予定です"));
+document.getElementById("btn-reload").addEventListener("click",()=>{if(confirm("ページを再読込します。未保存の入力内容は消えます。担当しますか？"))location.reload();});
 
 // ===== 明細画面 =====
 function renderList(){
