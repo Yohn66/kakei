@@ -261,6 +261,10 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .bottom-btns { display: flex; gap: 6px; margin-top: 6px; margin-bottom: 8px; }
 .bottom-btn-sm { flex: 1; text-align: center; font-size: 11px; color: #555; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 10px 4px; background: var(--white); cursor: pointer; line-height: 1.6; }
 .bottom-btn-sm:active { opacity: 0.7; }
+
+.repeating-scope-btn { display:flex; justify-content:space-between; align-items:center; padding:13px 14px; border-radius:8px; border:0.5px solid var(--border); cursor:pointer; }
+.repeating-scope-btn:active { opacity:0.7; }
+.scope-label { font-size:14px; color:var(--black); }
 </style>
 </head>
 <body>
@@ -525,7 +529,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
   <div id="screen-repeating" class="screen">
     <div class="list-nav">
       <div class="list-nav-back" id="btn-repeating-back">← 戻る</div>
-      <div class="list-nav-title">固定費</div>
+      <div class="list-nav-title" id="repeating-nav-title">固定費</div>
       <div style="width:48px;"></div>
     </div>
     <div class="list-scroll" id="repeating-scroll"></div>
@@ -626,6 +630,37 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     </div>
     <button class="primary-btn" id="btn-loan-save" style="margin-top:13px;">追加する</button>
     <div class="modal-close-btn" id="btn-loan-cancel">キャンセル</div>
+  </div>
+</div>
+
+<!-- 固定費期間選択モーダル -->
+<div class="modal-overlay" id="modal-repeating-scope">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <span class="modal-title" id="repeating-scope-title">変更する期間を選択する</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;" id="repeating-scope-list">
+      <div class="repeating-scope-btn" data-scope="thismonth" id="scope-thismonth">
+        <span class="scope-label">4月のみ</span>
+        <span style="color:var(--gray2);">›</span>
+      </div>
+      <div class="repeating-scope-btn" data-scope="fromthis" id="scope-fromthis">
+        <span class="scope-label">4月から</span>
+        <span style="color:var(--gray2);">›</span>
+      </div>
+      <div class="repeating-scope-btn" data-scope="fromnext" id="scope-fromnext">
+        <span class="scope-label">5月から</span>
+        <span style="color:var(--gray2);">›</span>
+      </div>
+      <div class="repeating-scope-btn" data-scope="all" id="scope-all" style="border-color:#e0a0a0;background:#fff8f8;">
+        <div style="display:flex;flex-direction:column;gap:2px;">
+          <span class="scope-label" style="color:#c0392b;" id="scope-all-label">全期間</span>
+          <span style="font-size:11px;color:#c0392b;opacity:0.8;" id="scope-all-sub">過去分も含む全記録を変更</span>
+        </div>
+        <span style="color:#c0392b;">›</span>
+      </div>
+    </div>
+    <div class="modal-close-btn" id="btn-repeating-scope-cancel">キャンセル</div>
   </div>
 </div>
 
@@ -961,43 +996,172 @@ document.getElementById("btn-fixed-mode").addEventListener("click",()=>{
 });
 
 // ===== 固定費管理画面 =====
+let repeatingEditId = null;
+let repeatingEditData = null;
+let repeatingEditYM = null;
+let repeatingEditMode = null; // "save" or "delete"
+let repeatingEditNewData = null;
+
 function showRepeatingScreen(){
-  const scroll=document.getElementById("repeating-scroll");scroll.innerHTML="";
-  const items=Object.entries(state.repeating||{});
-  if(items.length===0){
-    scroll.innerHTML='<div class="list-empty">登録された固定費はありません<br><span style="font-size:12px;color:#bbb;margin-top:8px;display:block;">入力画面で「固定費」ボタンをオンにして追加してください</span></div>';
-  }else{
-    const p1=state.meta?.person1||"一人目";const p2=state.meta?.person2||"二人目";
-    const pl=v=>v==="both"?"二人":v==="person1"?p1:p2;
-    const fl=v=>v==="both"?"二人分":v==="person1"?`${p1}の分`:`${p2}の分`;
-    const ml=v=>v==="barcode"?"バーコード":v==="card"?"カード":"現金";
-    items.sort(([,a],[,b])=>b.createdAt-a.createdAt).forEach(([id,r])=>{
-      const wrap=document.createElement("div");wrap.className="record-row-wrap";
-      const row=document.createElement("div");row.className="record-row";row.style.cursor="default";
-      const catColor=CAT_COLORS[8]; // 固定費は9色目
-      row.innerHTML=`<span class="cat-badge" style="border-color:${catColor};color:${catColor};min-width:52px;text-align:center;">固定費</span><div class="record-main"><div class="record-memo">${r.memo||""}</div><div class="record-sub">${pl(r.paidBy)}・${fl(r.forWhom)}・${ml(r.method)}・毎月1日</div></div><div class="record-right"><div class="record-amount">${fmtAmt(r.amount)}</div></div>`;
-      // 削除ボタン
-      const del=document.createElement("div");del.className="swipe-delete-btn";del.textContent="削除";
-      del.addEventListener("click",async()=>{
-        if(!confirm(`「${r.memo||"固定費"}」の固定費登録を削除しますか？\n（過去の記録は残ります）`))return;
-        try{
-          await remove(ref(db,`rooms/${state.roomId}/repeating/${id}`));
-          delete state.repeating[id];
-          showRepeatingScreen();
-          showToast("削除しました ✓");
-        }catch(e){showToast("削除に失敗しました");}
-      });
-      wrap.appendChild(del);wrap.appendChild(row);
-      // スワイプ削除
-      setupSwipe(row,del,wrap);
-      scroll.appendChild(wrap);
+  const ym = state.summary.yearMonth;
+  repeatingEditYM = ym;
+  document.getElementById("repeating-nav-title").textContent = `${formatYearMonthJP(ym)}　固定費`;
+  const scroll = document.getElementById("repeating-scroll"); scroll.innerHTML = "";
+  const items = Object.entries(state.repeating || {});
+  if(items.length === 0){
+    scroll.innerHTML = '<div class="list-empty">登録された固定費はありません<br><span style="font-size:12px;color:#bbb;margin-top:8px;display:block;">入力画面で「固定費」ボタンをオンにして追加してください</span></div>';
+  } else {
+    const p1 = state.meta?.person1 || "一人目"; const p2 = state.meta?.person2 || "二人目";
+    const pl = v => v==="both"?"二人":v==="person1"?p1:p2;
+    const fl = v => v==="both"?"二人分":v==="person1"?`${p1}の分`:`${p2}の分`;
+    const ml = v => v==="barcode"?"バーコード":v==="card"?"カード":"現金";
+    items.sort(([,a],[,b]) => b.createdAt - a.createdAt).forEach(([id, r]) => {
+      const wrap = document.createElement("div"); wrap.className = "record-row-wrap";
+      const row = document.createElement("div"); row.className = "record-row";
+      const catColor = CAT_COLORS[8];
+      row.innerHTML = `<span class="cat-badge" style="border-color:${catColor};color:${catColor};min-width:52px;text-align:center;">固定費</span><div class="record-main"><div class="record-memo">${r.memo||""}</div><div class="record-sub">${pl(r.paidBy)}・${fl(r.forWhom)}・${ml(r.method)}・毎月1日</div></div><div class="record-right"><div class="record-amount">${fmtAmt(r.amount)}</div></div>`;
+      row.addEventListener("click", () => openRepeatingEditModal(id, r));
+      wrap.appendChild(row); scroll.appendChild(wrap);
     });
   }
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById("screen-repeating").classList.add("active");
   document.getElementById("tab-bar").classList.remove("visible");
 }
-document.getElementById("btn-repeating-back").addEventListener("click",()=>showScreen("screen-summary"));
+document.getElementById("btn-repeating-back").addEventListener("click", () => showScreen("screen-summary"));
+
+// 固定費編集モーダル
+function openRepeatingEditModal(id, r){
+  repeatingEditId = id;
+  repeatingEditData = {...r};
+  const p1 = state.meta?.person1 || "一人目"; const p2 = state.meta?.person2 || "二人目";
+  ["edit-paid-p1","edit-for-p1"].forEach(i => document.getElementById(i).textContent = p1);
+  ["edit-paid-p2","edit-for-p2"].forEach(i => document.getElementById(i).textContent = p2);
+  document.getElementById("edit-modal-date").textContent = "固定費テンプレート";
+  document.getElementById("edit-memo").value = r.memo || "";
+  setEditToggle("edit-toggle-paid-by", r.paidBy);
+  setEditToggle("edit-toggle-for-whom", r.forWhom);
+  setEditToggle("edit-toggle-method", r.method);
+  editState = {...r};
+  document.getElementById("edit-amount-display").textContent = r.amount.toLocaleString();
+  document.getElementById("edit-currency-badge").textContent = getCurrencySymbol(r.currency || "JPY");
+  // カテゴリグリッド非表示（固定費固定）
+  document.getElementById("edit-cat-grid").innerHTML = '<div style="font-size:13px;color:#888;padding:6px 0;">カテゴリ：固定費</div>';
+  // ボタンの挙動を差し替え
+  document.getElementById("btn-edit-save").onclick = () => {
+    const memo = document.getElementById("edit-memo").value.trim();
+    if(!memo){ showToast("メモを入力してください"); return; }
+    if(!editState.amount || editState.amount <= 0){ showToast("金額を入力してください"); return; }
+    repeatingEditNewData = {
+      memo, paidBy: editState.paidBy, forWhom: editState.forWhom,
+      method: editState.method, amount: editState.amount, currency: editState.currency || "JPY"
+    };
+    // 変更があるか確認
+    const changed = Object.keys(repeatingEditNewData).some(k => repeatingEditNewData[k] !== repeatingEditData[k]);
+    if(!changed){ document.getElementById("modal-edit").classList.remove("open"); showToast("変更がありません"); return; }
+    repeatingEditMode = "save";
+    openRepeatingScopeModal();
+  };
+  document.getElementById("btn-edit-delete").onclick = () => {
+    repeatingEditMode = "delete";
+    document.getElementById("modal-edit").classList.remove("open");
+    openRepeatingScopeModal();
+  };
+  document.getElementById("modal-edit").classList.add("open");
+}
+
+// 期間選択モーダル
+function openRepeatingScopeModal(){
+  const ym = repeatingEditYM;
+  const [y, m] = ym.split("-").map(Number);
+  const nextYMStr = m === 12 ? `${y+1}-01` : `${y}-${String(m+1).padStart(2,'0')}`;
+  const ymLabel = `${parseInt(m)}月`;
+  const nextLabel = `${m === 12 ? y+1 : y}年${m === 12 ? 1 : m+1}月`.replace(/^\d+年/,'') ;
+  // 同じ年なら年を省略
+  const nextLabelSimple = (m === 12 ? `${y+1}年1月` : `${m+1}月`);
+
+  document.getElementById("scope-thismonth").querySelector(".scope-label").textContent = `${ymLabel}のみ`;
+  document.getElementById("scope-fromthis").querySelector(".scope-label").textContent = `${ymLabel}から`;
+  document.getElementById("scope-fromnext").querySelector(".scope-label").textContent = `${nextLabelSimple}から`;
+
+  const isDelete = repeatingEditMode === "delete";
+  document.getElementById("repeating-scope-title").textContent = isDelete ? "削除する期間を選択する" : "変更する期間を選択する";
+  document.getElementById("scope-all-label").textContent = "全期間";
+  document.getElementById("scope-all-sub").textContent = isDelete ? "過去分も含む全記録を削除" : "過去分も含む全記録を変更";
+
+  document.getElementById("modal-repeating-scope").classList.add("open");
+}
+
+document.getElementById("btn-repeating-scope-cancel").addEventListener("click", () => {
+  document.getElementById("modal-repeating-scope").classList.remove("open");
+});
+document.getElementById("modal-repeating-scope").addEventListener("click", e => {
+  if(e.target === document.getElementById("modal-repeating-scope")) document.getElementById("modal-repeating-scope").classList.remove("open");
+});
+
+document.getElementById("repeating-scope-list").addEventListener("click", async e => {
+  const btn = e.target.closest(".repeating-scope-btn"); if(!btn) return;
+  const scope = btn.dataset.scope;
+  if(scope === "all" && repeatingEditMode === "delete"){
+    if(!confirm("過去分も含む全記録を削除します。よろしいですか？")) return;
+  }
+  document.getElementById("modal-repeating-scope").classList.remove("open");
+  await executeRepeatingAction(scope);
+});
+
+async function executeRepeatingAction(scope){
+  const ym = repeatingEditYM;
+  const isDelete = repeatingEditMode === "delete";
+  try {
+    // 対象expensesを特定（カテゴリ固定費・メモ・金額で近似マッチ）
+    const matchExp = ([, e]) => e.category === FIXED_CAT && e.memo === repeatingEditData.memo && e.amount === repeatingEditData.amount;
+
+    if(scope === "thismonth"){
+      // 今月のexpensesのみ変更・削除
+      const targets = Object.entries(state.expenses || {}).filter(([,e]) => e.date.startsWith(ym) && matchExp([,e]));
+      if(isDelete){
+        await Promise.all(targets.map(([id]) => remove(ref(db, `rooms/${state.roomId}/expenses/${id}`))));
+      } else {
+        await Promise.all(targets.map(([id]) => update(ref(db, `rooms/${state.roomId}/expenses/${id}`), repeatingEditNewData)));
+      }
+
+    } else if(scope === "fromthis"){
+      // 今月以降のexpenses変更・削除 ＋ テンプレート変更・削除
+      const targets = Object.entries(state.expenses || {}).filter(([,e]) => e.date >= `${ym}-01` && matchExp([,e]));
+      if(isDelete){
+        await Promise.all(targets.map(([id]) => remove(ref(db, `rooms/${state.roomId}/expenses/${id}`))));
+        await remove(ref(db, `rooms/${state.roomId}/repeating/${repeatingEditId}`));
+      } else {
+        await Promise.all(targets.map(([id]) => update(ref(db, `rooms/${state.roomId}/expenses/${id}`), repeatingEditNewData)));
+        await update(ref(db, `rooms/${state.roomId}/repeating/${repeatingEditId}`), repeatingEditNewData);
+      }
+
+    } else if(scope === "fromnext"){
+      // テンプレートのみ変更・削除（今月のexpensesは触らない）
+      if(isDelete){
+        await remove(ref(db, `rooms/${state.roomId}/repeating/${repeatingEditId}`));
+      } else {
+        await update(ref(db, `rooms/${state.roomId}/repeating/${repeatingEditId}`), repeatingEditNewData);
+      }
+
+    } else if(scope === "all"){
+      // 全期間のexpenses変更・削除 ＋ テンプレート変更・削除
+      const targets = Object.entries(state.expenses || {}).filter(matchExp);
+      if(isDelete){
+        await Promise.all(targets.map(([id]) => remove(ref(db, `rooms/${state.roomId}/expenses/${id}`))));
+        await remove(ref(db, `rooms/${state.roomId}/repeating/${repeatingEditId}`));
+      } else {
+        await Promise.all(targets.map(([id]) => update(ref(db, `rooms/${state.roomId}/expenses/${id}`), repeatingEditNewData)));
+        await update(ref(db, `rooms/${state.roomId}/repeating/${repeatingEditId}`), repeatingEditNewData);
+      }
+    }
+
+    showToast(isDelete ? "削除しました ✓" : "変更しました ✓");
+    showScreen("screen-summary");
+  } catch(e) {
+    console.error(e); showToast("処理に失敗しました");
+  }
+}
 
 // ===== 集計ロジック =====
 function getFilteredExpenses(expenses,ym,filter){
