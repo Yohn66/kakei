@@ -177,33 +177,33 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .record-row-wrap { position: relative; overflow: hidden; }
 .record-row { display: flex; align-items: center; padding: 12px 16px; border-bottom: 0.5px solid #ececec; gap: 10px; cursor: pointer; background: var(--white); transform: translateX(0); transition: transform 0.2s ease; position: relative; z-index: 1; }
 .record-row:active { background: #f8f8f8; }
-.swipe-delete-btn { position: absolute; right: 0; top: 0; bottom: 0; width: 80px; background: #e74c3c; color: white; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; cursor: pointer; z-index: 0; }
-.cat-badge { font-size: 11px; padding: 3px 8px; border-radius: 99px; background: #f5f5f5; color: #555; white-space: nowrap; border: 0.5px solid #ccc; flex-shrink: 0; }
+.swipe-delete-btn { position: absolute; right: 0; top: 0; bottom: 0; width: 80px; background: #e74c3c; color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; cursor: pointer; z-index: 0; }
+.cat-badge { font-size: 11px; border: 1px solid; border-radius: 5px; padding: 2px 7px; white-space: nowrap; flex-shrink: 0; }
 .record-main { flex: 1; min-width: 0; }
 .record-memo { font-size: 14px; color: var(--black); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.record-sub { font-size: 11px; color: #888; margin-top: 3px; }
-.record-right { text-align: right; white-space: nowrap; flex-shrink: 0; }
-.record-amount { font-size: 15px; font-weight: 500; color: var(--black); }
-.record-method { font-size: 11px; color: #888; margin-top: 2px; }
-.list-empty { padding: 40px 20px; text-align: center; font-size: 14px; color: var(--gray1); }
+.record-sub { font-size: 11px; color: var(--gray1); margin-top: 2px; }
+.record-right { text-align: right; flex-shrink: 0; }
+.record-amount { font-size: 14px; font-weight: 500; color: var(--black); }
+.record-method { font-size: 11px; color: var(--gray2); margin-top: 1px; }
+.list-empty { text-align: center; padding: 60px 20px; font-size: 14px; color: var(--gray2); }
 
 /* 精算詳細画面 */
 #screen-settle { display: none; flex-direction: column; flex: 1; overflow: hidden; }
 #screen-settle.active { display: flex; }
 .settle-nav { display: flex; align-items: center; justify-content: space-between; padding: 11px 16px; border-bottom: 0.5px solid var(--border); flex-shrink: 0; background: var(--white); }
+.settle-nav-back { font-size: 14px; color: var(--gray1); cursor: pointer; }
 .settle-nav-title { font-size: 15px; font-weight: 500; }
-.settle-nav-back { font-size: 14px; color: var(--gray1); cursor: pointer; padding: 4px 0; }
-.settle-scroll { flex: 1; overflow-y: auto; padding: 14px 16px 40px; -webkit-overflow-scrolling: touch; }
+.settle-scroll { flex: 1; overflow-y: auto; padding: 16px 16px 40px; -webkit-overflow-scrolling: touch; }
 .settle-scroll::-webkit-scrollbar { display: none; }
-.settle-chart-area { display: flex; justify-content: center; margin: 4px 0 8px; position: relative; }
-.legend-row { display: flex; justify-content: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+.settle-chart-area { display: flex; justify-content: center; margin-bottom: 12px; position: relative; }
+.legend-row { display: flex; justify-content: center; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
 .legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #444; }
-.legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-.section-lbl { font-size: 11px; color: var(--gray1); margin: 10px 0 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.03em; }
-.detail-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 0.5px solid #ececec; }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.section-lbl { font-size: 11px; color: var(--gray1); margin: 10px 0 4px; font-weight: 500; }
+.detail-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 0.5px solid #ececec; cursor: default; }
 .detail-row.tappable { cursor: pointer; }
-.detail-row.tappable:active { background: #f8f8f8; margin: 0 -4px; padding-left: 4px; padding-right: 4px; border-radius: 6px; }
-.detail-left { font-size: 13px; color: #333; line-height: 1.5; }
+.detail-row.tappable:active { background: #fafafa; margin: 0 -4px; padding-left: 4px; padding-right: 4px; }
+.detail-left { font-size: 14px; color: var(--black); }
 .detail-sub { font-size: 11px; color: var(--gray1); margin-top: 2px; }
 .detail-right { font-size: 13px; font-weight: 500; color: var(--black); white-space: nowrap; display: flex; align-items: center; gap: 4px; }
 .detail-arrow { font-size: 14px; color: var(--gray2); }
@@ -231,6 +231,8 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .modal-close-btn { text-align: center; font-size: 13px; color: var(--gray1); margin-top: 13px; padding-top: 13px; border-top: 0.5px solid #ececec; cursor: pointer; }
 .cat-edit-item { display: flex; align-items: center; gap: 9px; padding: 9px 11px; border-radius: 8px; border: 0.5px solid #e0e0e0; margin-bottom: 5px; }
 .cat-edit-input { border: none; outline: none; font-size: 14px; color: var(--black); background: transparent; flex: 1; border-bottom: 0.5px solid #ccc; padding-bottom: 2px; font-family: var(--font); }
+.cat-edit-delete-btn { font-size: 12px; color: #c0392b; cursor: pointer; padding: 4px 8px; border: 1px solid #c0392b; border-radius: 6px; flex-shrink: 0; }
+.cat-edit-delete-btn:active { opacity: 0.7; }
 .cat-add-btn { text-align: center; font-size: 13px; color: #555; border: 0.5px dashed #bbb; border-radius: 8px; padding: 11px; margin-top: 5px; cursor: pointer; }
 .fx-modal-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 0.5px solid #ececec; }
 .fx-modal-lbl { font-size: 14px; color: #333; }
@@ -357,7 +359,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
           </g>
         </svg>
       </div>
-      <div class="guide-title">Kake. ができました</div>
+      <div class="guide-title">Kake.ができました</div>
       <div class="section-label" style="margin-bottom:6px;">パートナーと共有するURL</div>
       <div class="url-box"><div class="url-text" id="guide-url-text"></div></div>
       <div class="copy-btn" id="btn-copy-url">URLをコピー</div>
@@ -504,15 +506,17 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     </div>
     <div class="list-scroll" id="paid-list-scroll"></div>
   </div>
- <!-- 貸し借り一覧画面 -->
- <div id="screen-loan-list" class="screen">
-  <div class="list-nav">
-    <div class="list-nav-back" id="btn-loan-list-back">← 戻る</div>
-    <div class="list-nav-title" id="loan-list-title"></div>
-    <div style="width:48px;"></div>
+
+  <!-- 貸し借り一覧画面 -->
+  <div id="screen-loan-list" class="screen">
+    <div class="list-nav">
+      <div class="list-nav-back" id="btn-loan-list-back">← 戻る</div>
+      <div class="list-nav-title" id="loan-list-title"></div>
+      <div style="width:48px;"></div>
+    </div>
+    <div class="list-scroll" id="loan-list-scroll"></div>
   </div>
-  <div class="list-scroll" id="loan-list-scroll"></div>
-</div>
+
 </div><!-- #app -->
 
 <!-- カテゴリ編集モーダル -->
@@ -619,6 +623,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     <div class="modal-close-btn" id="btn-add-home-close">閉じる</div>
   </div>
 </div>
+
 <!-- 数字キーボード -->
 <div class="numpad-overlay" id="numpad-overlay">
   <div class="numpad-sheet">
@@ -714,7 +719,7 @@ function showScreen(id){
   closeFilterDropdown();
 }
 
-// ===== フィルタードロップダウン（どこタップでも閉じる） =====
+// ===== フィルタードロップダウン =====
 function closeFilterDropdown(){
   document.getElementById("filter-dropdown").classList.remove("open");
   document.getElementById("filter-overlay").classList.remove("open");
@@ -815,7 +820,16 @@ function renderEditCatGrid(){
 
 // ===== カテゴリ編集モーダル =====
 let catEditValues=[];
-function openCatEditModal(){catEditValues=[...(state.meta?.categories||[])];renderCatEditList();document.getElementById("modal-cat-edit").classList.add("open");}
+// モーダルを開く時に変更前のカテゴリを記憶
+let catEditOriginal=[];
+function openCatEditModal(){
+  catEditValues=[...(state.meta?.categories||[])];
+  catEditOriginal=[...(state.meta?.categories||[])];
+  renderCatEditList();
+  document.getElementById("modal-cat-edit").classList.add("open");
+}
+
+// ★修正1: 削除ボタン付きのrenderCatEditList
 function renderCatEditList(){
   const list=document.getElementById("cat-edit-list");list.innerHTML="";
   catEditValues.forEach((cat,i)=>{
@@ -823,25 +837,83 @@ function renderCatEditList(){
     const dot=document.createElement("div");dot.className="color-dot";dot.style.background=CAT_COLORS[i];dot.style.flexShrink="0";dot.style.width="10px";dot.style.height="10px";dot.style.borderRadius="50%";
     const inp=document.createElement("input");inp.className="cat-edit-input";inp.value=cat;inp.maxLength=10;
     inp.addEventListener("input",e=>{catEditValues[i]=e.target.value;});
-    item.appendChild(dot);item.appendChild(inp);list.appendChild(item);
+    const delBtn=document.createElement("div");
+    delBtn.className="cat-edit-delete-btn";
+    delBtn.textContent="削除";
+    delBtn.addEventListener("click",()=>confirmDeleteCategory(i));
+    item.appendChild(dot);item.appendChild(inp);item.appendChild(delBtn);list.appendChild(item);
   });
   const remain=8-catEditValues.length;
   document.getElementById("cat-add-remain").textContent=remain;
   document.getElementById("btn-cat-add").style.display=remain>0?"block":"none";
 }
+
 document.getElementById("btn-cat-add").addEventListener("click",()=>{if(catEditValues.length>=8)return;catEditValues.push("新しいカテゴリ");renderCatEditList();});
+
+// ★修正2: 空欄チェック + 既存支出のカテゴリ名一括更新
 document.getElementById("btn-cat-save").addEventListener("click",async()=>{
-  const cleaned=catEditValues.map(c=>c.trim()).filter(c=>c);
+  const cleaned=catEditValues.map(c=>c.trim());
+  // 空欄チェック
+  if(cleaned.some(c=>!c)){showToast("カテゴリ名が空欄のものがあります");return;}
   if(cleaned.length===0){showToast("カテゴリは1つ以上必要です");return;}
+  // 変更前後のマッピング（同じ位置 = 同じカテゴリ）
+  const renameMap={};
+  catEditOriginal.forEach((old,i)=>{if(cleaned[i]&&old!==cleaned[i])renameMap[old]=cleaned[i];});
   try{
+    // 既存支出のカテゴリ名を一括更新
+    const renames=Object.entries(renameMap);
+    if(renames.length>0){
+      const updates={};
+      Object.entries(state.expenses||{}).forEach(([id,exp])=>{
+        if(renameMap[exp.category]){updates[`rooms/${state.roomId}/expenses/${id}/category`]=renameMap[exp.category];}
+      });
+      if(Object.keys(updates).length>0)await update(ref(db),updates);
+    }
     await update(ref(db,`rooms/${state.roomId}/meta`),{categories:cleaned});
     state.meta.categories=cleaned;
     if(!cleaned.includes(state.input.category))state.input.category=cleaned[0];
-    renderInputCatGrid();document.getElementById("modal-cat-edit").classList.remove("open");showToast("保存しました ✓");
+    renderInputCatGrid();
+    document.getElementById("modal-cat-edit").classList.remove("open");
+    showToast("保存しました ✓");
     if(document.getElementById("screen-summary").classList.contains("active"))renderSummary();
   }catch(e){showToast("保存に失敗しました");}
 });
+
 document.getElementById("btn-cat-cancel").addEventListener("click",()=>document.getElementById("modal-cat-edit").classList.remove("open"));
+
+// ★修正3: カテゴリ削除（振り替え先選択 or 即削除）
+async function confirmDeleteCategory(index){
+  const catName=catEditValues[index];
+  if(catEditValues.length<=1){showToast("最後のカテゴリは削除できません");return;}
+  // 該当カテゴリの支出件数を確認
+  const usedCount=Object.values(state.expenses||{}).filter(e=>e.category===catName).length;
+  if(usedCount===0){
+    if(!confirm(`「${catName}」を削除しますか？`))return;
+    catEditValues.splice(index,1);
+    renderCatEditList();
+    return;
+  }
+  // 振り替え先を選ばせる
+  const others=catEditValues.filter((_,i)=>i!==index);
+  const options=others.map((c,i)=>`${i+1}: ${c}`).join("\n");
+  const input=prompt(`「${catName}」を削除します。\nこのカテゴリの支出 ${usedCount}件 をどこに移しますか？\n\n${options}\n\n番号を入力してください：`);
+  if(!input)return;
+  const chosen=parseInt(input)-1;
+  if(isNaN(chosen)||chosen<0||chosen>=others.length){showToast("正しい番号を入力してください");return;}
+  const destCat=others[chosen];
+  if(!confirm(`「${catName}」の支出 ${usedCount}件 を「${destCat}」に移動して削除しますか？`))return;
+  try{
+    const updates={};
+    Object.entries(state.expenses||{}).forEach(([id,exp])=>{
+      if(exp.category===catName)updates[`rooms/${state.roomId}/expenses/${id}/category`]=destCat;
+    });
+    if(Object.keys(updates).length>0)await update(ref(db),updates);
+    catEditValues.splice(index,1);
+    showToast(`「${catName}」を削除しました ✓`);
+    renderCatEditList();
+  }catch(e){showToast("削除に失敗しました");}
+}
+
 document.getElementById("btn-cat-edit-input").addEventListener("click",openCatEditModal);
 document.getElementById("btn-cat-edit-summary").addEventListener("click",openCatEditModal);
 
@@ -885,7 +957,7 @@ function calcSettle(expenses,loans,fxRates,ym){
   return{total,commonNet,commonAccountNet,advanceNet,loanNet,p1PaidBoth,p2PaidBoth,p1PaidForP2,p2PaidForP1,bothPaidForP1,bothPaidForP2,hasBothPayer};
 }
 
-// 計算式生成：(大 − 小) ÷ 2 [+ 立て替え] [+ 貸し借り] ＝ ¥〇〇
+// 計算式生成
 function buildFormula(settle){
   const big=Math.max(settle.p1PaidBoth,settle.p2PaidBoth);
   const small=Math.min(settle.p1PaidBoth,settle.p2PaidBoth);
@@ -927,6 +999,24 @@ function renderSummary(){
     row.addEventListener("click",()=>{state.list.yearMonth=ym;state.list.filterCategory=cat;showScreen("screen-list");});
     listEl.appendChild(row);
   });
+
+  // ★修正4: 未知カテゴリの警告表示
+  const unknownTotal={};
+  filtered.forEach(e=>{
+    if(!cats.includes(e.category)){
+      const c=e.category||"未分類";
+      const amt=toJPY(e.amount,e.currency,fxRates,ym);
+      unknownTotal[c]=(unknownTotal[c]||0)+amt;
+    }
+  });
+  Object.entries(unknownTotal).forEach(([cat,amt])=>{
+    const row=document.createElement("div");row.className="cat-row";
+    row.style.opacity="0.6";
+    row.innerHTML=`<div class="cat-left"><div class="color-dot" style="background:#ccc;"></div><span class="cat-name-lbl">⚠️ ${cat}（未分類）</span></div><div class="cat-right"><span class="cat-amt-lbl">${fmtAmt(amt)}</span></div>`;
+    row.addEventListener("click",()=>{state.list.yearMonth=ym;state.list.filterCategory=cat;showScreen("screen-list");});
+    listEl.appendChild(row);
+  });
+
   // 為替
   const fxArea=document.getElementById("fx-area");
   const allExps=Object.values(expenses).filter(e=>e.date.startsWith(ym));
@@ -1010,8 +1100,8 @@ function showSettleScreen(){
   else if(loan<0)loanHtml=`<div class="detail-row" style="border:none;"><div class="detail-left">${p2}が${p1}分を支払<div class="detail-sub">差し引き後</div></div><div class="detail-right">${fmtAmt(loan)}</div></div>`;
   document.getElementById("settle-loan-row").innerHTML=loanHtml;
   document.getElementById("settle-loan-row").querySelector(".detail-row")?.addEventListener("click",()=>{
-  if(Object.values(state.loans||{}).filter(l=>l.date&&l.date.startsWith(ym)).length>0)showLoanList(ym);
-});
+    if(Object.values(state.loans||{}).filter(l=>l.date&&l.date.startsWith(ym)).length>0)showLoanList(ym);
+  });
   // 最終精算ボックス
   const tot=settle.total;
   const mainEl=document.getElementById("final-settle-main");
@@ -1057,7 +1147,6 @@ function showPaidList(person,ym){
       wrap.appendChild(row);scroll.appendChild(wrap);
     });
   }
-  // 精算詳細に戻る
   document.getElementById("btn-paid-list-back").onclick=()=>{
     document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
     document.getElementById("screen-settle").classList.add("active");
@@ -1099,7 +1188,6 @@ document.getElementById("btn-fx-save").addEventListener("click",async()=>{
 document.getElementById("btn-prev-month").addEventListener("click",()=>{isMonthNavigation=true;state.summary.yearMonth=prevYM(state.summary.yearMonth);renderSummary();});
 document.getElementById("btn-next-month").addEventListener("click",()=>{isMonthNavigation=true;state.summary.yearMonth=nextYM(state.summary.yearMonth);renderSummary();});
 
-// ===== 各種ボタン =====
 // ===== 貸し借り =====
 let loanDate = todayString();
 let loanAmount = 0;
@@ -1121,8 +1209,9 @@ function updateLoanAmountDisplay(){
 }
 
 document.getElementById("btn-add-loan").addEventListener("click",()=>{
-  loanDate=todayString(); loanAmount=0; loanDirection="p1top2";
-  updateLoanDirectionBtns(); updateLoanDateDisplay(); updateLoanAmountDisplay();
+  loanDate=todayString();
+  loanAmount=0;loanDirection="p1top2";
+  updateLoanDirectionBtns();updateLoanDateDisplay();updateLoanAmountDisplay();
   document.getElementById("loan-memo").value="";
   document.querySelectorAll("#loan-toggle-direction .toggle-btn").forEach(b=>b.classList.toggle("active",b.dataset.value==="p1top2"));
   document.getElementById("modal-loan").classList.add("open");
@@ -1131,11 +1220,11 @@ document.getElementById("btn-add-loan").addEventListener("click",()=>{
 document.getElementById("loan-toggle-direction").addEventListener("click",e=>{
   const btn=e.target.closest(".toggle-btn");if(!btn)return;
   document.querySelectorAll("#loan-toggle-direction .toggle-btn").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active"); loanDirection=btn.dataset.value;
+  btn.classList.add("active");loanDirection=btn.dataset.value;
 });
 
 document.getElementById("loan-amount-row").addEventListener("click",()=>{
-  numpadTarget="loan"; numpadValue=loanAmount>0?String(loanAmount):"0";
+  numpadTarget="loan";numpadValue=loanAmount>0?String(loanAmount):"0";
   document.getElementById("numpad-display").textContent=Number(numpadValue).toLocaleString();
   document.getElementById("numpad-overlay").classList.add("open");
 });
@@ -1193,6 +1282,7 @@ function showLoanList(ym){
   document.getElementById("screen-loan-list").classList.add("active");
   document.getElementById("tab-bar").classList.remove("visible");
 }
+
 document.getElementById("btn-go-list").addEventListener("click",()=>{state.list.yearMonth=state.summary.yearMonth;state.list.filterCategory=null;showScreen("screen-list");});
 document.getElementById("btn-share-url").addEventListener("click",()=>{if(navigator.share)navigator.share({url:getRoomUrl(state.roomId)});else navigator.clipboard.writeText(getRoomUrl(state.roomId)).then(()=>showToast("URLをコピーしました"));});
 document.getElementById("btn-add-home").addEventListener("click",()=>{
@@ -1410,11 +1500,29 @@ document.getElementById("btn-join").addEventListener("click",()=>{
   if(!m){showToast("URLの形式が正しくありません");return;}location.href=v;
 });
 
-// Firebase購読
+// ★修正5: Firebase購読 - meta・loans・fxRatesもリアルタイム監視して画面再描画
 function subscribeRoom(roomId){
-  onValue(ref(db,`rooms/${roomId}/expenses`),snap=>{state.expenses=snap.val()||{};if(document.getElementById("screen-summary").classList.contains("active"))renderSummary();if(document.getElementById("screen-list").classList.contains("active"))renderList();});
-  onValue(ref(db,`rooms/${roomId}/loans`),snap=>{state.loans=snap.val()||{};});
-  onValue(ref(db,`rooms/${roomId}/fxRates`),snap=>{state.fxRates=snap.val()||{};});
+  onValue(ref(db,`rooms/${roomId}/expenses`),snap=>{
+    state.expenses=snap.val()||{};
+    if(document.getElementById("screen-summary").classList.contains("active"))renderSummary();
+    if(document.getElementById("screen-list").classList.contains("active"))renderList();
+  });
+  onValue(ref(db,`rooms/${roomId}/loans`),snap=>{
+    state.loans=snap.val()||{};
+    if(document.getElementById("screen-summary").classList.contains("active"))renderSummary();
+  });
+  onValue(ref(db,`rooms/${roomId}/fxRates`),snap=>{
+    state.fxRates=snap.val()||{};
+    if(document.getElementById("screen-summary").classList.contains("active"))renderSummary();
+  });
+  onValue(ref(db,`rooms/${roomId}/meta`),snap=>{
+    if(!snap.exists())return;
+    const newMeta=snap.val();
+    state.meta=newMeta;
+    updatePersonToggles();
+    renderInputCatGrid();
+    if(document.getElementById("screen-summary").classList.contains("active"))renderSummary();
+  });
 }
 
 // 起動
