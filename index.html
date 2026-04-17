@@ -1166,7 +1166,7 @@ async function executeRepeatingAction(scope){
 // ===== 集計ロジック =====
 function getFilteredExpenses(expenses,ym,filter){
   return Object.values(expenses||{}).filter(e=>{
-    if(!e.date.startsWith(ym))return false;
+    if(!e.date||!e.date.startsWith(ym))return false;
     if(filter==="all")return true;
     if(filter==="both")return e.forWhom==="both";
     if(filter==="person1")return e.forWhom==="person1";
