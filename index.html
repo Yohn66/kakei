@@ -1648,6 +1648,7 @@ document.getElementById("edit-amount-row").addEventListener("click",e=>{
   document.getElementById("numpad-overlay").classList.add("open");
 });
 document.getElementById("btn-edit-save").addEventListener("click",async()=>{
+  if(repeatingEditId) return; // 固定費編集モードのときはonclickに任せる
   if(!editState.memo?.trim()){showToast("「何に使ったか」を入力してください");return;}
   if(!editState.amount||editState.amount<=0){showToast("金額を入力してください");return;}
   if(!editState.category){showToast("カテゴリを選択してください");return;}
@@ -1657,8 +1658,9 @@ document.getElementById("btn-edit-save").addEventListener("click",async()=>{
     if(document.getElementById("screen-summary").classList.contains("active"))renderSummary();
   }catch(e){showToast("保存に失敗しました");}
 });
-document.getElementById("btn-edit-cancel").addEventListener("click",()=>document.getElementById("modal-edit").classList.remove("open"));
+document.getElementById("btn-edit-cancel").addEventListener("click",()=>{repeatingEditId=null;document.getElementById("modal-edit").classList.remove("open");});
 document.getElementById("btn-edit-delete").addEventListener("click",()=>{
+  if(repeatingEditId)return;
   const id=editingExpenseId;const data={...state.expenses[id]};
   document.getElementById("modal-edit").classList.remove("open");delete state.expenses[id];renderList();
   if(document.getElementById("screen-summary").classList.contains("active"))renderSummary();
