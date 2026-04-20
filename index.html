@@ -1818,8 +1818,6 @@ function setupToggleGroup(gid,key){
   });
 }
 document.getElementById("input-memo").addEventListener("input",e=>{state.input.memo=e.target.value;});
-document.getElementById("input-memo").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();e.target.blur();setTimeout(()=>{numpadTarget="input";numpadAccum=0;numpadValue=state.input.amount>0?String(state.input.amount):"0";document.getElementById("numpad-display").textContent=Number(numpadValue).toLocaleString();document.getElementById("numpad-overlay").classList.add("open");},100);}});
-document.getElementById("input-memo").addEventListener("blur",()=>{if(state.input.memo.trim()&&state.input.amount===0){setTimeout(()=>{if(!document.activeElement||document.activeElement.tagName!=="INPUT"){numpadTarget="input";numpadAccum=0;numpadValue="0";document.getElementById("numpad-display").textContent="0";document.getElementById("numpad-overlay").classList.add("open");}},150);}});
 let numpadAccum=0;
 function openNumpad(){numpadTarget="input";numpadAccum=0;numpadValue=state.input.amount>0?String(state.input.amount):"0";document.getElementById("numpad-display").textContent=Number(numpadValue).toLocaleString();document.getElementById("numpad-overlay").classList.add("open");}
 function closeNumpad(){document.getElementById("numpad-overlay").classList.remove("open");}
@@ -1829,7 +1827,7 @@ document.querySelectorAll(".numpad-key").forEach(key=>{
     const k=key.dataset.key;
    if(k==="sen"){numpadAccum+=(parseInt(numpadValue)||0)*1000;numpadValue="0";document.getElementById("numpad-display").textContent=Number(numpadAccum).toLocaleString();return;}
    if(k==="man"){numpadAccum+=(parseInt(numpadValue)||0)*10000;numpadValue="0";document.getElementById("numpad-display").textContent=Number(numpadAccum).toLocaleString();return;}
-   if(k==="done"){const v=numpadAccum+(parseInt(numpadValue)||0);if(numpadTarget==="input"){state.input.amount=v;updateAmountDisplay();}else if(numpadTarget==="loan"){loanAmount=v;updateLoanAmountDisplay();}else{editState.amount=v;document.getElementById("edit-amount-display").textContent=v.toLocaleString();}closeNumpad();return;}
+   if(k==="done"){const v=numpadAccum+(parseInt(numpadValue)||0);if(numpadTarget==="input"){state.input.amount=v;updateAmountDisplay();closeNumpad();setTimeout(()=>document.getElementById("input-memo").focus(),100);}else if(numpadTarget==="loan"){loanAmount=v;updateLoanAmountDisplay();closeNumpad();}else{editState.amount=v;document.getElementById("edit-amount-display").textContent=v.toLocaleString();closeNumpad();}return;}
    if(k==="del"){if(numpadAccum>0&&numpadValue==="0"){numpadAccum=0;document.getElementById("numpad-display").textContent="0";return;}numpadValue=numpadValue.length>1?numpadValue.slice(0,-1):"0";}
    else{if(numpadValue==="0")numpadValue=k;else if(numpadValue.length<8)numpadValue+=k;}
    document.getElementById("numpad-display").textContent=Number(numpadAccum+parseInt(numpadValue)||0).toLocaleString();
