@@ -927,7 +927,7 @@ function renderCatEditList(){
   catEditValues.forEach((cat,i)=>{
     const item=document.createElement("div");item.className="cat-edit-item";
     const dot=document.createElement("div");dot.className="color-dot";dot.style.background=CAT_COLORS[i];dot.style.flexShrink="0";dot.style.width="10px";dot.style.height="10px";dot.style.borderRadius="50%";
-    const inp=document.createElement("input");inp.className="cat-edit-input";inp.value=cat;inp.maxLength=10;
+    const inp=document.createElement("input");inp.className="cat-edit-input";inp.value=cat;inp.maxLength=8;
     inp.addEventListener("input",e=>{catEditValues[i]=e.target.value;});
     const delBtn=document.createElement("div");
     delBtn.className="cat-edit-delete-btn";
@@ -1536,7 +1536,7 @@ function showPaidList(person,ym){
       const wrap=document.createElement("div");wrap.className="record-row-wrap";
       const row=document.createElement("div");row.className="record-row";
       row.style.cursor="default";
-      row.innerHTML=`<span class="cat-badge" style="border-color:${cc};color:${cc};">${e.category||"?"}</span><div class="record-main"><div class="record-memo">${e.memo||""}</div></div><div class="record-right"><div class="record-amount">${ad}</div><div class="record-method">${ml(e.method)}</div></div>`;
+      row.innerHTML=`<span class="cat-badge" style="border-color:${cc};color:${cc};">${(e.category||"?").slice(0,5)}</span><div class="record-main"><div class="record-memo">${e.memo||""}</div></div><div class="record-right"><div class="record-amount">${ad}</div><div class="record-method">${ml(e.method)}</div></div>`;
       wrap.appendChild(row);scroll.appendChild(wrap);
     });
   }
@@ -1718,7 +1718,7 @@ function renderList(){
     const row=document.createElement("div");row.className="record-row";
     const cats=state.meta?.categories||[];const ci=cats.indexOf(e.category);const cc=ci>=0?CAT_COLORS[ci]:"#aaa";
     const ad=e.currency&&e.currency!=="JPY"?`${getCurrencySymbol(e.currency)}${e.amount.toLocaleString()}`:fmtAmt(e.amount);
-    row.innerHTML=`<span class="cat-badge" style="border-color:${cc};color:${cc};">${e.category||"?"}</span><div class="record-main"><div class="record-memo">${e.memo||""}</div><div class="record-sub">${pl(e.paidBy)}・${fl(e.forWhom)}</div></div><div class="record-right"><div class="record-amount">${ad}</div><div class="record-method">${ml(e.method)}</div></div>`;
+    row.innerHTML=`<span class="cat-badge" style="border-color:${cc};color:${cc};">${(e.category||"?").slice(0,5)}</span><div class="record-main"><div class="record-memo">${e.memo||""}</div><div class="record-sub">${pl(e.paidBy)}・${fl(e.forWhom)}</div></div><div class="record-right"><div class="record-amount">${ad}</div><div class="record-method">${ml(e.method)}</div></div>`;
     row.addEventListener("click",()=>{if(row.style.transform&&row.style.transform!=="translateX(0px)"&&row.style.transform!=="translateX(0)")return;openEditModal(id,e);});
     setupSwipe(row,del,wrap);wrap.appendChild(del);wrap.appendChild(row);scroll.appendChild(wrap);
   });
