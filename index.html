@@ -1158,7 +1158,6 @@ function openRepeatingEditModal(id, r){
   const p1 = state.meta?.person1 || "一人目"; const p2 = state.meta?.person2 || "二人目";
   ["edit-paid-p1","edit-for-p1"].forEach(i => document.getElementById(i).textContent = p1);
   ["edit-paid-p2","edit-for-p2"].forEach(i => document.getElementById(i).textContent = p2);
-  document.getElementById("edit-modal-date").textContent = "固定費テンプレート";
   document.getElementById("edit-memo").value = r.memo || "";
   setEditToggle("edit-toggle-paid-by", r.paidBy);
   setEditToggle("edit-toggle-for-whom", r.forWhom);
