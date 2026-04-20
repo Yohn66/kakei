@@ -571,10 +571,11 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 
 <!-- 編集モーダル -->
 <div class="modal-overlay" id="modal-edit">
- <div class="modal-header">
-  <span class="modal-title">記録を編集</span>
-  <span class="modal-sub" id="edit-modal-date" style="border-bottom:1px dashed #bbb;cursor:pointer;padding-bottom:1px;"></span>
-</div>
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <span class="modal-title">記録を編集</span>
+      <span class="modal-sub" id="edit-modal-date" style="border-bottom:1px dashed #bbb;cursor:pointer;padding-bottom:1px;"></span>
+    </div>
     <div class="lbl-mini" style="margin-top:0;">誰が</div>
     <div class="toggle-group" id="edit-toggle-paid-by">
       <div class="toggle-btn active" data-value="both">二人</div>
@@ -1048,7 +1049,7 @@ function openCalendar(currentDate, onSelect) {
     });
 
     const grid = document.createElement("div");
-    grid.style.cssText = "display:grid;grid-template-columns:repeat(7,1fr);padding:0 12px;gap:2px;";
+    grid.style.cssText = "display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:repeat(6,1fr);padding:0 12px;gap:2px;height:252px;";
 
     const firstDay = new Date(viewYear, viewMonth-1, 1).getDay();
     const daysInMonth = new Date(viewYear, viewMonth, 0).getDate();
