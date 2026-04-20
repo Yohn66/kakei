@@ -1055,7 +1055,7 @@ function openRepeatingEditModal(id, r){
   document.getElementById("edit-amount-display").textContent = r.amount.toLocaleString();
   document.getElementById("edit-currency-badge").textContent = getCurrencySymbol(r.currency || "JPY");
   // カテゴリグリッド非表示（固定費固定）
-  document.getElementById("edit-cat-grid").innerHTML = '<div style="font-size:13px;color:#888;padding:6px 0;">カテゴリ：固定費</div>';
+  document.getElementById("edit-cat-grid").innerHTML = '';
   // ボタンの挙動を差し替え
   document.getElementById("btn-edit-save").onclick = () => {
     const memo = document.getElementById("edit-memo").value.trim();
