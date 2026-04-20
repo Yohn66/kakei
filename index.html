@@ -1295,18 +1295,6 @@ async function executeRepeatingAction(scope){
   }
 }
 
-// stateを再取得して画面を更新
-    const expSnap = await get(ref(db, `rooms/${state.roomId}/expenses`));
-    state.expenses = expSnap.exists() ? expSnap.val() : {};
-    const repSnap = await get(ref(db, `rooms/${state.roomId}/repeating`));
-    state.repeating = repSnap.exists() ? repSnap.val() : {};
-    showToast(isDelete ? "削除しました ✓" : "変更しました ✓");
-    showScreen("screen-summary");
-  } catch(e) {
-    console.error(e); showToast("処理に失敗しました");
-  }
-}
-
 // ===== 集計ロジック =====
 function getFilteredExpenses(expenses,ym,filter){
   return Object.values(expenses||{}).filter(e=>{
