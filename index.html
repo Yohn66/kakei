@@ -251,11 +251,10 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .numpad-overlay.open { display: flex; }
 .numpad-sheet { width: 100%; max-width: 430px; margin: 0 auto; background: #f2f2f7; border-radius: 16px 16px 0 0; padding: 12px 8px 24px; }
 .numpad-display { text-align: right; font-size: 30px; font-weight: 500; color: var(--black); padding: 6px 18px 10px; min-height: 52px; }
-.numpad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .numpad-key { background: var(--white); border-radius: 10px; padding: 17px 0; font-size: 22px; font-weight: 400; text-align: center; cursor: pointer; color: var(--black); box-shadow: 0 1px 0 rgba(0,0,0,0.15); user-select: none; }
 .numpad-key:active { opacity: 0.6; }
-.numpad-key.dark { background: #aeb4bc; font-size: 17px; }
-.numpad-key.done { background: var(--black); color: var(--white); font-size: 16px; font-weight: 600; }
+.numpad-key.dark { background: #aeb4bc; font-size: 17px; color: var(--black); }
+.numpad-key.done { background: var(--black); color: var(--white); font-size: 17px; font-weight: 600; }
 
 /* 下部ボタン3列 */
 .bottom-btns { display: flex; gap: 6px; margin-top: 6px; margin-bottom: 8px; }
@@ -401,11 +400,11 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
         <div class="toggle-btn active" data-value="card">カード</div>
         <div class="toggle-btn" data-value="cash">現金</div>
       </div>
-      <input class="text-input" id="input-memo" placeholder="例：長浜ラーメン" maxlength="30" style="margin-top:9px;" />
-      <div class="amount-row" id="amount-row" style="margin-top:8px;">
-        <div class="currency-badge" id="currency-badge">¥</div>
-        <div class="amount-display placeholder" id="amount-display">0</div>
-      </div>
+      <div class="amount-row" id="amount-row" style="margin-top:9px;">
+       <div class="currency-badge" id="currency-badge">¥</div>
+       <div class="amount-display placeholder" id="amount-display">0</div>
+     </div>
+     <input class="text-input" id="input-memo" placeholder="例：長浜ラーメン" maxlength="30" style="margin-top:8px;" />
       <div class="divider"></div>
       <div class="input-cat-grid" id="input-cat-grid"></div>
       <div class="cat-edit-link" id="btn-cat-edit-input">カテゴリを編集</div>
@@ -677,12 +676,22 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 <div class="numpad-overlay" id="numpad-overlay">
   <div class="numpad-sheet">
     <div class="numpad-display" id="numpad-display">0</div>
-    <div class="numpad-grid">
-      <div class="numpad-key" data-key="1">1</div><div class="numpad-key" data-key="2">2</div><div class="numpad-key" data-key="3">3</div>
-      <div class="numpad-key" data-key="4">4</div><div class="numpad-key" data-key="5">5</div><div class="numpad-key" data-key="6">6</div>
-      <div class="numpad-key" data-key="7">7</div><div class="numpad-key" data-key="8">8</div><div class="numpad-key" data-key="9">9</div>
-      <div class="numpad-key dark" data-key="del">⌫</div><div class="numpad-key" data-key="0">0</div><div class="numpad-key done" data-key="done">確定</div>
-    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+     <div class="numpad-key" data-key="1">1</div>
+     <div class="numpad-key" data-key="2">2</div>
+     <div class="numpad-key" data-key="3">3</div>
+     <div class="numpad-key dark" data-key="del">⌫</div>
+     <div class="numpad-key" data-key="4">4</div>
+     <div class="numpad-key" data-key="5">5</div>
+     <div class="numpad-key" data-key="6">6</div>
+     <div class="numpad-key dark" data-key="sen">千</div>
+     <div class="numpad-key" data-key="7">7</div>
+     <div class="numpad-key" data-key="8">8</div>
+     <div class="numpad-key" data-key="9">9</div>
+     <div class="numpad-key dark" data-key="man">万</div>
+     <div class="numpad-key" data-key="0">0</div>
+     <div class="numpad-key done" data-key="done" style="grid-column:span 3;">確定</div>
+   </div>
   </div>
 </div>
 
@@ -1704,7 +1713,9 @@ document.getElementById("numpad-overlay").addEventListener("click",e=>{if(e.targ
 document.querySelectorAll(".numpad-key").forEach(key=>{
   key.addEventListener("click",()=>{
     const k=key.dataset.key;
-    if(k==="done"){const v=parseInt(numpadValue)||0;if(numpadTarget==="input"){state.input.amount=v;updateAmountDisplay();}else if(numpadTarget==="loan"){loanAmount=v;updateLoanAmountDisplay();}else{editState.amount=v;document.getElementById("edit-amount-display").textContent=v.toLocaleString();}closeNumpad();}
+    if(k==="sen"){numpadValue=String((parseInt(numpadValue)||0)+1000);document.getElementById("numpad-display").textContent=Number(numpadValue).toLocaleString();return;}
+if(k==="man"){numpadValue=String((parseInt(numpadValue)||0)+10000);document.getElementById("numpad-display").textContent=Number(numpadValue).toLocaleString();return;}
+if(k==="done"){const v=parseInt(numpadValue)||0;if(numpadTarget==="input"){state.input.amount=v;updateAmountDisplay();}else if(numpadTarget==="loan"){loanAmount=v;updateLoanAmountDisplay();}else{editState.amount=v;document.getElementById("edit-amount-display").textContent=v.toLocaleString();}closeNumpad();}
     else if(k==="del"){numpadValue=numpadValue.length>1?numpadValue.slice(0,-1):"0";}
     else{if(numpadValue==="0")numpadValue=k;else if(numpadValue.length<8)numpadValue+=k;}
     document.getElementById("numpad-display").textContent=Number(numpadValue).toLocaleString();
@@ -1714,10 +1725,21 @@ function updateAmountDisplay(){const el=document.getElementById("amount-display"
 document.getElementById("amount-row").addEventListener("click",e=>{if(e.target.id==="currency-badge")return;openNumpad();});
 function updateDateDisplay(){document.getElementById("input-date-display").textContent=formatDateJP(state.input.date);}
 document.getElementById("input-date-row").addEventListener("click",()=>{
-  const inp=document.createElement("input");inp.type="date";inp.value=state.input.date;inp.style.cssText="position:fixed;opacity:0;top:0;left:0;width:1px;height:1px;";
-  document.body.appendChild(inp);inp.focus();inp.click();
-  inp.addEventListener("change",()=>{if(inp.value){state.input.date=inp.value;updateDateDisplay();}document.body.removeChild(inp);});
-  inp.addEventListener("blur",()=>{setTimeout(()=>{if(document.body.contains(inp))document.body.removeChild(inp);},300);});
+  const existing=document.getElementById("inline-date-picker");
+  if(existing){existing.remove();return;}
+  const picker=document.createElement("div");
+  picker.id="inline-date-picker";
+  picker.style.cssText="margin-top:8px;border-radius:12px;overflow:hidden;border:0.5px solid #ddd;";
+  const inp=document.createElement("input");
+  inp.type="date";inp.value=state.input.date;
+  inp.style.cssText="width:100%;padding:10px 14px;font-size:16px;border:none;outline:none;background:#fff;box-sizing:border-box;";
+  inp.addEventListener("change",()=>{
+    if(inp.value){state.input.date=inp.value;updateDateDisplay();}
+    picker.remove();
+  });
+  picker.appendChild(inp);
+  document.getElementById("input-date-row").insertAdjacentElement("afterend",picker);
+  setTimeout(()=>{inp.focus();inp.click();},50);
 });
 function resetInputForm(){
   state.input.date=todayString();state.input.amount=0;state.input.memo="";state.input.currency="JPY";
