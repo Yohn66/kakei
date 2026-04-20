@@ -327,7 +327,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
       </div>
       <div class="cat-header">
         <span class="cat-header-lbl">カテゴリ（後から変更できます）</span>
-        <span class="cat-limit">※上限9つ</span>
+        <span class="cat-limit">※上限12個</span>
       </div>
       <div class="cat-grid" id="top-cat-grid"></div>
       <div class="cat-hint">タップで選択・解除、長押しで名前を変更</div>
@@ -717,7 +717,7 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getDatabase(firebaseApp);
 
-const CAT_COLORS = ["#c4846a","#b8962e","#7a9abf","#8fba8f","#a0889e","#7aab9e","#888780","#c9a87c","#9b7cb6"];
+const CAT_COLORS = ["#c4846a","#b8962e","#7a9abf","#8fba8f","#a0889e","#7aab9e","#888780","#c9a87c","#7a8fbf","#c4a86a","#9abf7a","#bf7a9a","#9b7cb6"];
 const FIXED_CAT = "固定費";
 const CURRENCIES = [
   { code:"JPY", symbol:"¥",   name:"円"      },
@@ -889,7 +889,7 @@ function renderTopCatGrid(){
 }
 function toggleTopCat(cat,btn){
   if(topSelectedCats.includes(cat)){if(topSelectedCats.length<=1)return;topSelectedCats=topSelectedCats.filter(c=>c!==cat);btn.classList.add("off");}
-  else{if(topSelectedCats.length>=9){showToast("カテゴリは最大9つです");return;}topSelectedCats.push(cat);btn.classList.remove("off");}
+  else{if(topSelectedCats.length>=12){showToast("カテゴリは最大12個です");return;}topSelectedCats.push(cat);btn.classList.remove("off");}
 }
 function renderInputCatGrid(){
   const grid=document.getElementById("input-cat-grid");
@@ -935,12 +935,12 @@ function renderCatEditList(){
     delBtn.addEventListener("click",()=>confirmDeleteCategory(i));
     item.appendChild(dot);item.appendChild(inp);item.appendChild(delBtn);list.appendChild(item);
   });
-  const remain=9-catEditValues.length;
+  const remain=12-catEditValues.length;
   document.getElementById("cat-add-remain").textContent=remain;
   document.getElementById("btn-cat-add").style.display=remain>0?"block":"none";
 }
 
-document.getElementById("btn-cat-add").addEventListener("click",()=>{if(catEditValues.length>=9)return;catEditValues.push("新しいカテゴリ");renderCatEditList();});
+document.getElementById("btn-cat-add").addEventListener("click",()=>{if(catEditValues.length>=12)return;catEditValues.push("新しいカテゴリ");renderCatEditList();});
 
 // ★修正2: 空欄チェック + 既存支出のカテゴリ名一括更新
 document.getElementById("btn-cat-save").addEventListener("click",async()=>{
@@ -1139,7 +1139,7 @@ function showRepeatingScreen(){
     items.sort(([,a],[,b]) => b.createdAt - a.createdAt).forEach(([id, r]) => {
       const wrap = document.createElement("div"); wrap.className = "record-row-wrap";
       const row = document.createElement("div"); row.className = "record-row";
-      const catColor = CAT_COLORS[8];
+      const catColor = CAT_COLORS[12];
       row.innerHTML = `<span class="cat-badge" style="border-color:${catColor};color:${catColor};min-width:52px;text-align:center;">固定費</span><div class="record-main"><div class="record-memo">${r.memo||""}</div><div class="record-sub">${pl(r.paidBy)}・${fl(r.forWhom)}・${ml(r.method)}・毎月1日</div></div><div class="record-right"><div class="record-amount">${fmtAmt(r.amount)}</div></div>`;
       row.addEventListener("click", () => openRepeatingEditModal(id, r));
       wrap.appendChild(row); scroll.appendChild(wrap);
@@ -1369,7 +1369,7 @@ function renderSummary(){
   const total=Object.values(catTotals).reduce((a,b)=>a+b,0);
   document.getElementById("chart-total").textContent=fmtAmt(total);
   // グラフ：通常カテゴリ＋固定費
-  const chartColors=[...cats.map((_,i)=>CAT_COLORS[i]), CAT_COLORS[8]];
+  const chartColors=[...cats.map((_,i)=>CAT_COLORS[i]), CAT_COLORS[12]];
   renderDonutChart("summary-chart",allCats.map(c=>catTotals[c]),chartColors,isMonthNavigation?0:400);
   const listEl=document.getElementById("cat-list");listEl.innerHTML="";
   cats.forEach((cat,i)=>{
@@ -1388,7 +1388,7 @@ function renderSummary(){
     const fixedDiff=fixedAmt-prevFixedTotal;
     const fixedDiffHtml=fixedDiff===0?`<span class="diff-eq">±0</span>`:fixedDiff>0?`<span class="diff-up">+${fixedDiff.toLocaleString()}</span>`:`<span class="diff-dn">−${Math.abs(fixedDiff).toLocaleString()}</span>`;
     const fixedRow=document.createElement("div");fixedRow.className="cat-row";
-    fixedRow.innerHTML=`<div class="cat-left"><div class="color-dot" style="background:${CAT_COLORS[8]};"></div><span class="cat-name-lbl">固定費</span></div><div class="cat-right">${fixedDiffHtml}<span class="cat-amt-lbl">${fmtAmt(fixedAmt)}</span></div>`;
+    fixedRow.innerHTML=`<div class="cat-left"><div class="color-dot" style="background:${CAT_COLORS[12]};"></div><span class="cat-name-lbl">固定費</span></div><div class="cat-right">${fixedDiffHtml}<span class="cat-amt-lbl">${fmtAmt(fixedAmt)}</span></div>`;
     fixedRow.addEventListener("click",()=>showRepeatingScreen());
     listEl.appendChild(fixedRow);
   }
