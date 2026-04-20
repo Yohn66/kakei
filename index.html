@@ -1239,12 +1239,13 @@ async function executeRepeatingAction(scope){
   const ym = repeatingEditYM;
   const isDelete = repeatingEditMode === "delete";
   try {
-    // 対象expensesを特定（カテゴリ固定費・メモ・金額で近似マッチ）
-    const matchExp = ([, e]) => e.category === FIXED_CAT && e.memo === repeatingEditData.memo && e.amount === repeatingEditData.amount;
+    const matchExp = ([, e]) => e.category === FIXED_CAT
+      && e.memo === repeatingEditData.memo
+      && e.amount === repeatingEditData.amount;
 
     if(scope === "thismonth"){
-      // 今月のexpensesのみ変更・削除
-      const targets = Object.entries(state.expenses || {}).filter(([,e]) => e.date.startsWith(ym) && matchExp([,e]));
+      const targets = Object.entries(state.expenses || {})
+        .filter(([,e]) => e.date.startsWith(ym) && matchExp([,e]));
       if(isDelete){
         await Promise.all(targets.map(([id]) => remove(ref(db, `rooms/${state.roomId}/expenses/${id}`))));
       } else {
@@ -1252,8 +1253,8 @@ async function executeRepeatingAction(scope){
       }
 
     } else if(scope === "fromthis"){
-      // 今月以降のexpenses変更・削除 ＋ テンプレート変更・削除
-      const targets = Object.entries(state.expenses || {}).filter(([,e]) => e.date >= `${ym}-01` && matchExp([,e]));
+      const targets = Object.entries(state.expenses || {})
+        .filter(([,e]) => e.date >= `${ym}-01` && matchExp([,e]));
       if(isDelete){
         await Promise.all(targets.map(([id]) => remove(ref(db, `rooms/${state.roomId}/expenses/${id}`))));
         await remove(ref(db, `rooms/${state.roomId}/repeating/${repeatingEditId}`));
@@ -1263,7 +1264,6 @@ async function executeRepeatingAction(scope){
       }
 
     } else if(scope === "fromnext"){
-      // テンプレートのみ変更・削除（今月のexpensesは触らない）
       if(isDelete){
         await remove(ref(db, `rooms/${state.roomId}/repeating/${repeatingEditId}`));
       } else {
@@ -1271,7 +1271,6 @@ async function executeRepeatingAction(scope){
       }
 
     } else if(scope === "all"){
-      // 全期間のexpenses変更・削除 ＋ テンプレート変更・削除
       const targets = Object.entries(state.expenses || {}).filter(matchExp);
       if(isDelete){
         await Promise.all(targets.map(([id]) => remove(ref(db, `rooms/${state.roomId}/expenses/${id}`))));
@@ -1281,6 +1280,20 @@ async function executeRepeatingAction(scope){
         await update(ref(db, `rooms/${state.roomId}/repeating/${repeatingEditId}`), repeatingEditNewData);
       }
     }
+
+    const expSnap = await get(ref(db, `rooms/${state.roomId}/expenses`));
+    state.expenses = expSnap.exists() ? expSnap.val() : {};
+    const repSnap = await get(ref(db, `rooms/${state.roomId}/repeating`));
+    state.repeating = repSnap.exists() ? repSnap.val() : {};
+
+    // 編集していた月の集計画面に戻る
+    state.summary.yearMonth = ym;
+    showToast(isDelete ? "削除しました ✓" : "変更しました ✓");
+    showScreen("screen-summary");
+  } catch(e) {
+    console.error(e); showToast("処理に失敗しました");
+  }
+}
 
 // stateを再取得して画面を更新
     const expSnap = await get(ref(db, `rooms/${state.roomId}/expenses`));
