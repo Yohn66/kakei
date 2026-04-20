@@ -1725,20 +1725,17 @@ function updateAmountDisplay(){const el=document.getElementById("amount-display"
 document.getElementById("amount-row").addEventListener("click",e=>{if(e.target.id==="currency-badge")return;openNumpad();});
 function updateDateDisplay(){document.getElementById("input-date-display").textContent=formatDateJP(state.input.date);}
 document.getElementById("input-date-row").addEventListener("click",()=>{
-  const existing=document.getElementById("inline-date-picker");
-  if(existing){existing.remove();return;}
-  const picker=document.createElement("div");
-  picker.id="inline-date-picker";
-  picker.style.cssText="margin-top:8px;border-radius:12px;overflow:hidden;border:0.5px solid #ddd;";
   const inp=document.createElement("input");
   inp.type="date";inp.value=state.input.date;
-  inp.style.cssText="width:100%;padding:10px 14px;font-size:16px;border:none;outline:none;background:#fff;box-sizing:border-box;";
+  inp.style.cssText="position:fixed;opacity:0;top:50%;left:50%;width:1px;height:1px;";
+  document.body.appendChild(inp);
   inp.addEventListener("change",()=>{
     if(inp.value){state.input.date=inp.value;updateDateDisplay();}
-    picker.remove();
+    if(document.body.contains(inp))document.body.removeChild(inp);
   });
-  picker.appendChild(inp);
-  document.getElementById("input-date-row").insertAdjacentElement("afterend",picker);
+  inp.addEventListener("blur",()=>{
+    setTimeout(()=>{if(document.body.contains(inp))document.body.removeChild(inp);},300);
+  });
   setTimeout(()=>{inp.focus();inp.click();},50);
 });
 function resetInputForm(){
