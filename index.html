@@ -1716,10 +1716,10 @@ document.querySelectorAll(".numpad-key").forEach(key=>{
     const k=key.dataset.key;
    if(k==="sen"){numpadAccum+=(parseInt(numpadValue)||0)*1000;numpadValue="0";document.getElementById("numpad-display").textContent=Number(numpadAccum).toLocaleString();return;}
    if(k==="man"){numpadAccum+=(parseInt(numpadValue)||0)*10000;numpadValue="0";document.getElementById("numpad-display").textContent=Number(numpadAccum).toLocaleString();return;}
-   if(k==="done"){const v=numpadAccum+(parseInt(numpadValue)||0);if(numpadTarget==="input"){state.input.amount=v;updateAmountDisplay();}else if(numpadTarget==="loan"){loanAmount=v;updateLoanAmountDisplay();}else{editState.amount=v;document.getElementById("edit-amount-display").textContent=v.toLocaleString();}closeNumpad();}
-    else if(k==="del"){numpadValue=numpadValue.length>1?numpadValue.slice(0,-1):"0";}
-    else{if(numpadValue==="0")numpadValue=k;else if(numpadValue.length<8)numpadValue+=k;}
-    document.getElementById("numpad-display").textContent=Number(numpadValue).toLocaleString();
+   if(k==="done"){const v=numpadAccum+(parseInt(numpadValue)||0);if(numpadTarget==="input"){state.input.amount=v;updateAmountDisplay();}else if(numpadTarget==="loan"){loanAmount=v;updateLoanAmountDisplay();}else{editState.amount=v;document.getElementById("edit-amount-display").textContent=v.toLocaleString();}closeNumpad();return;}
+   if(k==="del"){if(numpadAccum>0&&numpadValue==="0"){numpadAccum=0;document.getElementById("numpad-display").textContent="0";return;}numpadValue=numpadValue.length>1?numpadValue.slice(0,-1):"0";}
+   else{if(numpadValue==="0")numpadValue=k;else if(numpadValue.length<8)numpadValue+=k;}
+   document.getElementById("numpad-display").textContent=Number(numpadAccum+parseInt(numpadValue)||0).toLocaleString();
   });
 });
 function updateAmountDisplay(){const el=document.getElementById("amount-display");if(state.input.amount===0){el.textContent="0";el.classList.add("placeholder");}else{el.textContent=state.input.amount.toLocaleString();el.classList.remove("placeholder");}}
@@ -1728,7 +1728,7 @@ function updateDateDisplay(){document.getElementById("input-date-display").textC
 document.getElementById("input-date-row").addEventListener("click",()=>{
   const inp=document.createElement("input");
   inp.type="date";inp.value=state.input.date;
-  inp.style.cssText="position:fixed;opacity:0;top:50%;left:50%;width:1px;height:1px;";
+  inp.style.cssText="position:fixed;opacity:0;top:0;left:0;width:1px;height:1px;";
   document.body.appendChild(inp);
   inp.addEventListener("change",()=>{
     if(inp.value){state.input.date=inp.value;updateDateDisplay();}
@@ -1737,7 +1737,7 @@ document.getElementById("input-date-row").addEventListener("click",()=>{
   inp.addEventListener("blur",()=>{
     setTimeout(()=>{if(document.body.contains(inp))document.body.removeChild(inp);},300);
   });
-  setTimeout(()=>{inp.focus();inp.click();},50);
+  inp.focus();inp.click();
 });
 function resetInputForm(){
   state.input.date=todayString();state.input.amount=0;state.input.memo="";state.input.currency="JPY";
