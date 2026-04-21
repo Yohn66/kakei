@@ -381,6 +381,8 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
         </div>
         <div id="btn-fixed-mode" style="border:1px solid #bbb;border-radius:8px;padding:11px 14px;font-size:13px;color:#999;cursor:pointer;white-space:nowrap;background:var(--white);font-family:var(--font);flex-shrink:0;">固定費</div>
       </div>
+      <!-- 固定費モード時の日付代替テキスト -->
+      <div id="fixed-mode-date-label" style="display:none;height:0;"></div>
       <div class="lbl-mini">誰が</div>
       <div class="toggle-group" id="toggle-paid-by">
         <div class="toggle-btn active" data-value="both">二人</div>
@@ -408,9 +410,10 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
       <div class="divider"></div>
       <div class="input-cat-grid" id="input-cat-grid"></div>
       <div class="cat-edit-link" id="btn-cat-edit-input">カテゴリを編集</div>
-      <!-- 固定費モード：期間入力エリア -->
-      <div id="fixed-period-area" style="display:none;">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:2px 0;">
+      <button class="primary-btn" id="btn-add-expense" style="margin-top:11px;">追加する</button>
+      <!-- 固定費モード：期間入力エリア（追加ボタンの後） -->
+      <div id="fixed-period-area" style="display:none;margin-top:4px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;">
           <span style="font-size:12px;color:#888;">開始月</span>
           <div style="display:flex;align-items:center;gap:4px;">
             <span id="btn-fixed-start-prev" style="font-size:18px;color:#aaa;cursor:pointer;padding:4px 10px;">◀</span>
@@ -418,11 +421,11 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
             <span id="btn-fixed-start-next" style="font-size:18px;color:#aaa;cursor:pointer;padding:4px 10px;">▶</span>
           </div>
         </div>
-        <div id="fixed-end-toggle-row" style="text-align:right;margin-top:4px;">
+        <div id="fixed-end-toggle-row" style="text-align:right;margin-top:2px;">
           <span id="btn-fixed-end-toggle" style="font-size:12px;color:#aaa;cursor:pointer;">終了月を設定</span>
         </div>
         <div id="fixed-end-area" style="display:none;margin-top:4px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:2px 0;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;">
             <span style="font-size:12px;color:#888;">終了月</span>
             <div style="display:flex;align-items:center;gap:4px;">
               <span id="btn-fixed-end-prev" style="font-size:18px;color:#aaa;cursor:pointer;padding:4px 10px;">◀</span>
@@ -433,7 +436,6 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
           </div>
         </div>
       </div>
-      <button class="primary-btn" id="btn-add-expense" style="margin-top:11px;">追加する</button>
     </div>
   </div>
 
@@ -1157,12 +1159,14 @@ document.getElementById("btn-fixed-mode").addEventListener("click",()=>{
     state.input.category=FIXED_CAT;
     fixedStart=currentYearMonth();
     fixedEnd=null;
-    document.getElementById("input-date-row").style.display="none";
+    document.getElementById("input-date-row").style.visibility="hidden";
+    document.getElementById("fixed-period-area").style.display="block";
     document.getElementById("fixed-end-area").style.display="none";
     document.getElementById("fixed-end-toggle-row").style.display="block";
     updateFixedPeriodDisplay();
   }else{
-    document.getElementById("input-date-row").style.display="flex";
+    document.getElementById("input-date-row").style.visibility="visible";
+    document.getElementById("fixed-period-area").style.display="none";
     const cats=state.meta?.categories||[];
     state.input.category=cats[0]||null;
   }
@@ -1951,7 +1955,7 @@ function resetInputForm(){
     updateFixedModeBtn();
     renderInputCatGrid();
     document.getElementById("fixed-period-area").style.display="none";
-    document.getElementById("input-date-row").style.display="flex";
+    document.getElementById("input-date-row").style.visibility="visible";
     document.getElementById("fixed-end-area").style.display="none";
     document.getElementById("fixed-end-toggle-row").style.display="block";
   }
