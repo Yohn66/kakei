@@ -381,6 +381,31 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
         </div>
         <div id="btn-fixed-mode" style="border:1px solid #bbb;border-radius:8px;padding:11px 14px;font-size:13px;color:#999;cursor:pointer;white-space:nowrap;background:var(--white);font-family:var(--font);flex-shrink:0;">固定費</div>
       </div>
+      <!-- 固定費モード：期間入力エリア -->
+      <div id="fixed-period-area" style="display:none;margin-top:6px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:12px;color:#888;white-space:nowrap;">開始月</span>
+          <div style="display:flex;align-items:center;gap:4px;flex:1;justify-content:center;">
+            <span id="btn-fixed-start-prev" style="font-size:18px;color:#aaa;cursor:pointer;padding:4px 8px;">◀</span>
+            <span id="fixed-start-display" style="font-size:14px;font-weight:500;min-width:80px;text-align:center;"></span>
+            <span id="btn-fixed-start-next" style="font-size:18px;color:#aaa;cursor:pointer;padding:4px 8px;">▶</span>
+          </div>
+        </div>
+        <div id="fixed-end-toggle-row" style="text-align:center;margin-top:6px;">
+          <span id="btn-fixed-end-toggle" style="font-size:12px;color:#aaa;cursor:pointer;">終了月を設定</span>
+        </div>
+        <div id="fixed-end-area" style="display:none;margin-top:4px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:12px;color:#888;white-space:nowrap;">終了月</span>
+            <div style="display:flex;align-items:center;gap:4px;flex:1;justify-content:center;">
+              <span id="btn-fixed-end-prev" style="font-size:18px;color:#aaa;cursor:pointer;padding:4px 8px;">◀</span>
+              <span id="fixed-end-display" style="font-size:14px;font-weight:500;min-width:80px;text-align:center;"></span>
+              <span id="btn-fixed-end-next" style="font-size:18px;color:#aaa;cursor:pointer;padding:4px 8px;">▶</span>
+            </div>
+            <span id="btn-fixed-end-clear" style="font-size:16px;color:#aaa;cursor:pointer;padding:4px;">✕</span>
+          </div>
+        </div>
+      </div>
       <div class="lbl-mini">誰が</div>
       <div class="toggle-group" id="toggle-paid-by">
         <div class="toggle-btn active" data-value="both">二人</div>
@@ -530,6 +555,11 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
       <div class="list-nav-back" id="btn-repeating-back">← 戻る</div>
       <div class="list-nav-title" id="repeating-nav-title">固定費</div>
       <div style="width:48px;"></div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px;padding:10px 16px 6px;border-bottom:0.5px solid #ececec;background:var(--white);flex-shrink:0;">
+      <span id="btn-repeating-prev" style="font-size:20px;color:#aaa;cursor:pointer;padding:4px 8px;">◀</span>
+      <span id="repeating-month-display" style="font-size:15px;font-weight:500;min-width:100px;text-align:center;"></span>
+      <span id="btn-repeating-next" style="font-size:20px;color:#aaa;cursor:pointer;padding:4px 8px;">▶</span>
     </div>
     <div class="list-scroll" id="repeating-scroll"></div>
   </div>
@@ -1102,13 +1132,38 @@ function updateFixedModeBtn(){
     btn.style.background="var(--white)";btn.style.color="#999";btn.style.borderColor="#bbb";btn.style.fontWeight="400";
   }
 }
+
+// 固定費期間state
+let fixedStart = null; // "2026-04"
+let fixedEnd = null;   // "2026-09" or null
+
+function ymAdd(ym, months){
+  let [y,m]=ym.split("-").map(Number);
+  m+=months; while(m>12){m-=12;y++;} while(m<1){m+=12;y--;}
+  return `${y}-${String(m).padStart(2,"0")}`;
+}
+function formatYM(ym){
+  const [y,m]=ym.split("-").map(Number);
+  return `${y}年${m}月`;
+}
+function updateFixedPeriodDisplay(){
+  document.getElementById("fixed-start-display").textContent=formatYM(fixedStart);
+  if(fixedEnd) document.getElementById("fixed-end-display").textContent=formatYM(fixedEnd);
+}
+
 document.getElementById("btn-fixed-mode").addEventListener("click",()=>{
   isFixedMode=!isFixedMode;
   if(isFixedMode){
-    // 固定費モードオン：カテゴリを固定費に強制セット
     state.input.category=FIXED_CAT;
+    fixedStart=currentYearMonth();
+    fixedEnd=null;
+    document.getElementById("fixed-period-area").style.display="block";
+    document.getElementById("input-date-row").style.display="none";
+    document.getElementById("fixed-end-area").style.display="none";
+    updateFixedPeriodDisplay();
   }else{
-    // 固定費モードオフ：通常カテゴリに戻す
+    document.getElementById("fixed-period-area").style.display="none";
+    document.getElementById("input-date-row").style.display="flex";
     const cats=state.meta?.categories||[];
     state.input.category=cats[0]||null;
   }
@@ -1116,40 +1171,117 @@ document.getElementById("btn-fixed-mode").addEventListener("click",()=>{
   renderInputCatGrid();
 });
 
+document.getElementById("btn-fixed-start-prev").addEventListener("click",()=>{
+  fixedStart=ymAdd(fixedStart,-1);
+  if(fixedEnd&&fixedEnd<fixedStart)fixedEnd=fixedStart;
+  updateFixedPeriodDisplay();
+});
+document.getElementById("btn-fixed-start-next").addEventListener("click",()=>{
+  fixedStart=ymAdd(fixedStart,1);
+  if(fixedEnd&&fixedEnd<fixedStart)fixedEnd=fixedStart;
+  updateFixedPeriodDisplay();
+});
+document.getElementById("btn-fixed-end-toggle").addEventListener("click",()=>{
+  fixedEnd=fixedEnd||ymAdd(fixedStart,1);
+  document.getElementById("fixed-end-area").style.display="block";
+  document.getElementById("fixed-end-toggle-row").style.display="none";
+  updateFixedPeriodDisplay();
+});
+document.getElementById("btn-fixed-end-prev").addEventListener("click",()=>{
+  const prev=ymAdd(fixedEnd,-1);
+  if(prev>=fixedStart){fixedEnd=prev;updateFixedPeriodDisplay();}
+});
+document.getElementById("btn-fixed-end-next").addEventListener("click",()=>{
+  fixedEnd=ymAdd(fixedEnd,1);updateFixedPeriodDisplay();
+});
+document.getElementById("btn-fixed-end-clear").addEventListener("click",()=>{
+  fixedEnd=null;
+  document.getElementById("fixed-end-area").style.display="none";
+  document.getElementById("fixed-end-toggle-row").style.display="block";
+});
+
 // ===== 固定費管理画面 =====
-let repeatingEditId = null;
 let repeatingEditData = null;
 let repeatingEditYM = null;
-let repeatingEditMode = null; // "save" or "delete"
+let repeatingEditMode = null;
 let repeatingEditNewData = null;
+let repeatingEditGroupId = null;
 
 function showRepeatingScreen(){
-  const ym = state.summary.yearMonth;
-  repeatingEditYM = ym;
-  document.getElementById("repeating-nav-title").textContent = `${formatYearMonthJP(ym)}　固定費`;
-  const scroll = document.getElementById("repeating-scroll"); scroll.innerHTML = "";
-  const items = Object.entries(state.repeating || {});
-  if(items.length === 0){
-    scroll.innerHTML = '<div class="list-empty">登録された固定費はありません<br><span style="font-size:12px;color:#bbb;margin-top:8px;display:block;">入力画面で「固定費」ボタンをオンにして追加してください</span></div>';
-  } else {
-    const p1 = state.meta?.person1 || "一人目"; const p2 = state.meta?.person2 || "二人目";
-    const pl = v => v==="both"?"二人":v==="person1"?p1:p2;
-    const fl = v => v==="both"?"二人分":v==="person1"?`${p1}の分`:`${p2}の分`;
-    const ml = v => v==="barcode"?"バーコード":v==="card"?"カード":"現金";
-    items.sort(([,a],[,b]) => b.createdAt - a.createdAt).forEach(([id, r]) => {
-      const wrap = document.createElement("div"); wrap.className = "record-row-wrap";
-      const row = document.createElement("div"); row.className = "record-row";
-      const catColor = CAT_COLORS[12];
-      row.innerHTML = `<span class="cat-badge" style="border-color:${catColor};color:${catColor};min-width:52px;text-align:center;">固定費</span><div class="record-main"><div class="record-memo">${r.memo||""}</div><div class="record-sub">${pl(r.paidBy)}・${fl(r.forWhom)}・${ml(r.method)}・毎月1日</div></div><div class="record-right"><div class="record-amount">${fmtAmt(r.amount)}</div></div>`;
-      row.addEventListener("click", () => openRepeatingEditModal(id, r));
-      wrap.appendChild(row); scroll.appendChild(wrap);
-    });
-  }
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  repeatingEditYM = state.summary.yearMonth;
+  renderRepeatingScreen();
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById("screen-repeating").classList.add("active");
   document.getElementById("tab-bar").classList.remove("visible");
 }
-document.getElementById("btn-repeating-back").addEventListener("click", () => showScreen("screen-summary"));
+
+function renderRepeatingScreen(){
+  const ym = repeatingEditYM;
+  document.getElementById("repeating-nav-title").textContent = `固定費`;
+  document.getElementById("repeating-month-display").textContent = formatYM(ym);
+  const scroll = document.getElementById("repeating-scroll"); scroll.innerHTML = "";
+  const items = Object.entries(state.expenses||{}).filter(([,e])=>
+    e.category===FIXED_CAT && e.isRepeating && e.date && e.date.startsWith(ym)
+  );
+  if(items.length===0){
+    scroll.innerHTML='<div class="list-empty">この月の固定費はありません</div>';return;
+  }
+  const p1=state.meta?.person1||"一人目";const p2=state.meta?.person2||"二人目";
+  const pl=v=>v==="both"?"二人":v==="person1"?p1:p2;
+  const fl=v=>v==="both"?"二人分":v==="person1"?`${p1}の分`:`${p2}の分`;
+  const ml=v=>v==="barcode"?"バーコード":v==="card"?"カード":"現金";
+  const catColor=CAT_COLORS[12];
+  items.sort(([,a],[,b])=>a.memo.localeCompare(b.memo,"ja")).forEach(([id,r])=>{
+    const wrap=document.createElement("div");wrap.className="record-row-wrap";
+    const row=document.createElement("div");row.className="record-row";
+    row.innerHTML=`<span class="cat-badge" style="border-color:${catColor};color:${catColor};min-width:52px;text-align:center;">固定費</span><div class="record-main"><div class="record-memo">${r.memo||""}</div><div class="record-sub">${pl(r.paidBy)}・${fl(r.forWhom)}・${ml(r.method)}</div></div><div class="record-right"><div class="record-amount">${fmtAmt(r.amount)}</div></div>`;
+    row.addEventListener("click",()=>openRepeatingEditModal(id,r));
+    wrap.appendChild(row);scroll.appendChild(wrap);
+  });
+}
+
+document.getElementById("btn-repeating-prev").addEventListener("click",()=>{
+  repeatingEditYM=ymAdd(repeatingEditYM,-1);renderRepeatingScreen();
+});
+document.getElementById("btn-repeating-next").addEventListener("click",()=>{
+  repeatingEditYM=ymAdd(repeatingEditYM,1);renderRepeatingScreen();
+});
+document.getElementById("btn-repeating-back").addEventListener("click",()=>showScreen("screen-summary"));
+
+function openRepeatingEditModal(id,r){
+  repeatingEditData={...r};
+  repeatingEditGroupId=r.repeatingGroupId||null;
+  const p1=state.meta?.person1||"一人目";const p2=state.meta?.person2||"二人目";
+  ["edit-paid-p1","edit-for-p1"].forEach(i=>document.getElementById(i).textContent=p1);
+  ["edit-paid-p2","edit-for-p2"].forEach(i=>document.getElementById(i).textContent=p2);
+  document.getElementById("edit-modal-date").textContent=formatYM(repeatingEditYM);
+  document.getElementById("edit-memo").value=r.memo||"";
+  setEditToggle("edit-toggle-paid-by",r.paidBy);
+  setEditToggle("edit-toggle-for-whom",r.forWhom);
+  setEditToggle("edit-toggle-method",r.method);
+  editState={...r};
+  document.getElementById("edit-amount-display").textContent=r.amount.toLocaleString();
+  document.getElementById("edit-currency-badge").textContent=getCurrencySymbol(r.currency||"JPY");
+  document.getElementById("edit-cat-grid").innerHTML="";
+  document.getElementById("btn-edit-save").onclick=()=>{
+    const memo=document.getElementById("edit-memo").value.trim();
+    if(!memo){showToast("メモを入力してください");return;}
+    if(!editState.amount||editState.amount<=0){showToast("金額を入力してください");return;}
+    repeatingEditNewData={memo,paidBy:editState.paidBy,forWhom:editState.forWhom,method:editState.method,amount:editState.amount,currency:editState.currency||"JPY"};
+    const changed=Object.keys(repeatingEditNewData).some(k=>repeatingEditNewData[k]!==repeatingEditData[k]);
+    if(!changed){document.getElementById("modal-edit").classList.remove("open");showToast("変更がありません");return;}
+    repeatingEditMode="save";
+    document.getElementById("modal-edit").classList.remove("open");
+    openRepeatingScopeModal();
+  };
+  document.getElementById("btn-edit-delete").onclick=()=>{
+    repeatingEditMode="delete";
+    document.getElementById("modal-edit").classList.remove("open");
+    openRepeatingScopeModal();
+  };
+  document.getElementById("edit-modal-date").onclick=null;
+  document.getElementById("modal-edit").classList.add("open");
+}
 
 // 固定費編集モーダル
 function openRepeatingEditModal(id, r){
@@ -1236,63 +1368,80 @@ document.getElementById("repeating-scope-list").addEventListener("click", async 
 });
 
 async function executeRepeatingAction(scope){
-  const ym = repeatingEditYM;
-  const isDelete = repeatingEditMode === "delete";
-  try {
-    const matchExp = ([, e]) => e.category === FIXED_CAT
-      && e.memo === repeatingEditData.memo
-      && e.amount === repeatingEditData.amount;
+  const ym=repeatingEditYM;
+  const isDelete=repeatingEditMode==="delete";
+  try{
+    const groupId=repeatingEditGroupId;
+    const allInGroup=groupId
+      ? Object.entries(state.expenses||{}).filter(([,e])=>e.repeatingGroupId===groupId)
+      : [];
 
-    if(scope === "thismonth"){
-      const targets = Object.entries(state.expenses || {})
-        .filter(([,e]) => e.date.startsWith(ym) && matchExp([,e]));
+    if(scope==="thismonth"){
+      const targets=allInGroup.filter(([,e])=>e.date.startsWith(ym));
       if(isDelete){
-        await Promise.all(targets.map(([id]) => remove(ref(db, `rooms/${state.roomId}/expenses/${id}`))));
-      } else {
-        await Promise.all(targets.map(([id]) => update(ref(db, `rooms/${state.roomId}/expenses/${id}`), repeatingEditNewData)));
+        await Promise.all(targets.map(([id])=>remove(ref(db,`rooms/${state.roomId}/expenses/${id}`))));
+      }else{
+        await Promise.all(targets.map(([id])=>update(ref(db,`rooms/${state.roomId}/expenses/${id}`),repeatingEditNewData)));
       }
 
-    } else if(scope === "fromthis"){
-      const targets = Object.entries(state.expenses || {})
-        .filter(([,e]) => e.date >= `${ym}-01` && matchExp([,e]));
+    }else if(scope==="fromthis"){
+      const targets=allInGroup.filter(([,e])=>e.date>=`${ym}-01`);
       if(isDelete){
-        await Promise.all(targets.map(([id]) => remove(ref(db, `rooms/${state.roomId}/expenses/${id}`))));
-        await remove(ref(db, `rooms/${state.roomId}/repeating/${repeatingEditId}`));
-      } else {
-        await Promise.all(targets.map(([id]) => update(ref(db, `rooms/${state.roomId}/expenses/${id}`), repeatingEditNewData)));
-        await update(ref(db, `rooms/${state.roomId}/repeating/${repeatingEditId}`), repeatingEditNewData);
+        await Promise.all(targets.map(([id])=>remove(ref(db,`rooms/${state.roomId}/expenses/${id}`))));
+      }else{
+        // 今月以降を更新。repeatingEndlessならさらに先まで再生成
+        await Promise.all(targets.map(([id])=>update(ref(db,`rooms/${state.roomId}/expenses/${id}`),repeatingEditNewData)));
+        if(repeatingEditData.repeatingEndless){
+          await extendRepeatingGroup(groupId,ym,null,repeatingEditNewData);
+        }
       }
 
-    } else if(scope === "fromnext"){
+    }else if(scope==="fromnext"){
+      const nextYM=ymAdd(ym,1);
+      const targets=allInGroup.filter(([,e])=>e.date>=`${nextYM}-01`);
       if(isDelete){
-        await remove(ref(db, `rooms/${state.roomId}/repeating/${repeatingEditId}`));
-      } else {
-        await update(ref(db, `rooms/${state.roomId}/repeating/${repeatingEditId}`), repeatingEditNewData);
+        await Promise.all(targets.map(([id])=>remove(ref(db,`rooms/${state.roomId}/expenses/${id}`))));
+      }else{
+        await Promise.all(targets.map(([id])=>update(ref(db,`rooms/${state.roomId}/expenses/${id}`),repeatingEditNewData)));
+        if(repeatingEditData.repeatingEndless){
+          await extendRepeatingGroup(groupId,nextYM,null,repeatingEditNewData);
+        }
       }
 
-    } else if(scope === "all"){
-      const targets = Object.entries(state.expenses || {}).filter(matchExp);
+    }else if(scope==="all"){
       if(isDelete){
-        await Promise.all(targets.map(([id]) => remove(ref(db, `rooms/${state.roomId}/expenses/${id}`))));
-        await remove(ref(db, `rooms/${state.roomId}/repeating/${repeatingEditId}`));
-      } else {
-        await Promise.all(targets.map(([id]) => update(ref(db, `rooms/${state.roomId}/expenses/${id}`), repeatingEditNewData)));
-        await update(ref(db, `rooms/${state.roomId}/repeating/${repeatingEditId}`), repeatingEditNewData);
+        await Promise.all(allInGroup.map(([id])=>remove(ref(db,`rooms/${state.roomId}/expenses/${id}`))));
+      }else{
+        await Promise.all(allInGroup.map(([id])=>update(ref(db,`rooms/${state.roomId}/expenses/${id}`),repeatingEditNewData)));
+        if(repeatingEditData.repeatingEndless){
+          const firstYM=allInGroup.map(([,e])=>e.date.slice(0,7)).sort()[0]||ym;
+          await extendRepeatingGroup(groupId,firstYM,null,repeatingEditNewData);
+        }
       }
     }
 
-    const expSnap = await get(ref(db, `rooms/${state.roomId}/expenses`));
-    state.expenses = expSnap.exists() ? expSnap.val() : {};
-    const repSnap = await get(ref(db, `rooms/${state.roomId}/repeating`));
-    state.repeating = repSnap.exists() ? repSnap.val() : {};
+    const expSnap=await get(ref(db,`rooms/${state.roomId}/expenses`));
+    state.expenses=expSnap.exists()?expSnap.val():{};
+    showToast(isDelete?"削除しました ✓":"変更しました ✓");
+    renderRepeatingScreen();
+    if(document.getElementById("screen-summary").classList.contains("active"))renderSummary();
+  }catch(e){console.error(e);showToast("処理に失敗しました");}
+}
 
-    // 編集していた月の集計画面に戻る
-    state.summary.yearMonth = ym;
-    showToast(isDelete ? "削除しました ✓" : "変更しました ✓");
-    showScreen("screen-summary");
-  } catch(e) {
-    console.error(e); showToast("処理に失敗しました");
+// 無期限グループの先打ち延長（既存を消して再生成）
+async function extendRepeatingGroup(groupId,startYM,endYM,data){
+  // 既存の同グループを全削除してから再生成
+  const existing=Object.entries(state.expenses||{}).filter(([,e])=>e.repeatingGroupId===groupId&&e.date>=`${startYM}-01`);
+  await Promise.all(existing.map(([id])=>remove(ref(db,`rooms/${state.roomId}/expenses/${id}`))));
+  const end=endYM||ymAdd(startYM,60); // 5年
+  const pushTasks=[];
+  let cur=startYM;
+  while(cur<=end){
+    const record={date:`${cur}-01`,...data,category:FIXED_CAT,isRepeating:true,repeatingGroupId:groupId,repeatingEndless:!endYM,createdAt:Date.now()};
+    pushTasks.push(push(ref(db,`rooms/${state.roomId}/expenses`),record));
+    cur=ymAdd(cur,1);
   }
+  await Promise.all(pushTasks);
 }
 
 // ===== 集計ロジック =====
@@ -1844,28 +1993,59 @@ function resetInputForm(){
   state.input.date=todayString();state.input.amount=0;state.input.memo="";state.input.currency="JPY";
   document.getElementById("input-memo").value="";document.getElementById("currency-badge").textContent="¥";
   updateDateDisplay();updateAmountDisplay();
-  // 固定費モードをリセット
-  if(isFixedMode){isFixedMode=false;updateFixedModeBtn();renderInputCatGrid();}
+  if(isFixedMode){
+    isFixedMode=false;
+    updateFixedModeBtn();
+    renderInputCatGrid();
+    document.getElementById("fixed-period-area").style.display="none";
+    document.getElementById("input-date-row").style.display="flex";
+    document.getElementById("fixed-end-area").style.display="none";
+    document.getElementById("fixed-end-toggle-row").style.display="block";
+  }
 }
 document.getElementById("btn-add-expense").addEventListener("click",async()=>{
   if(!state.input.memo.trim()){showToast("「何に使ったか」を入力してください");return;}
   if(state.input.amount<=0){showToast("金額を入力してください");return;}
   if(!isFixedMode&&!state.input.category){showToast("カテゴリを選択してください");return;}
   if(!state.roomId){showToast("エラー：ルームが見つかりません");return;}
-  const category=isFixedMode?FIXED_CAT:state.input.category;
-  const data={date:state.input.date,memo:state.input.memo.trim(),paidBy:state.input.paidBy,forWhom:state.input.forWhom,amount:state.input.amount,currency:state.input.currency,method:state.input.method,category,createdAt:Date.now()};
-  try{
-    await push(ref(db,`rooms/${state.roomId}/expenses`),data);
-    // 固定費モードならrepeatingにも保存
-    if(isFixedMode){
-      const repData={memo:data.memo,paidBy:data.paidBy,forWhom:data.forWhom,amount:data.amount,currency:data.currency,method:data.method,category:FIXED_CAT,createdAt:Date.now(),lastAppliedYM:state.input.date.slice(0,7)};
-      await push(ref(db,`rooms/${state.roomId}/repeating`),repData);
-      showToast("固定費として登録しました ✓");
-    }else{
-      showToast("追加しました ✓");
+  if(isFixedMode){
+    // 固定費：開始月〜終了月（または5年先）を一括push
+    const groupId=Math.random().toString(36).slice(2,14);
+    const endYM=fixedEnd||ymAdd(fixedStart,60);
+    const endless=!fixedEnd;
+    const pushTasks=[];
+    let cur=fixedStart;
+    while(cur<=endYM){
+      const record={
+        date:`${cur}-01`,
+        memo:state.input.memo.trim(),
+        paidBy:state.input.paidBy,
+        forWhom:state.input.forWhom,
+        amount:state.input.amount,
+        currency:state.input.currency,
+        method:state.input.method,
+        category:FIXED_CAT,
+        isRepeating:true,
+        repeatingGroupId:groupId,
+        repeatingEndless:endless,
+        createdAt:Date.now()
+      };
+      pushTasks.push(push(ref(db,`rooms/${state.roomId}/expenses`),record));
+      cur=ymAdd(cur,1);
     }
-    resetInputForm();
-  }catch(e){showToast("保存に失敗しました");}
+    try{
+      await Promise.all(pushTasks);
+      showToast(`固定費を登録しました（${endless?`${formatYM(fixedStart)}〜5年分`:`${formatYM(fixedStart)}〜${formatYM(fixedEnd)}`}） ✓`);
+      resetInputForm();
+    }catch(e){showToast("保存に失敗しました");}
+  }else{
+    const data={date:state.input.date,memo:state.input.memo.trim(),paidBy:state.input.paidBy,forWhom:state.input.forWhom,amount:state.input.amount,currency:state.input.currency,method:state.input.method,category:state.input.category,createdAt:Date.now()};
+    try{
+      await push(ref(db,`rooms/${state.roomId}/expenses`),data);
+      showToast("追加しました ✓");
+      resetInputForm();
+    }catch(e){showToast("保存に失敗しました");}
+  }
 });
 setupToggleGroup("toggle-paid-by","paidBy");setupToggleGroup("toggle-for-whom","forWhom");setupToggleGroup("toggle-method","method");
 document.getElementById("tab-bar").addEventListener("click",e=>{const tab=e.target.closest(".tab");if(!tab)return;showScreen(`screen-${tab.dataset.tab}`);});
@@ -1942,43 +2122,16 @@ async function init(){
   renderTopCatGrid();
   const hash=location.hash.replace("#","");
   if(hash&&/^[a-z0-9]{12}$/.test(hash)){
-    try{const snap=await get(ref(db,`rooms/${hash}/meta`));if(snap.exists()){state.roomId=hash;state.meta=snap.val();state.input.category=state.meta.categories[0];localStorage.setItem("kakei_room",hash);updatePersonToggles();renderInputCatGrid();updateDateDisplay();subscribeRoom(hash);await applyRepeating();showScreen("screen-input");return;}}catch(e){console.error(e);}
+    try{const snap=await get(ref(db,`rooms/${hash}/meta`));if(snap.exists()){state.roomId=hash;state.meta=snap.val();state.input.category=state.meta.categories[0];localStorage.setItem("kakei_room",hash);updatePersonToggles();renderInputCatGrid();updateDateDisplay();subscribeRoom(hash);showScreen("screen-input");return;}}catch(e){console.error(e);}
   }
   const saved=localStorage.getItem("kakei_room");
   if(saved){
-    try{const snap=await get(ref(db,`rooms/${saved}/meta`));if(snap.exists()){state.roomId=saved;state.meta=snap.val();state.input.category=state.meta.categories[0];location.hash=saved;updatePersonToggles();renderInputCatGrid();updateDateDisplay();subscribeRoom(saved);await applyRepeating();showScreen("screen-input");return;}}catch(e){console.error(e);}
+    try{const snap=await get(ref(db,`rooms/${saved}/meta`));if(snap.exists()){state.roomId=saved;state.meta=snap.val();state.input.category=state.meta.categories[0];location.hash=saved;updatePersonToggles();renderInputCatGrid();updateDateDisplay();subscribeRoom(saved);showScreen("screen-input");return;}}catch(e){console.error(e);}
   }
   showScreen("screen-top");
 }
 
-// 固定費の自動追加（起動時に未追加の月があれば1日付で追加）
-async function applyRepeating(){
-  try{
-    const repSnap=await get(ref(db,`rooms/${state.roomId}/repeating`));
-    if(!repSnap.exists())return;
-    const repeating=repSnap.val();
-    const currentYM=currentYearMonth();
-    const updates={};
-    const pushTasks=[];
-    for(const[id,r]of Object.entries(repeating)){
-      const lastYM=r.lastAppliedYM||"";
-      // lastAppliedYMが今月より前なら、今月分を追加
-      if(lastYM<currentYM){
-        const date=`${currentYM}-01`;
-        const data={date,memo:r.memo,paidBy:r.paidBy,forWhom:r.forWhom,amount:r.amount,currency:r.currency||"JPY",method:r.method,category:FIXED_CAT,createdAt:Date.now()};
-        pushTasks.push(push(ref(db,`rooms/${state.roomId}/expenses`),data));
-        updates[`rooms/${state.roomId}/repeating/${id}/lastAppliedYM`]=currentYM;
-      }
-    }
-    if(pushTasks.length>0){
-      await Promise.all(pushTasks);
-      await update(ref(db),updates);
-      // stateにも反映（subscribeRoomがすぐ拾うが念のため）
-      const expSnap=await get(ref(db,`rooms/${state.roomId}/expenses`));
-      if(expSnap.exists())state.expenses=expSnap.val();
-    }
-  }catch(e){console.error("applyRepeating error:",e);}
-}
+
 init();
 </script>
 </body>
