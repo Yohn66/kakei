@@ -412,9 +412,9 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
       <div class="cat-edit-link" id="btn-cat-edit-input">カテゴリを編集</div>
       <!-- 固定費モード：期間入力エリア -->
       <div id="fixed-period-area" style="display:none;margin-top:8px;">
-        <div style="display:grid;grid-template-columns:48px 1fr;align-items:center;gap:4px;padding:4px 0;">
-          <span style="font-size:12px;color:#888;">開始月</span>
-          <div style="display:flex;align-items:center;justify-content:flex-end;gap:0;">
+        <div style="display:flex;align-items:center;padding:4px 0;gap:4px;">
+          <span style="font-size:12px;color:#888;width:36px;flex-shrink:0;">開始月</span>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:0;">
             <span id="btn-fixed-start-prev" style="font-size:18px;color:#aaa;cursor:pointer;padding:4px 10px;">◀</span>
             <span id="fixed-start-y" style="font-size:14px;font-weight:500;cursor:pointer;border-bottom:1px dashed #bbb;padding:0 2px;min-width:44px;text-align:center;"></span>
             <span style="font-size:13px;color:#888;margin:0 2px;">年</span>
@@ -422,21 +422,24 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
             <span style="font-size:13px;color:#888;margin:0 2px;">月</span>
             <span id="btn-fixed-start-next" style="font-size:18px;color:#aaa;cursor:pointer;padding:4px 10px;">▶</span>
           </div>
+          <div style="width:28px;flex-shrink:0;"></div>
         </div>
-        <div id="fixed-end-toggle-row" style="text-align:right;margin-top:2px;">
+        <div id="fixed-end-toggle-row" style="text-align:center;margin-top:2px;">
           <span id="btn-fixed-end-toggle" style="font-size:12px;color:#aaa;cursor:pointer;">終了月を設定</span>
         </div>
         <div id="fixed-end-area" style="display:none;margin-top:4px;">
-          <div style="display:grid;grid-template-columns:48px 1fr;align-items:center;gap:4px;padding:4px 0;">
-            <span style="font-size:12px;color:#888;">終了月</span>
-            <div style="display:flex;align-items:center;justify-content:flex-end;gap:0;">
+          <div style="display:flex;align-items:center;padding:4px 0;gap:4px;">
+            <span style="font-size:12px;color:#888;width:36px;flex-shrink:0;">終了月</span>
+            <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:0;">
               <span id="btn-fixed-end-prev" style="font-size:18px;color:#aaa;cursor:pointer;padding:4px 10px;">◀</span>
               <span id="fixed-end-y" style="font-size:14px;font-weight:500;cursor:pointer;border-bottom:1px dashed #bbb;padding:0 2px;min-width:44px;text-align:center;"></span>
               <span style="font-size:13px;color:#888;margin:0 2px;">年</span>
               <span id="fixed-end-m" style="font-size:14px;font-weight:500;cursor:pointer;border-bottom:1px dashed #bbb;padding:0 2px;min-width:24px;text-align:center;"></span>
               <span style="font-size:13px;color:#888;margin:0 2px;">月</span>
               <span id="btn-fixed-end-next" style="font-size:18px;color:#aaa;cursor:pointer;padding:4px 10px;">▶</span>
-              <span id="btn-fixed-end-clear" style="font-size:16px;color:#aaa;cursor:pointer;padding:4px 6px;">✕</span>
+            </div>
+            <div style="width:28px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+              <span id="btn-fixed-end-clear" style="font-size:16px;color:#aaa;cursor:pointer;">✕</span>
             </div>
           </div>
         </div>
