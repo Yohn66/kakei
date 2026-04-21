@@ -410,14 +410,16 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
       <div class="divider"></div>
       <div class="input-cat-grid" id="input-cat-grid"></div>
       <div class="cat-edit-link" id="btn-cat-edit-input">カテゴリを編集</div>
-      <button class="primary-btn" id="btn-add-expense" style="margin-top:11px;">追加する</button>
-      <!-- 固定費モード：期間入力エリア（追加ボタンの後） -->
-      <div id="fixed-period-area" style="display:none;margin-top:4px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;">
+      <!-- 固定費モード：期間入力エリア -->
+      <div id="fixed-period-area" style="display:none;margin-top:8px;">
+        <div style="display:grid;grid-template-columns:48px 1fr;align-items:center;gap:4px;padding:4px 0;">
           <span style="font-size:12px;color:#888;">開始月</span>
-          <div style="display:flex;align-items:center;gap:4px;">
+          <div style="display:flex;align-items:center;justify-content:flex-end;gap:0;">
             <span id="btn-fixed-start-prev" style="font-size:18px;color:#aaa;cursor:pointer;padding:4px 10px;">◀</span>
-            <span id="fixed-start-display" style="font-size:14px;font-weight:500;min-width:80px;text-align:center;"></span>
+            <span id="fixed-start-y" style="font-size:14px;font-weight:500;cursor:pointer;border-bottom:1px dashed #bbb;padding:0 2px;min-width:44px;text-align:center;"></span>
+            <span style="font-size:13px;color:#888;margin:0 2px;">年</span>
+            <span id="fixed-start-m" style="font-size:14px;font-weight:500;cursor:pointer;border-bottom:1px dashed #bbb;padding:0 2px;min-width:24px;text-align:center;"></span>
+            <span style="font-size:13px;color:#888;margin:0 2px;">月</span>
             <span id="btn-fixed-start-next" style="font-size:18px;color:#aaa;cursor:pointer;padding:4px 10px;">▶</span>
           </div>
         </div>
@@ -425,17 +427,21 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
           <span id="btn-fixed-end-toggle" style="font-size:12px;color:#aaa;cursor:pointer;">終了月を設定</span>
         </div>
         <div id="fixed-end-area" style="display:none;margin-top:4px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;">
+          <div style="display:grid;grid-template-columns:48px 1fr;align-items:center;gap:4px;padding:4px 0;">
             <span style="font-size:12px;color:#888;">終了月</span>
-            <div style="display:flex;align-items:center;gap:4px;">
+            <div style="display:flex;align-items:center;justify-content:flex-end;gap:0;">
               <span id="btn-fixed-end-prev" style="font-size:18px;color:#aaa;cursor:pointer;padding:4px 10px;">◀</span>
-              <span id="fixed-end-display" style="font-size:14px;font-weight:500;min-width:80px;text-align:center;"></span>
+              <span id="fixed-end-y" style="font-size:14px;font-weight:500;cursor:pointer;border-bottom:1px dashed #bbb;padding:0 2px;min-width:44px;text-align:center;"></span>
+              <span style="font-size:13px;color:#888;margin:0 2px;">年</span>
+              <span id="fixed-end-m" style="font-size:14px;font-weight:500;cursor:pointer;border-bottom:1px dashed #bbb;padding:0 2px;min-width:24px;text-align:center;"></span>
+              <span style="font-size:13px;color:#888;margin:0 2px;">月</span>
               <span id="btn-fixed-end-next" style="font-size:18px;color:#aaa;cursor:pointer;padding:4px 10px;">▶</span>
               <span id="btn-fixed-end-clear" style="font-size:16px;color:#aaa;cursor:pointer;padding:4px 6px;">✕</span>
             </div>
           </div>
         </div>
       </div>
+      <button class="primary-btn" id="btn-add-expense" style="margin-top:11px;">追加する</button>
     </div>
   </div>
 
@@ -1149,8 +1155,59 @@ function formatYM(ym){
   return `${y}年${m}月`;
 }
 function updateFixedPeriodDisplay(){
-  document.getElementById("fixed-start-display").textContent=formatYM(fixedStart);
-  if(fixedEnd) document.getElementById("fixed-end-display").textContent=formatYM(fixedEnd);
+  const [sy,sm]=fixedStart.split("-").map(Number);
+  document.getElementById("fixed-start-y").textContent=sy;
+  document.getElementById("fixed-start-m").textContent=sm;
+  if(fixedEnd){
+    const [ey,em]=fixedEnd.split("-").map(Number);
+    document.getElementById("fixed-end-y").textContent=ey;
+    document.getElementById("fixed-end-m").textContent=em;
+  }
+}
+function openYMPicker(currentYM, onChange){
+  const [cy,cm]=currentYM.split("-").map(Number);
+  const overlay=document.createElement("div");
+  overlay.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:9000;display:flex;flex-direction:column;justify-content:flex-end;";
+  const sheet=document.createElement("div");
+  sheet.style.cssText="background:#fff;border-radius:16px 16px 0 0;padding:16px 20px 32px;";
+  sheet.innerHTML=`
+    <div style="font-size:14px;font-weight:500;margin-bottom:14px;text-align:center;">年月を選択</div>
+    <div style="display:flex;gap:12px;justify-content:center;align-items:center;margin-bottom:16px;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <span style="font-size:11px;color:#aaa;">年</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span id="ym-y-prev" style="font-size:22px;color:#aaa;cursor:pointer;padding:0 6px;">‹</span>
+          <span id="ym-y-val" style="font-size:18px;font-weight:500;min-width:48px;text-align:center;">${cy}</span>
+          <span id="ym-y-next" style="font-size:22px;color:#aaa;cursor:pointer;padding:0 6px;">›</span>
+        </div>
+      </div>
+      <span style="font-size:18px;color:#ccc;">／</span>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <span style="font-size:11px;color:#aaa;">月</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span id="ym-m-prev" style="font-size:22px;color:#aaa;cursor:pointer;padding:0 6px;">‹</span>
+          <span id="ym-m-val" style="font-size:18px;font-weight:500;min-width:32px;text-align:center;">${cm}</span>
+          <span id="ym-m-next" style="font-size:22px;color:#aaa;cursor:pointer;padding:0 6px;">›</span>
+        </div>
+      </div>
+    </div>
+    <button style="width:100%;background:#111;color:#fff;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:600;cursor:pointer;" id="ym-ok">決定</button>
+    <div style="text-align:center;margin-top:10px;font-size:13px;color:#aaa;cursor:pointer;" id="ym-cancel">キャンセル</div>
+  `;
+  overlay.appendChild(sheet);
+  document.body.appendChild(overlay);
+  let y=cy,m=cm;
+  const upd=()=>{sheet.querySelector("#ym-y-val").textContent=y;sheet.querySelector("#ym-m-val").textContent=m;};
+  sheet.querySelector("#ym-y-prev").addEventListener("click",()=>{y--;upd();});
+  sheet.querySelector("#ym-y-next").addEventListener("click",()=>{y++;upd();});
+  sheet.querySelector("#ym-m-prev").addEventListener("click",()=>{m--;if(m<1){m=12;y--;}upd();});
+  sheet.querySelector("#ym-m-next").addEventListener("click",()=>{m++;if(m>12){m=1;y++;}upd();});
+  sheet.querySelector("#ym-ok").addEventListener("click",()=>{
+    document.body.removeChild(overlay);
+    onChange(`${y}-${String(m).padStart(2,"0")}`);
+  });
+  sheet.querySelector("#ym-cancel").addEventListener("click",()=>document.body.removeChild(overlay));
+  overlay.addEventListener("click",e=>{if(e.target===overlay)document.body.removeChild(overlay);});
 }
 
 document.getElementById("btn-fixed-mode").addEventListener("click",()=>{
@@ -1201,6 +1258,24 @@ document.getElementById("btn-fixed-end-clear").addEventListener("click",()=>{
   fixedEnd=null;
   document.getElementById("fixed-end-area").style.display="none";
   document.getElementById("fixed-end-toggle-row").style.display="block";
+});
+["fixed-start-y","fixed-start-m"].forEach(id=>{
+  document.getElementById(id).addEventListener("click",()=>{
+    openYMPicker(fixedStart,ym=>{
+      fixedStart=ym;
+      if(fixedEnd&&fixedEnd<fixedStart)fixedEnd=fixedStart;
+      updateFixedPeriodDisplay();
+    });
+  });
+});
+["fixed-end-y","fixed-end-m"].forEach(id=>{
+  document.getElementById(id).addEventListener("click",()=>{
+    if(!fixedEnd)return;
+    openYMPicker(fixedEnd,ym=>{
+      if(ym>=fixedStart){fixedEnd=ym;updateFixedPeriodDisplay();}
+      else showToast("終了月は開始月以降にしてください");
+    });
+  });
 });
 
 // ===== 固定費管理画面 =====
