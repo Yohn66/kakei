@@ -1944,7 +1944,14 @@ function openEditModal(id,expense){
   setEditToggle("edit-toggle-paid-by",expense.paidBy);setEditToggle("edit-toggle-for-whom",expense.forWhom);setEditToggle("edit-toggle-method",expense.method);
   document.getElementById("edit-amount-display").textContent=expense.amount.toLocaleString();
   document.getElementById("edit-currency-badge").textContent=getCurrencySymbol(expense.currency||"JPY");
-  renderEditCatGrid();document.getElementById("modal-edit").classList.add("open");
+  renderEditCatGrid();
+document.getElementById("edit-modal-date").onclick=()=>{
+  openCalendar(editState.date,date=>{
+    editState.date=date;
+    document.getElementById("edit-modal-date").textContent=formatDateJP(date);
+  });
+};
+document.getElementById("modal-edit").classList.add("open");
 }
 function setEditToggle(gid,val){document.querySelectorAll(`#${gid} .toggle-btn`).forEach(b=>b.classList.toggle("active",b.dataset.value===val));}
 ["edit-toggle-paid-by","edit-toggle-for-whom","edit-toggle-method"].forEach(gid=>{
@@ -1966,7 +1973,7 @@ document.getElementById("btn-edit-save").addEventListener("click",async()=>{
   if(!editState.amount||editState.amount<=0){showToast("金額を入力してください");return;}
   if(!editState.category){showToast("カテゴリを選択してください");return;}
   try{
-    await update(ref(db,`rooms/${state.roomId}/expenses/${editingExpenseId}`),{memo:editState.memo.trim(),paidBy:editState.paidBy,forWhom:editState.forWhom,method:editState.method,amount:editState.amount,category:editState.category});
+    await update(ref(db,`rooms/${state.roomId}/expenses/${editingExpenseId}`),{memo:editState.memo.trim(),paidBy:editState.paidBy,forWhom:editState.forWhom,method:editState.method,amount:editState.amount,category:editState.category,date:editState.date});
     document.getElementById("modal-edit").classList.remove("open");showToast("更新しました ✓");renderList();
     if(document.getElementById("screen-summary").classList.contains("active"))renderSummary();
   }catch(e){showToast("保存に失敗しました");}
