@@ -1578,18 +1578,13 @@ function renderSummary(){
   const prevTotals={};allCats.forEach(c=>prevTotals[c]=0);
   prevFiltered.forEach(e=>{const amt=toJPY(e.amount,e.currency,fxRates,pym);if(prevTotals[e.category]!==undefined)prevTotals[e.category]+=amt;});
   const total=Object.values(catTotals).reduce((a,b)=>a+b,0);
-  document.getElementById("chart-total").textContent=fmtAmt(total);
   // グラフ：通常カテゴリ＋固定費
   const chartColors=[...cats.map((_,i)=>CAT_COLORS[i]), CAT_COLORS[12]];
-  renderDonutChart("summary-chart",allCats.map(c=>catTotals[c]),chartColors,isMonthNavigation?0:400);
-  const listEl=document.getElementById("cat-list");listEl.innerHTML="";
   const budgets=state.budgets||{};
   const monthBudgets=budgets[ym]||{};
-  // グラフ・中央表示の切り替え
   if(isBudgetMode){
-    const budgetCats=[...cats,"固定費"];
-    const budgetAmts=cats.map((_,i)=>monthBudgets[cats[i]]||0);
-    budgetAmts.push(0); // 固定費の予算は非対応
+    const budgetAmts=cats.map(c=>monthBudgets[c]||0);
+    budgetAmts.push(0);
     const budgetTotal=budgetAmts.reduce((a,b)=>a+b,0);
     document.getElementById("chart-center-lbl").textContent="予算合計";
     document.getElementById("chart-total").textContent=fmtAmt(budgetTotal);
@@ -1599,6 +1594,7 @@ function renderSummary(){
     document.getElementById("chart-total").textContent=fmtAmt(total);
     renderDonutChart("summary-chart",allCats.map(c=>catTotals[c]),chartColors,isMonthNavigation?0:400);
   }
+  const listEl=document.getElementById("cat-list");listEl.innerHTML="";
   cats.forEach((cat,i)=>{
     const amt=catTotals[cat];
     let diffHtml;
