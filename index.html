@@ -1602,7 +1602,7 @@ function renderSummary(){
   const monthBudgets=budgets[ym]||{};
   if(isBudgetMode){
     const budgetAmts=cats.map(c=>monthBudgets[c]||0);
-    budgetAmts.push(0);
+    budgetAmts.push(monthBudgets[FIXED_CAT]||0);
     const budgetTotal=budgetAmts.reduce((a,b)=>a+b,0);
     document.getElementById("chart-center-lbl").textContent="予算合計";
     document.getElementById("chart-total").textContent=fmtAmt(budgetTotal);
@@ -1635,7 +1635,10 @@ function renderSummary(){
   const fixedAmt=catTotals[FIXED_CAT]||0;
   if(fixedAmt>0||Object.keys(state.repeating||{}).length>0){
     const fixedDiff=fixedAmt-prevFixedTotal;
-    const fixedDiffHtml=fixedDiff===0?`<span class="diff-eq">±0</span>`:fixedDiff>0?`<span class="diff-up">+${fixedDiff.toLocaleString()}</span>`:`<span class="diff-dn">−${Math.abs(fixedDiff).toLocaleString()}</span>`;
+    const fixedBudget=monthBudgets[FIXED_CAT]||0;
+    const fixedDiffHtml=isBudgetMode
+      ?(fixedBudget===0?`<span class="diff-budget-none">－</span>`:fixedAmt-fixedBudget<=0?`<span class="diff-budget-ok">¥${(fixedBudget-fixedAmt).toLocaleString()}残</span>`:`<span class="diff-budget-over">¥${(fixedAmt-fixedBudget).toLocaleString()}超過</span>`)
+      :(fixedDiff===0?`<span class="diff-eq">±0</span>`:fixedDiff>0?`<span class="diff-up">+${fixedDiff.toLocaleString()}</span>`:`<span class="diff-dn">−${Math.abs(fixedDiff).toLocaleString()}</span>`);
     const fixedRow=document.createElement("div");fixedRow.className="cat-row";
     fixedRow.innerHTML=`<div class="cat-left"><div class="color-dot" style="background:${CAT_COLORS[12]};"></div><span class="cat-name-lbl">固定費</span></div><div class="cat-right">${fixedDiffHtml}<span class="cat-amt-lbl">${fmtAmt(fixedAmt)}</span></div>`;
     fixedRow.addEventListener("click",()=>showRepeatingScreen());
@@ -1877,17 +1880,18 @@ function getDefaultRefYM() {
 
 function renderBudgetRefMonth() {
   const cats = state.meta?.categories || [];
+  const allCatsForBudget = [...cats, FIXED_CAT];
   const expenses = state.expenses || {};
   const fxRates = state.fxRates || {};
   const refExps = Object.values(expenses).filter(e => e.date.startsWith(budgetRefYM));
   const refTotals = {};
-  cats.forEach(c => refTotals[c] = 0);
+  allCatsForBudget.forEach(c => refTotals[c] = 0);
   refExps.forEach(e => {
     const amt = toJPY(e.amount, e.currency, fxRates, budgetRefYM);
     if (refTotals[e.category] !== undefined) refTotals[e.category] += amt;
   });
   document.getElementById("budget-ref-month-lbl").textContent = formatYearMonthJP(budgetRefYM);
-  cats.forEach((cat, i) => {
+  allCatsForBudget.forEach((cat, i) => {
     const refEl = document.getElementById(`budget-ref-${i}`);
     if (refEl) refEl.textContent = refTotals[cat] > 0 ? fmtAmt(refTotals[cat]) : "－";
   });
@@ -1898,18 +1902,20 @@ function openBudgetModal() {
   budgetRefYM = getDefaultRefYM();
   document.getElementById("budget-modal-title").textContent = `${formatYearMonthJP(ym)}の予算`;
   const cats = state.meta?.categories || [];
+  const allCatsForBudget = [...cats, FIXED_CAT];
   const budgets = state.budgets || {};
   const monthBudgets = budgets[ym] || {};
-  const rows = cats.map((cat, i) => {
+  const rows = allCatsForBudget.map((cat, i) => {
+    const color = CAT_COLORS[i] || CAT_COLORS[12];
     const val = monthBudgets[cat] || "";
     return `<div style="display:flex;align-items:center;padding:10px 16px;border-bottom:0.5px solid #f0f0f0;gap:8px;">
-      <div style="width:9px;height:9px;border-radius:50%;background:${CAT_COLORS[i]};flex-shrink:0;"></div>
+      <div style="width:9px;height:9px;border-radius:50%;background:${color};flex-shrink:0;"></div>
       <span style="font-size:13px;color:#222;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${cat}</span>
       <div style="display:flex;align-items:center;gap:2px;width:110px;flex-shrink:0;">
         <span style="font-size:13px;color:#888;">¥</span>
         <input type="number" inputmode="numeric" id="budget-input-${i}" value="${val}" placeholder="0"
           style="width:72px;border:0.5px solid #ccc;border-radius:6px;padding:6px 6px;font-size:13px;text-align:right;font-family:var(--font);outline:none;" />
-        <span id="budget-clear-${i}" style="font-size:16px;color:#bbb;cursor:pointer;padding:0 2px;line-height:1;" onclick="document.getElementById('budget-input-${i}').value=''">×</span>
+        <span style="font-size:16px;color:#bbb;cursor:pointer;padding:0 2px;line-height:1;" onclick="document.getElementById('budget-input-${i}').value=''">×</span>
       </div>
       <span id="budget-ref-${i}" style="width:80px;font-size:12px;color:#888;text-align:right;flex-shrink:0;">－</span>
     </div>`;
@@ -1922,8 +1928,9 @@ function openBudgetModal() {
 document.getElementById("btn-budget-save").addEventListener("click", async () => {
   const ym = state.summary.yearMonth;
   const cats = state.meta?.categories || [];
+  const allCatsForBudget = [...cats, FIXED_CAT];
   const budgetData = {};
-  cats.forEach((cat, i) => {
+  allCatsForBudget.forEach((cat, i) => {
     const v = parseInt(document.getElementById(`budget-input-${i}`)?.value || "0");
     if (v > 0) budgetData[cat] = v;
   });
