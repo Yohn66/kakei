@@ -133,6 +133,12 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .filter-option.selected { font-weight: 600; }
 .detail-nav-btn { font-size: 13px; color: #555; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 6px 14px; background: var(--white); cursor: pointer; }
 .detail-nav-btn:active { opacity: 0.7; }
+.budget-mode-btn { font-size: 13px; color: #555; border: 0.5px solid var(--gray3); border-radius: 8px; padding: 6px 14px; background: var(--white); cursor: pointer; }
+.budget-mode-btn.active { background: var(--black); color: var(--white); border-color: var(--black); }
+.budget-mode-btn:active { opacity: 0.7; }
+.diff-budget-ok { font-size: 11px; color: #27ae60; }
+.diff-budget-over { font-size: 11px; color: #c0392b; }
+.diff-budget-none { font-size: 11px; color: var(--gray2); }
 .summary-scroll { flex: 1; overflow-y: auto; padding: 10px 14px 40px; -webkit-overflow-scrolling: touch; }
 .summary-scroll::-webkit-scrollbar { display: none; }
 .chart-area { display: flex; justify-content: center; margin: 2px 0 10px; position: relative; }
@@ -464,6 +470,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
           </div>
           <div class="filter-dropdown" id="filter-dropdown"></div>
         </div>
+        <div class="budget-mode-btn" id="btn-budget-mode">予算</div>
         <div class="detail-nav-btn" id="btn-go-list">明細</div>
       </div>
       <div class="filter-overlay" id="filter-overlay"></div>
@@ -476,6 +483,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
       </div>
       <div id="cat-list"></div>
       <div class="cat-edit-link-summary" id="btn-cat-edit-summary">カテゴリを編集</div>
+      <div class="cat-edit-link-summary" id="btn-budget-edit-summary" style="padding-top:0;color:#888;">予算を設定</div>
       <div style="height:0.5px;background:#e0e0e0;margin:8px 0;"></div>
       <div id="fx-area"></div>
       <div class="settle-box">
@@ -649,6 +657,22 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
   </div>
 </div>
 
+<!-- 予算設定モーダル -->
+<div class="modal-overlay" id="modal-budget">
+  <div class="modal-sheet">
+    <div class="modal-header"><span class="modal-title" id="budget-modal-title">予算を設定</span></div>
+    <div class="modal-body" style="padding:0 0 8px;">
+      <div id="budget-input-rows"></div>
+    </div>
+    <div style="padding:0 16px 8px;">
+      <button class="primary-btn" id="btn-budget-save" style="margin-bottom:0;">保存する</button>
+    </div>
+    <div style="padding:8px 16px 16px;">
+      <div class="secondary-btn" id="btn-budget-cancel">キャンセル</div>
+    </div>
+  </div>
+</div>
+
 <!-- 貸し借り入力モーダル -->
 <div class="modal-overlay" id="modal-loan">
   <div class="modal-sheet">
@@ -802,7 +826,7 @@ const HOLIDAYS = new Set([
 
 const state = {
   roomId:null, meta:null,
-  expenses:{}, loans:{}, fxRates:{}, repeating:{},
+  expenses:{}, loans:{}, fxRates:{}, repeating:{}, budgets:{},
   summary:{ yearMonth:currentYearMonth(), filter:"all" },
   list:{ yearMonth:currentYearMonth(), filterCategory:null },
   input:{ date:todayString(), paidBy:"both", forWhom:"both", memo:"", method:"card", amount:0, currency:"JPY", category:null }
@@ -1559,9 +1583,33 @@ function renderSummary(){
   const chartColors=[...cats.map((_,i)=>CAT_COLORS[i]), CAT_COLORS[12]];
   renderDonutChart("summary-chart",allCats.map(c=>catTotals[c]),chartColors,isMonthNavigation?0:400);
   const listEl=document.getElementById("cat-list");listEl.innerHTML="";
+  const budgets=state.budgets||{};
+  const monthBudgets=budgets[ym]||{};
+  // グラフ・中央表示の切り替え
+  if(isBudgetMode){
+    const budgetCats=[...cats,"固定費"];
+    const budgetAmts=cats.map((_,i)=>monthBudgets[cats[i]]||0);
+    budgetAmts.push(0); // 固定費の予算は非対応
+    const budgetTotal=budgetAmts.reduce((a,b)=>a+b,0);
+    document.getElementById("chart-center-lbl").textContent="予算合計";
+    document.getElementById("chart-total").textContent=fmtAmt(budgetTotal);
+    renderDonutChart("summary-chart",budgetAmts,chartColors,isMonthNavigation?0:400);
+  }else{
+    document.getElementById("chart-center-lbl").textContent="今月の合計";
+    document.getElementById("chart-total").textContent=fmtAmt(total);
+    renderDonutChart("summary-chart",allCats.map(c=>catTotals[c]),chartColors,isMonthNavigation?0:400);
+  }
   cats.forEach((cat,i)=>{
-    const amt=catTotals[cat];const diff=amt-(prevTotals[cat]||0);
-    const diffHtml=diff===0?`<span class="diff-eq">±0</span>`:diff>0?`<span class="diff-up">+${diff.toLocaleString()}</span>`:`<span class="diff-dn">−${Math.abs(diff).toLocaleString()}</span>`;
+    const amt=catTotals[cat];
+    let diffHtml;
+    if(isBudgetMode){
+      const budget=monthBudgets[cat]||0;
+      if(budget===0){diffHtml=`<span class="diff-budget-none">－</span>`;}
+      else{const rem=budget-amt;diffHtml=rem>=0?`<span class="diff-budget-ok">残¥${rem.toLocaleString()}</span>`:`<span class="diff-budget-over">¥${Math.abs(rem).toLocaleString()}超過</span>`;}
+    }else{
+      const diff=amt-(prevTotals[cat]||0);
+      diffHtml=diff===0?`<span class="diff-eq">±0</span>`:diff>0?`<span class="diff-up">+${diff.toLocaleString()}</span>`:`<span class="diff-dn">−${Math.abs(diff).toLocaleString()}</span>`;
+    }
     const row=document.createElement("div");row.className="cat-row";
     row.innerHTML=`<div class="cat-left"><div class="color-dot" style="background:${CAT_COLORS[i]};"></div><span class="cat-name-lbl">${cat}</span></div><div class="cat-right">${diffHtml}<span class="cat-amt-lbl">${fmtAmt(amt)}</span></div>`;
     row.addEventListener("click",()=>{state.list.yearMonth=ym;state.list.filterCategory=cat;showScreen("screen-list");});
@@ -1762,6 +1810,77 @@ document.getElementById("btn-fx-save").addEventListener("click",async()=>{
     if(!state.fxRates[ym])state.fxRates[ym]={};Object.assign(state.fxRates[ym],rates);
     document.getElementById("modal-fx").classList.remove("open");showToast("保存しました ✓");renderSummary();
   }catch(e){showToast("保存に失敗しました");}
+});
+
+// ===== 予算機能 =====
+let isBudgetMode = false;
+
+function toggleBudgetMode(on) {
+  isBudgetMode = on;
+  document.getElementById("btn-budget-mode").classList.toggle("active", on);
+  renderSummary();
+}
+
+document.getElementById("btn-budget-mode").addEventListener("click", () => {
+  const ym = state.summary.yearMonth;
+  const budgets = state.budgets || {};
+  const monthBudgets = budgets[ym] || {};
+  const cats = state.meta?.categories || [];
+  const hasAny = cats.some(c => monthBudgets[c] > 0);
+  if (!isBudgetMode && !hasAny) {
+    showToast("予算が設定されていません");
+    openBudgetModal();
+    return;
+  }
+  toggleBudgetMode(!isBudgetMode);
+});
+
+document.getElementById("btn-budget-edit-summary").addEventListener("click", openBudgetModal);
+document.getElementById("btn-budget-cancel").addEventListener("click", () => {
+  document.getElementById("modal-budget").classList.remove("open");
+});
+document.getElementById("modal-budget").addEventListener("click", e => {
+  if (e.target === document.getElementById("modal-budget")) document.getElementById("modal-budget").classList.remove("open");
+});
+
+function openBudgetModal() {
+  const ym = state.summary.yearMonth;
+  document.getElementById("budget-modal-title").textContent = `${formatYearMonthJP(ym)}の予算`;
+  const cats = state.meta?.categories || [];
+  const budgets = state.budgets || {};
+  const monthBudgets = budgets[ym] || {};
+  const rows = cats.map((cat, i) => {
+    const val = monthBudgets[cat] || "";
+    return `<div style="display:flex;align-items:center;padding:11px 16px;border-bottom:0.5px solid #f0f0f0;gap:10px;">
+      <div style="width:10px;height:10px;border-radius:50%;background:${CAT_COLORS[i]};flex-shrink:0;"></div>
+      <span style="font-size:14px;color:#222;flex:1;">${cat}</span>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <span style="font-size:14px;color:#888;">¥</span>
+        <input type="number" inputmode="numeric" id="budget-input-${i}" value="${val}" placeholder="0"
+          style="width:100px;border:0.5px solid #ccc;border-radius:6px;padding:7px 8px;font-size:14px;text-align:right;font-family:var(--font);outline:none;" />
+      </div>
+    </div>`;
+  }).join("");
+  document.getElementById("budget-input-rows").innerHTML = rows;
+  document.getElementById("modal-budget").classList.add("open");
+}
+
+document.getElementById("btn-budget-save").addEventListener("click", async () => {
+  const ym = state.summary.yearMonth;
+  const cats = state.meta?.categories || [];
+  const budgetData = {};
+  cats.forEach((cat, i) => {
+    const v = parseInt(document.getElementById(`budget-input-${i}`)?.value || "0");
+    if (v > 0) budgetData[cat] = v;
+  });
+  try {
+    await set(ref(db, `rooms/${state.roomId}/budgets/${ym}`), budgetData);
+    if (!state.budgets) state.budgets = {};
+    state.budgets[ym] = budgetData;
+    document.getElementById("modal-budget").classList.remove("open");
+    showToast("予算を保存しました ✓");
+    if (isBudgetMode) renderSummary();
+  } catch(e) { showToast("保存に失敗しました"); }
 });
 
 // ===== 月ナビ =====
@@ -2156,6 +2275,10 @@ function subscribeRoom(roomId){
   });
   onValue(ref(db,`rooms/${roomId}/repeating`),snap=>{
     state.repeating=snap.val()||{};
+  });
+  onValue(ref(db,`rooms/${roomId}/budgets`),snap=>{
+    state.budgets=snap.val()||{};
+    if(document.getElementById("screen-summary").classList.contains("active"))renderSummary();
   });
 }
 
