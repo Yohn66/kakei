@@ -1626,7 +1626,7 @@ function renderSummary(){
     }
     const row=document.createElement("div");row.className="cat-row";
     row.innerHTML=`<div class="cat-left"><div class="color-dot" style="background:${CAT_COLORS[i]};"></div><span class="cat-name-lbl">${cat}</span></div><div class="cat-right">${diffHtml}<span class="cat-amt-lbl">${fmtAmt(amt)}</span></div>`;
-    row.addEventListener("click",()=>{state.list.yearMonth=ym;state.list.filterCategory=cat;showScreen("screen-list");});
+    row.addEventListener("click",()=>{state.list.yearMonth=ym;state.list.filterCategory=cat;state.list.filterPerson=state.summary.filter;showScreen("screen-list");});
     listEl.appendChild(row);
   });
 
@@ -1658,7 +1658,7 @@ function renderSummary(){
     const row=document.createElement("div");row.className="cat-row";
     row.style.opacity="0.6";
     row.innerHTML=`<div class="cat-left"><div class="color-dot" style="background:#ccc;"></div><span class="cat-name-lbl">⚠️ ${cat}（未分類）</span></div><div class="cat-right"><span class="cat-amt-lbl">${fmtAmt(amt)}</span></div>`;
-    row.addEventListener("click",()=>{state.list.yearMonth=ym;state.list.filterCategory=cat;showScreen("screen-list");});
+    row.addEventListener("click",()=>{state.list.yearMonth=ym;state.list.filterCategory=cat;state.list.filterPerson=state.summary.filter;showScreen("screen-list");});
     listEl.appendChild(row);
   });
 
@@ -2039,7 +2039,7 @@ function showLoanList(ym){
   document.getElementById("tab-bar").classList.remove("visible");
 }
 
-document.getElementById("btn-go-list").addEventListener("click",()=>{state.list.yearMonth=state.summary.yearMonth;state.list.filterCategory=null;showScreen("screen-list");});
+document.getElementById("btn-go-list").addEventListener("click",()=>{state.list.yearMonth=state.summary.yearMonth;state.list.filterCategory=null;state.list.filterPerson=state.summary.filter;showScreen("screen-list");});
 document.getElementById("btn-share-url").addEventListener("click",()=>{if(navigator.share)navigator.share({url:getRoomUrl(state.roomId)});else navigator.clipboard.writeText(getRoomUrl(state.roomId)).then(()=>showToast("URLをコピーしました"));});
 document.getElementById("btn-add-home").addEventListener("click",()=>{
   const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent);
@@ -2066,11 +2066,14 @@ document.getElementById("btn-reload").addEventListener("click",()=>{if(confirm("
 
 // ===== 明細画面 =====
 function renderList(){
-  const ym=state.list.yearMonth;const cf=state.list.filterCategory;
+  const ym=state.list.yearMonth;const cf=state.list.filterCategory;const ff=state.list.filterPerson||"all";
   document.getElementById("list-title").textContent=cf?`${formatYearMonthJP(ym)}　${cf}`:formatYearMonthJP(ym);
   const expenses=state.expenses||{};
   let exps=Object.entries(expenses).filter(([,e])=>e.date&&e.date.startsWith(ym)).sort(([,a],[,b])=>b.date.localeCompare(a.date)||b.createdAt-a.createdAt);
   if(cf)exps=exps.filter(([,e])=>e.category===cf);
+  if(ff==="both")exps=exps.filter(([,e])=>e.forWhom==="both");
+  else if(ff==="person1")exps=exps.filter(([,e])=>e.forWhom==="person1");
+  else if(ff==="person2")exps=exps.filter(([,e])=>e.forWhom==="person2");
   const scroll=document.getElementById("list-scroll");scroll.innerHTML="";
   if(exps.length===0){scroll.innerHTML='<div class="list-empty">この月の記録はありません</div>';return;}
   const p1=state.meta?.person1||"一人目";const p2=state.meta?.person2||"二人目";
