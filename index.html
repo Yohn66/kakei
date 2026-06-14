@@ -2098,7 +2098,9 @@ function exportCSV(){
   const p2=state.meta?.person2||"二人目";
   const forWhomLabel=v=>v==="both"?"共通":v==="person1"?p1:p2;
   const rows=[["日付","カテゴリ","メモ","誰の分","金額（円）"]];
-  const sorted=Object.values(expenses).filter(e=>e.date&&e.amount).sort((a,b)=>a.date.localeCompare(b.date));
+  // 固定費以外が存在する月のみ対象
+  const validMonths=new Set(Object.values(expenses).filter(e=>e.date&&e.amount&&e.category!==FIXED_CAT).map(e=>e.date.slice(0,7)));
+  const sorted=Object.values(expenses).filter(e=>e.date&&e.amount&&validMonths.has(e.date.slice(0,7))).sort((a,b)=>a.date.localeCompare(b.date));
   const fxRates=state.fxRates||{};
   sorted.forEach(e=>{
     const ym=e.date.slice(0,7);
@@ -2132,7 +2134,9 @@ function copyAIText(){
     if(!byMonth[ym])byMonth[ym]=[];
     byMonth[ym].push(e);
   });
-  const months=Object.keys(byMonth).sort();
+  // 固定費以外が存在する月のみ対象
+  const validMonths=new Set(Object.values(expenses).filter(e=>e.date&&e.amount&&e.category!==FIXED_CAT).map(e=>e.date.slice(0,7)));
+  const months=Object.keys(byMonth).filter(ym=>validMonths.has(ym)).sort();
   const allCats=[...cats,"固定費"];
   let text=`【家計簿データ】カテゴリ：${allCats.join("／")}\n\n`;
   months.forEach(ym=>{
