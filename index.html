@@ -755,6 +755,18 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
   </div>
 </div>
 
+<!-- CSV出力モーダル -->
+<div class="modal-overlay" id="modal-csv">
+  <div class="modal-sheet">
+    <div class="modal-header"><span class="modal-title">出力形式を選択</span></div>
+    <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:4px;">
+      <div class="cat-action-btn" id="btn-csv-detail" style="padding:14px 0;font-size:14px;">📄 明細CSV（全期間）</div>
+      <div class="cat-action-btn" id="btn-csv-ai" style="padding:14px 0;font-size:14px;">🤖 AI相談用テキストをコピー</div>
+    </div>
+    <div class="modal-close-btn" id="btn-csv-close">閉じる</div>
+  </div>
+</div>
+
 <!-- 数字キーボード -->
 <div class="numpad-overlay" id="numpad-overlay">
   <div class="numpad-sheet">
@@ -2061,7 +2073,91 @@ document.getElementById("btn-add-home").addEventListener("click",()=>{
 });
 document.getElementById("btn-add-home-close").addEventListener("click",()=>document.getElementById("modal-add-home").classList.remove("open"));
 document.getElementById("modal-add-home").addEventListener("click",e=>{if(e.target===document.getElementById("modal-add-home"))document.getElementById("modal-add-home").classList.remove("open");});
-document.getElementById("btn-csv").addEventListener("click",()=>showToast("CSV出力は近日実装予定です"));
+document.getElementById("btn-csv").addEventListener("click",()=>document.getElementById("modal-csv").classList.add("open"));
+document.getElementById("btn-csv-close").addEventListener("click",()=>document.getElementById("modal-csv").classList.remove("open"));
+document.getElementById("modal-csv").addEventListener("click",e=>{if(e.target===document.getElementById("modal-csv"))document.getElementById("modal-csv").classList.remove("open");});
+
+
+
+
+document.getElementById("btn-csv-detail").addEventListener("click",()=>{
+  document.getElementById("modal-csv").classList.remove("open");
+  exportCSV();
+});
+document.getElementById("btn-csv-ai").addEventListener("click",()=>{
+  document.getElementById("modal-csv").classList.remove("open");
+  copyAIText();
+});
+
+
+
+
+function exportCSV(){
+  const expenses=state.expenses||{};
+  const p1=state.meta?.person1||"一人目";
+  const p2=state.meta?.person2||"二人目";
+  const forWhomLabel=v=>v==="both"?"共通":v==="person1"?p1:p2;
+  const rows=[["日付","カテゴリ","メモ","誰の分","金額（円）"]];
+  const sorted=Object.values(expenses).filter(e=>e.date&&e.amount).sort((a,b)=>a.date.localeCompare(b.date));
+  const fxRates=state.fxRates||{};
+  sorted.forEach(e=>{
+    const ym=e.date.slice(0,7);
+    const amt=toJPY(e.amount,e.currency,fxRates,ym);
+    rows.push([e.date,e.category||"",e.memo||"",forWhomLabel(e.forWhom),Math.round(amt)]);
+  });
+  const bom="\uFEFF";
+  const csv=bom+rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;a.download="kake_meisai.csv";a.click();
+  URL.revokeObjectURL(url);
+  showToast("CSVをダウンロードしました ✓");
+}
+
+
+
+
+function copyAIText(){
+  const expenses=state.expenses||{};
+  const p1=state.meta?.person1||"一人目";
+  const p2=state.meta?.person2||"二人目";
+  const cats=state.meta?.categories||[];
+  const fxRates=state.fxRates||{};
+  const forWhomLabel=v=>v==="both"?"共通":v==="person1"?p1:p2;
+  // 月ごとにグループ化
+  const byMonth={};
+  Object.values(expenses).filter(e=>e.date&&e.amount).forEach(e=>{
+    const ym=e.date.slice(0,7);
+    if(!byMonth[ym])byMonth[ym]=[];
+    byMonth[ym].push(e);
+  });
+  const months=Object.keys(byMonth).sort();
+  const allCats=[...cats,"固定費"];
+  let text=`【家計簿データ】カテゴリ：${allCats.join("／")}\n\n`;
+  months.forEach(ym=>{
+    const exps=byMonth[ym].sort((a,b)=>a.date.localeCompare(b.date));
+    const total=exps.reduce((s,e)=>s+Math.round(toJPY(e.amount,e.currency,fxRates,ym)),0);
+    const commonTotal=exps.filter(e=>e.forWhom==="both").reduce((s,e)=>s+Math.round(toJPY(e.amount,e.currency,fxRates,ym)),0);
+    const p1Total=exps.filter(e=>e.forWhom==="person1").reduce((s,e)=>s+Math.round(toJPY(e.amount,e.currency,fxRates,ym)),0);
+    const p2Total=exps.filter(e=>e.forWhom==="person2").reduce((s,e)=>s+Math.round(toJPY(e.amount,e.currency,fxRates,ym)),0);
+    const [y,m]=ym.split("-");
+    text+=`【${y}年${parseInt(m)}月】合計 ¥${total.toLocaleString()}\n`;
+    text+=`　共通 ¥${commonTotal.toLocaleString()} ／ ${p1} ¥${p1Total.toLocaleString()} ／ ${p2} ¥${p2Total.toLocaleString()}\n`;
+    text+=`　明細：\n`;
+    exps.forEach(e=>{
+      const d=e.date.slice(5).replace("-","/");
+      const amt=Math.round(toJPY(e.amount,e.currency,fxRates,ym));
+      text+=`　${d} ${e.category||""} ${e.memo||""} ¥${amt.toLocaleString()}（${forWhomLabel(e.forWhom)}）\n`;
+    });
+    text+="\n";
+  });
+  navigator.clipboard.writeText(text).then(()=>{
+    showToast("AIテキストをコピーしました ✓");
+  }).catch(()=>{
+    showToast("コピーに失敗しました。ブラウザの設定を確認してください");
+  });
+}
 document.getElementById("btn-reload").addEventListener("click",()=>{if(confirm("ページを再読込します。未保存の入力内容は消えます。担当しますか？"))location.reload();});
 
 // ===== 明細画面 =====
