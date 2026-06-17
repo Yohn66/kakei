@@ -1842,6 +1842,7 @@ document.getElementById("btn-fx-save").addEventListener("click",async()=>{
 // ===== 予算機能 =====
 let isBudgetMode = false;
 let budgetRefYM = null;
+let budgetNumpadIdx = 0;
 
 function toggleBudgetMode(on) {
   isBudgetMode = on;
@@ -1939,9 +1940,13 @@ function openBudgetModal() {
     const inp = document.getElementById(`budget-input-${i}`);
     if (!inp) return;
     inp.addEventListener("click", () => {
-      openNumpad(v => {
-        inp.value = v > 0 ? "¥" + v.toLocaleString() : "";
-      }, parseInt(inp.value.replace(/[¥,]/g, "")) || 0);
+      budgetNumpadIdx = i;
+      const cur = parseInt(inp.value.replace(/[¥,]/g, "")) || 0;
+      numpadTarget = "budget";
+      numpadAccum = 0;
+      numpadValue = cur > 0 ? String(cur) : "0";
+      document.getElementById("numpad-display").textContent = Number(numpadValue).toLocaleString();
+      document.getElementById("numpad-overlay").classList.add("open");
     });
     inp.addEventListener("keydown", e => e.preventDefault());
   });
@@ -2413,7 +2418,7 @@ document.querySelectorAll(".numpad-key").forEach(key=>{
     const k=key.dataset.key;
    if(k==="sen"){numpadAccum+=(parseInt(numpadValue)||0)*1000;numpadValue="0";document.getElementById("numpad-display").textContent=Number(numpadAccum).toLocaleString();return;}
    if(k==="man"){numpadAccum+=(parseInt(numpadValue)||0)*10000;numpadValue="0";document.getElementById("numpad-display").textContent=Number(numpadAccum).toLocaleString();return;}
-   if(k==="done"){const v=numpadAccum+(parseInt(numpadValue)||0);if(numpadTarget==="input"){state.input.amount=v;updateAmountDisplay();closeNumpad();setTimeout(()=>document.getElementById("input-memo").focus(),100);}else if(numpadTarget==="loan"){loanAmount=v;updateLoanAmountDisplay();closeNumpad();}else{editState.amount=v;document.getElementById("edit-amount-display").textContent=v.toLocaleString();closeNumpad();}return;}
+   if(k==="done"){const v=numpadAccum+(parseInt(numpadValue)||0);if(numpadTarget==="input"){state.input.amount=v;updateAmountDisplay();closeNumpad();setTimeout(()=>document.getElementById("input-memo").focus(),100);}else if(numpadTarget==="loan"){loanAmount=v;updateLoanAmountDisplay();closeNumpad();}else if(numpadTarget==="budget"){const inp=document.getElementById(`budget-input-${budgetNumpadIdx}`);if(inp)inp.value=v>0?"¥"+v.toLocaleString():"";closeNumpad();}else{editState.amount=v;document.getElementById("edit-amount-display").textContent=v.toLocaleString();closeNumpad();}return;}
    if(k==="del"){if(numpadAccum>0&&numpadValue==="0"){numpadAccum=0;document.getElementById("numpad-display").textContent="0";return;}numpadValue=numpadValue.length>1?numpadValue.slice(0,-1):"0";}
    else{if(numpadValue==="0")numpadValue=k;else if(numpadValue.length<8)numpadValue+=k;}
    document.getElementById("numpad-display").textContent=Number(numpadAccum+parseInt(numpadValue)||0).toLocaleString();
