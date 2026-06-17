@@ -2138,7 +2138,7 @@ function copyAIText(){
   const validMonths=new Set(Object.values(expenses).filter(e=>e.date&&e.amount&&e.category!==FIXED_CAT).map(e=>e.date.slice(0,7)));
   const months=Object.keys(byMonth).filter(ym=>validMonths.has(ym)).sort();
   const allCats=[...cats,"固定費"];
-  let text=`【家計簿データ】カテゴリ：${allCats.join("／")}\n\n`;
+  let text=`以下は私たちの家計簿データです。月ごとの支出を見て、以下の点を教えてください。\n①支出が多いカテゴリとその傾向\n②削減できそうな支出の候補\n③2人の支出バランスで気になる点があれば\n---\n【家計簿データ】カテゴリ：${allCats.join("／")}\n\n`;
   months.forEach(ym=>{
     const exps=byMonth[ym].sort((a,b)=>a.date.localeCompare(b.date));
     const total=exps.reduce((s,e)=>s+Math.round(toJPY(e.amount,e.currency,fxRates,ym)),0);
