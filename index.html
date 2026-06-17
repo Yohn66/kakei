@@ -139,9 +139,8 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .diff-budget-ok { font-size: 11px; color: #27ae60; }
 .diff-budget-over { font-size: 11px; color: #c0392b; }
 .diff-budget-none { font-size: 11px; color: var(--gray2); }
-.budget-ref-month-nav { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 8px 0 4px; border-bottom: 0.5px solid #f0f0f0; margin-bottom: 4px; }
-.budget-ref-nav-arrow { font-size: 16px; color: #888; cursor: pointer; padding: 4px 8px; }
-.budget-ref-month-lbl { font-size: 13px; color: #555; font-weight: 500; }
+.budget-ref-nav-arrow { font-size: 15px; color: #888; cursor: pointer; padding: 2px 5px; }
+.budget-ref-month-lbl { font-size: 13px; color: #555; font-weight: 500; white-space: nowrap; }
 .summary-scroll { flex: 1; overflow-y: auto; padding: 10px 14px 40px; -webkit-overflow-scrolling: touch; }
 .summary-scroll::-webkit-scrollbar { display: none; }
 .chart-area { display: flex; justify-content: center; margin: 2px 0 10px; position: relative; }
@@ -668,26 +667,25 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 <!-- 予算設定モーダル -->
 <div class="modal-overlay" id="modal-budget">
   <div class="modal-sheet">
-    <div class="modal-header"><span class="modal-title" id="budget-modal-title">予算を設定</span></div>
-    <div class="budget-ref-month-nav">
-      <div class="budget-ref-nav-arrow" id="btn-budget-ref-prev">◀</div>
-      <div class="budget-ref-month-lbl" id="budget-ref-month-lbl"></div>
-      <div class="budget-ref-nav-arrow" id="btn-budget-ref-next">▶</div>
-    </div>
-    <div class="modal-body" style="padding:0 0 8px;">
-      <div style="display:flex;padding:6px 16px 4px;border-bottom:0.5px solid #f0f0f0;">
-        <span style="flex:1;font-size:11px;color:#aaa;">カテゴリ</span>
-        <span style="width:110px;font-size:11px;color:#aaa;text-align:center;">今月の予算</span>
-        <span style="width:80px;font-size:11px;color:#aaa;text-align:right;">参照月支出</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <span class="modal-title">予算を設定</span>
+      <div style="display:flex;align-items:center;gap:2px;">
+        <div class="budget-ref-nav-arrow" id="btn-budget-ref-prev">◀</div>
+        <div class="budget-ref-month-lbl" id="budget-ref-month-lbl"></div>
+        <div class="budget-ref-nav-arrow" id="btn-budget-ref-next">▶</div>
       </div>
-      <div id="budget-input-rows"></div>
     </div>
-    <div style="padding:0 16px 8px;">
-      <button class="primary-btn" id="btn-budget-save" style="margin-bottom:0;">保存する</button>
+    <div style="display:grid;grid-template-columns:100px 1fr 1fr 72px;gap:4px;padding:0 0 6px;border-bottom:0.5px solid #f0f0f0;">
+      <span style="font-size:11px;color:#aaa;">カテゴリ</span>
+      <span style="font-size:11px;color:#aaa;text-align:center;">支出</span>
+      <span style="font-size:11px;color:#aaa;text-align:center;">予算</span>
+      <span style="font-size:11px;color:#555;font-weight:500;text-align:center;" id="budget-col-title">予算</span>
     </div>
-    <div style="padding:8px 16px 16px;">
-      <div class="secondary-btn" id="btn-budget-cancel">キャンセル</div>
-    </div>
+    <div id="budget-input-rows"></div>
+    <div style="height:0.5px;background:#f0f0f0;margin:8px 0 10px;"></div>
+    <button class="secondary-btn" id="btn-budget-fill-prev" style="margin-bottom:10px;">前月と同じ予算を入力</button>
+    <button class="primary-btn" id="btn-budget-save" style="margin-bottom:6px;">保存する</button>
+    <div class="secondary-btn" id="btn-budget-cancel">キャンセル</div>
   </div>
 </div>
 
@@ -1912,7 +1910,8 @@ function renderBudgetRefMonth() {
 function openBudgetModal() {
   const ym = state.summary.yearMonth;
   budgetRefYM = getDefaultRefYM();
-  document.getElementById("budget-modal-title").textContent = `${formatYearMonthJP(ym)}の予算`;
+  const [y, m] = ym.split("-");
+  document.getElementById("budget-col-title").textContent = `${parseInt(m)}月の予算`;
   const cats = state.meta?.categories || [];
   const allCatsForBudget = [...cats, FIXED_CAT];
   const budgets = state.budgets || {};
@@ -1920,22 +1919,71 @@ function openBudgetModal() {
   const rows = allCatsForBudget.map((cat, i) => {
     const color = CAT_COLORS[i] || CAT_COLORS[12];
     const val = monthBudgets[cat] || "";
-    return `<div style="display:flex;align-items:center;padding:10px 16px;border-bottom:0.5px solid #f0f0f0;gap:8px;">
-      <div style="width:9px;height:9px;border-radius:50%;background:${color};flex-shrink:0;"></div>
-      <span style="font-size:13px;color:#222;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${cat}</span>
-      <div style="display:flex;align-items:center;gap:2px;width:110px;flex-shrink:0;">
-        <span style="font-size:13px;color:#888;">¥</span>
-        <input type="number" inputmode="numeric" id="budget-input-${i}" value="${val}" placeholder="0"
-          style="width:72px;border:0.5px solid #ccc;border-radius:6px;padding:6px 6px;font-size:13px;text-align:right;font-family:var(--font);outline:none;" />
-        <span style="font-size:16px;color:#bbb;cursor:pointer;padding:0 2px;line-height:1;" onclick="document.getElementById('budget-input-${i}').value=''">×</span>
+    return `<div style="display:grid;grid-template-columns:100px 1fr 1fr 72px;gap:4px;align-items:center;padding:8px 0;border-bottom:0.5px solid #f0f0f0;">
+      <div style="display:flex;align-items:center;gap:5px;min-width:0;">
+        <div style="width:7px;height:7px;border-radius:50%;background:${color};flex-shrink:0;"></div>
+        <span style="font-size:12px;color:#222;white-space:nowrap;overflow:hidden;letter-spacing:-0.03em;">${cat}</span>
       </div>
-      <span id="budget-ref-${i}" style="width:80px;font-size:12px;color:#888;text-align:right;flex-shrink:0;">－</span>
+      <span id="budget-ref-spend-${i}" style="font-size:12px;color:#888;text-align:center;">－</span>
+      <span id="budget-ref-${i}" style="font-size:12px;color:#888;text-align:center;">－</span>
+      <div style="display:flex;justify-content:center;">
+        <input type="text" inputmode="numeric" id="budget-input-${i}" value="${val?'¥'+Number(val).toLocaleString():''}" placeholder="－"
+          style="width:66px;border:0.5px solid #ccc;border-radius:6px;padding:4px 6px;font-size:13px;text-align:right;font-family:var(--font);outline:none;color:#111;"
+          onfocus="this.select();" />
+      </div>
     </div>`;
   }).join("");
   document.getElementById("budget-input-rows").innerHTML = rows;
+  // テンキーで入力
+  allCatsForBudget.forEach((cat, i) => {
+    const inp = document.getElementById(`budget-input-${i}`);
+    if (!inp) return;
+    inp.addEventListener("click", () => {
+      openNumpad(v => {
+        inp.value = v > 0 ? "¥" + v.toLocaleString() : "";
+      }, parseInt(inp.value.replace(/[¥,]/g, "")) || 0);
+    });
+    inp.addEventListener("keydown", e => e.preventDefault());
+  });
   renderBudgetRefMonth();
   document.getElementById("modal-budget").classList.add("open");
 }
+
+function renderBudgetRefMonth() {
+  const cats = state.meta?.categories || [];
+  const allCatsForBudget = [...cats, FIXED_CAT];
+  const expenses = state.expenses || {};
+  const fxRates = state.fxRates || {};
+  const budgets = state.budgets || {};
+  const refBudgets = budgets[budgetRefYM] || {};
+  const refExps = Object.values(expenses).filter(e => e.date.startsWith(budgetRefYM));
+  const refTotals = {};
+  allCatsForBudget.forEach(c => refTotals[c] = 0);
+  refExps.forEach(e => {
+    const amt = toJPY(e.amount, e.currency, fxRates, budgetRefYM);
+    if (refTotals[e.category] !== undefined) refTotals[e.category] += amt;
+  });
+  document.getElementById("budget-ref-month-lbl").textContent = formatYearMonthJP(budgetRefYM);
+  allCatsForBudget.forEach((cat, i) => {
+    const spendEl = document.getElementById(`budget-ref-spend-${i}`);
+    const budgetEl = document.getElementById(`budget-ref-${i}`);
+    if (spendEl) spendEl.textContent = refTotals[cat] > 0 ? fmtAmt(refTotals[cat]) : "－";
+    if (budgetEl) budgetEl.textContent = refBudgets[cat] > 0 ? fmtAmt(refBudgets[cat]) : "－";
+  });
+}
+
+document.getElementById("btn-budget-fill-prev").addEventListener("click", () => {
+  const cats = state.meta?.categories || [];
+  const allCatsForBudget = [...cats, FIXED_CAT];
+  const budgets = state.budgets || {};
+  const refBudgets = budgets[budgetRefYM] || {};
+  allCatsForBudget.forEach((cat, i) => {
+    const inp = document.getElementById(`budget-input-${i}`);
+    if (!inp) return;
+    const v = refBudgets[cat] || 0;
+    inp.value = v > 0 ? "¥" + v.toLocaleString() : "";
+  });
+});
 
 document.getElementById("btn-budget-save").addEventListener("click", async () => {
   const ym = state.summary.yearMonth;
@@ -1943,18 +1991,81 @@ document.getElementById("btn-budget-save").addEventListener("click", async () =>
   const allCatsForBudget = [...cats, FIXED_CAT];
   const budgetData = {};
   allCatsForBudget.forEach((cat, i) => {
-    const v = parseInt(document.getElementById(`budget-input-${i}`)?.value || "0");
+    const raw = document.getElementById(`budget-input-${i}`)?.value || "";
+    const v = parseInt(raw.replace(/[¥,]/g, "")) || 0;
     if (v > 0) budgetData[cat] = v;
   });
+  // この月だけ or この月から1年か選択
+  const choice = await showBudgetPeriodDialog();
+  if (choice === "cancel") return;
   try {
-    await set(ref(db, `rooms/${state.roomId}/budgets/${ym}`), budgetData);
-    if (!state.budgets) state.budgets = {};
-    state.budgets[ym] = budgetData;
+    if (choice === "month") {
+      await set(ref(db, `rooms/${state.roomId}/budgets/${ym}`), budgetData);
+      if (!state.budgets) state.budgets = {};
+      state.budgets[ym] = budgetData;
+    } else {
+      // この月から1年先まで
+      const targets = [];
+      let cur = ym;
+      for (let n = 0; n < 13; n++) { targets.push(cur); cur = nextYM(cur); }
+      // 設定済み月を確認
+      const budgets = state.budgets || {};
+      const alreadySet = targets.filter(m => m !== ym && budgets[m] && Object.keys(budgets[m]).length > 0);
+      let writeTargets = targets;
+      if (alreadySet.length > 0) {
+        const overwrite = await showBudgetOverwriteDialog(alreadySet.length);
+        if (overwrite === "cancel") return;
+        if (overwrite === "empty") writeTargets = targets.filter(m => !budgets[m] || Object.keys(budgets[m]).length === 0);
+      }
+      const updates = {};
+      writeTargets.forEach(m => { updates[`rooms/${state.roomId}/budgets/${m}`] = budgetData; });
+      await update(ref(db), updates);
+      if (!state.budgets) state.budgets = {};
+      writeTargets.forEach(m => { state.budgets[m] = {...budgetData}; });
+    }
     document.getElementById("modal-budget").classList.remove("open");
     showToast("予算を保存しました ✓");
     if (isBudgetMode) renderSummary();
   } catch(e) { showToast("保存に失敗しました"); }
 });
+
+function showBudgetPeriodDialog() {
+  return new Promise(resolve => {
+    const overlay = document.createElement("div");
+    overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:600;display:flex;align-items:flex-end;justify-content:center;max-width:430px;margin:0 auto;";
+    overlay.innerHTML = `<div style="background:#fff;border-radius:20px 20px 0 0;padding:20px 18px 36px;width:100%;">
+      <div style="font-size:14px;font-weight:600;color:#111;margin-bottom:6px;">保存する期間</div>
+      <div style="font-size:12px;color:#888;margin-bottom:16px;">この月だけ設定するか、1年先まで同じ予算を設定するか選んでください</div>
+      <div id="bpd-month" style="padding:14px;border:0.5px solid #ccc;border-radius:10px;text-align:center;font-size:15px;color:#111;cursor:pointer;margin-bottom:8px;">この月だけ</div>
+      <div id="bpd-year" style="padding:14px;border:0.5px solid #ccc;border-radius:10px;text-align:center;font-size:15px;color:#111;cursor:pointer;margin-bottom:8px;">この月から1年先まで</div>
+      <div id="bpd-cancel" style="padding:12px;text-align:center;font-size:14px;color:#888;cursor:pointer;">キャンセル</div>
+    </div>`;
+    document.getElementById("app").appendChild(overlay);
+    const cleanup = r => { overlay.remove(); resolve(r); };
+    overlay.querySelector("#bpd-month").addEventListener("click", () => cleanup("month"));
+    overlay.querySelector("#bpd-year").addEventListener("click", () => cleanup("year"));
+    overlay.querySelector("#bpd-cancel").addEventListener("click", () => cleanup("cancel"));
+  });
+}
+
+function showBudgetOverwriteDialog(count) {
+  return new Promise(resolve => {
+    const overlay = document.createElement("div");
+    overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:700;display:flex;align-items:flex-end;justify-content:center;max-width:430px;margin:0 auto;";
+    overlay.innerHTML = `<div style="background:#fff;border-radius:20px 20px 0 0;padding:20px 18px 36px;width:100%;">
+      <div style="font-size:14px;font-weight:600;color:#111;margin-bottom:6px;">予算設定済みの月があります</div>
+      <div style="font-size:12px;color:#888;margin-bottom:16px;">${count}ヶ月分がすでに設定済みです。上書きしますか？</div>
+      <div id="bod-overwrite" style="padding:14px;border:0.5px solid #ccc;border-radius:10px;text-align:center;font-size:15px;color:#111;cursor:pointer;margin-bottom:8px;">すべて上書きする</div>
+      <div id="bod-empty" style="padding:14px;border:0.5px solid #ccc;border-radius:10px;text-align:center;font-size:15px;color:#111;cursor:pointer;margin-bottom:8px;">未設定の月にのみ反映</div>
+      <div id="bod-cancel" style="padding:12px;text-align:center;font-size:14px;color:#888;cursor:pointer;">キャンセル</div>
+    </div>`;
+    document.getElementById("app").appendChild(overlay);
+    const cleanup = r => { overlay.remove(); resolve(r); };
+    overlay.querySelector("#bod-overwrite").addEventListener("click", () => cleanup("overwrite"));
+    overlay.querySelector("#bod-empty").addEventListener("click", () => cleanup("empty"));
+    overlay.querySelector("#bod-cancel").addEventListener("click", () => cleanup("cancel"));
+  });
+}
 
 // ===== 月ナビ =====
 document.getElementById("btn-prev-month").addEventListener("click",()=>{isMonthNavigation=true;state.summary.yearMonth=prevYM(state.summary.yearMonth);renderSummary();});
