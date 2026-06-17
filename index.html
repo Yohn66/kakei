@@ -1889,24 +1889,6 @@ function getDefaultRefYM() {
   return past.length > 0 ? past[past.length - 1] : prevYM(currentYM);
 }
 
-function renderBudgetRefMonth() {
-  const cats = state.meta?.categories || [];
-  const allCatsForBudget = [...cats, FIXED_CAT];
-  const expenses = state.expenses || {};
-  const fxRates = state.fxRates || {};
-  const refExps = Object.values(expenses).filter(e => e.date.startsWith(budgetRefYM));
-  const refTotals = {};
-  allCatsForBudget.forEach(c => refTotals[c] = 0);
-  refExps.forEach(e => {
-    const amt = toJPY(e.amount, e.currency, fxRates, budgetRefYM);
-    if (refTotals[e.category] !== undefined) refTotals[e.category] += amt;
-  });
-  document.getElementById("budget-ref-month-lbl").textContent = formatYearMonthJP(budgetRefYM);
-  allCatsForBudget.forEach((cat, i) => {
-    const refEl = document.getElementById(`budget-ref-${i}`);
-    if (refEl) refEl.textContent = refTotals[cat] > 0 ? fmtAmt(refTotals[cat]) : "－";
-  });
-}
 
 function openBudgetModal() {
   const ym = state.summary.yearMonth;
