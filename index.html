@@ -855,7 +855,7 @@ const HOLIDAYS = new Set([
 const state = {
   roomId:null, meta:null,
   expenses:{}, loans:{}, fxRates:{}, repeating:{}, budgets:{},
-  summary:{ yearMonth:currentYearMonth(), filter:"all" },
+  summary:{ yearMonth:currentYearMonth(), filter:"both" },
   list:{ yearMonth:currentYearMonth(), filterCategory:null },
   input:{ date:todayString(), paidBy:"both", forWhom:"both", memo:"", method:"card", amount:0, currency:"JPY", category:null }
 };
@@ -1629,7 +1629,7 @@ function renderSummary(){
     if(isBudgetMode){
       const budget=monthBudgets[cat]||0;
       if(budget===0){diffHtml=`<span class="diff-budget-none">－</span>`;}
-      else{const rem=budget-amt;diffHtml=rem>=0?`<span class="diff-budget-ok">¥${rem.toLocaleString()}残</span>`:`<span class="diff-budget-over">¥${Math.abs(rem).toLocaleString()}超過</span>`;}
+      else{const rem=budget-amt;diffHtml=rem>=0?`<span class="diff-budget-ok">¥${rem.toLocaleString()}残</span>`:`<span class="diff-budget-over">¥${Math.abs(rem).toLocaleString()}超</span>`;}
     }else{
       const diff=amt-(prevTotals[cat]||0);
       diffHtml=diff===0?`<span class="diff-eq">±0</span>`:diff>0?`<span class="diff-up">+${diff.toLocaleString()}</span>`:`<span class="diff-dn">−${Math.abs(diff).toLocaleString()}</span>`;
@@ -1647,7 +1647,7 @@ function renderSummary(){
     const fixedDiff=fixedAmt-prevFixedTotal;
     const fixedBudget=monthBudgets[FIXED_CAT]||0;
     const fixedDiffHtml=isBudgetMode
-      ?(fixedBudget===0?`<span class="diff-budget-none">－</span>`:fixedAmt-fixedBudget<=0?`<span class="diff-budget-ok">¥${(fixedBudget-fixedAmt).toLocaleString()}残</span>`:`<span class="diff-budget-over">¥${(fixedAmt-fixedBudget).toLocaleString()}超過</span>`)
+      ?(fixedBudget===0?`<span class="diff-budget-none">－</span>`:fixedAmt-fixedBudget<=0?`<span class="diff-budget-ok">¥${(fixedBudget-fixedAmt).toLocaleString()}残</span>`:`<span class="diff-budget-over">¥${(fixedAmt-fixedBudget).toLocaleString()}超</span>`)
       :(fixedDiff===0?`<span class="diff-eq">±0</span>`:fixedDiff>0?`<span class="diff-up">+${fixedDiff.toLocaleString()}</span>`:`<span class="diff-dn">−${Math.abs(fixedDiff).toLocaleString()}</span>`);
     const fixedRow=document.createElement("div");fixedRow.className="cat-row";
     fixedRow.innerHTML=`<div class="cat-left"><div class="color-dot" style="background:${CAT_COLORS[12]};"></div><span class="cat-name-lbl">固定費</span></div><div class="cat-right">${fixedDiffHtml}<span class="cat-amt-lbl">${fmtAmt(fixedAmt)}</span></div>`;
