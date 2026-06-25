@@ -630,6 +630,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
   <div class="modal-sheet">
     <div class="modal-header">
       <span class="modal-title">記録を編集</span>
+      <div id="btn-edit-fixed-mode" style="border:1px solid #bbb;border-radius:8px;padding:4px 10px;font-size:12px;color:#999;cursor:pointer;white-space:nowrap;background:var(--white);font-family:var(--font);">固定費</div>
       <span class="modal-sub" id="edit-modal-date" style="border-bottom:1px dashed #bbb;cursor:pointer;padding-bottom:1px;"></span>
     </div>
     <div class="lbl-mini" style="margin-top:0;">誰が</div>
@@ -658,6 +659,39 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     </div>
     <div style="height:0.5px;background:#e0e0e0;margin:11px 0;"></div>
     <div class="input-cat-grid" id="edit-cat-grid"></div>
+    <div id="edit-fixed-period-area" style="display:none;margin-top:8px;">
+      <div style="display:flex;align-items:center;padding:4px 0;gap:4px;">
+        <span style="font-size:12px;color:#888;width:36px;flex-shrink:0;">開始月</span>
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:0;">
+          <span id="edit-fixed-start-prev" style="font-size:18px;color:#aaa;cursor:pointer;padding:4px 10px;">◀</span>
+          <span id="edit-fixed-start-y" style="font-size:14px;font-weight:500;cursor:pointer;border-bottom:1px dashed #bbb;padding:0 2px;min-width:44px;text-align:center;"></span>
+          <span style="font-size:13px;color:#888;margin:0 2px;">年</span>
+          <span id="edit-fixed-start-m" style="font-size:14px;font-weight:500;cursor:pointer;border-bottom:1px dashed #bbb;padding:0 2px;min-width:24px;text-align:center;"></span>
+          <span style="font-size:13px;color:#888;margin:0 2px;">月</span>
+          <span id="edit-fixed-start-next" style="font-size:18px;color:#aaa;cursor:pointer;padding:4px 10px;">▶</span>
+        </div>
+        <div style="width:28px;flex-shrink:0;"></div>
+      </div>
+      <div id="edit-fixed-end-toggle-row" style="text-align:center;margin-top:2px;">
+        <span id="edit-btn-fixed-end-toggle" style="font-size:12px;color:#aaa;cursor:pointer;">終了月を設定</span>
+      </div>
+      <div id="edit-fixed-end-area" style="display:none;margin-top:4px;">
+        <div style="display:flex;align-items:center;padding:4px 0;gap:4px;">
+          <span style="font-size:12px;color:#888;width:36px;flex-shrink:0;">終了月</span>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:0;">
+            <span id="edit-fixed-end-prev" style="font-size:18px;color:#aaa;cursor:pointer;padding:4px 10px;">◀</span>
+            <span id="edit-fixed-end-y" style="font-size:14px;font-weight:500;cursor:pointer;border-bottom:1px dashed #bbb;padding:0 2px;min-width:44px;text-align:center;"></span>
+            <span style="font-size:13px;color:#888;margin:0 2px;">年</span>
+            <span id="edit-fixed-end-m" style="font-size:14px;font-weight:500;cursor:pointer;border-bottom:1px dashed #bbb;padding:0 2px;min-width:24px;text-align:center;"></span>
+            <span style="font-size:13px;color:#888;margin:0 2px;">月</span>
+            <span id="edit-fixed-end-next" style="font-size:18px;color:#aaa;cursor:pointer;padding:4px 10px;">▶</span>
+          </div>
+          <div style="width:28px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+            <span id="edit-btn-fixed-end-clear" style="font-size:16px;color:#aaa;cursor:pointer;">✕</span>
+          </div>
+        </div>
+      </div>
+    </div>
     <button class="primary-btn" id="btn-edit-save" style="margin-top:13px;">保存</button>
     <div class="delete-btn" id="btn-edit-delete">削除</div>
     <div class="modal-close-btn" id="btn-edit-cancel">キャンセル</div>
@@ -1384,6 +1418,12 @@ document.getElementById("btn-repeating-back").addEventListener("click",()=>showS
 function openRepeatingEditModal(id,r){
   repeatingEditData={...r};
   repeatingEditGroupId=r.repeatingGroupId||null;
+  editModalMode="repeating";
+  editFixedMode=false;
+  document.getElementById("btn-edit-fixed-mode").style.display="none";
+  document.getElementById("edit-fixed-period-area").style.display="none";
+  document.getElementById("edit-modal-date").style.visibility="visible";
+  document.getElementById("edit-cat-grid").style.display="grid";
   const p1=state.meta?.person1||"一人目";const p2=state.meta?.person2||"二人目";
   ["edit-paid-p1","edit-for-p1"].forEach(i=>document.getElementById(i).textContent=p1);
   ["edit-paid-p2","edit-for-p2"].forEach(i=>document.getElementById(i).textContent=p2);
@@ -1641,9 +1681,10 @@ function renderSummary(){
   });
 
   // 固定費行（9番目・カテゴリグリッドには出さないが集計画面には表示）
+  // 他カテゴリと同様、フィルターや金額の有無に関わらず常に表示する（0円ならそのまま0円表示）
   const prevFixedTotal=prevTotals[FIXED_CAT]||0;
   const fixedAmt=catTotals[FIXED_CAT]||0;
-  if(fixedAmt>0||Object.keys(state.repeating||{}).length>0){
+  {
     const fixedDiff=fixedAmt-prevFixedTotal;
     const fixedBudget=monthBudgets[FIXED_CAT]||0;
     const fixedDiffHtml=isBudgetMode
@@ -2314,8 +2355,20 @@ document.getElementById("btn-list-prev").addEventListener("click",()=>{state.lis
 document.getElementById("btn-list-next").addEventListener("click",()=>{state.list.yearMonth=nextYM(state.list.yearMonth);renderList();});
 
 // ===== 編集モーダル =====
+let editModalMode="normal"; // "normal"＝明細からの編集／"repeating"＝固定費管理画面からの編集
+let editFixedMode=false;
+let editFixedStart=null;
+let editFixedEnd=null;
+let editOriginalCategory=null;
 function openEditModal(id,expense){
   editingExpenseId=id;editState={...expense};
+  editModalMode="normal";
+  editFixedMode=false;
+  document.getElementById("btn-edit-fixed-mode").style.display="block";
+  updateEditFixedModeBtn();
+  document.getElementById("edit-fixed-period-area").style.display="none";
+  document.getElementById("edit-modal-date").style.visibility="visible";
+  document.getElementById("edit-cat-grid").style.display="grid";
   const p1=state.meta?.person1||"一人目";const p2=state.meta?.person2||"二人目";
   ["edit-paid-p1","edit-for-p1"].forEach(i=>document.getElementById(i).textContent=p1);
   ["edit-paid-p2","edit-for-p2"].forEach(i=>document.getElementById(i).textContent=p2);
@@ -2342,6 +2395,89 @@ function setEditToggle(gid,val){document.querySelectorAll(`#${gid} .toggle-btn`)
   });
 });
 document.getElementById("edit-memo").addEventListener("input",e=>{editState.memo=e.target.value;});
+function updateEditFixedModeBtn(){
+  const btn=document.getElementById("btn-edit-fixed-mode");
+  if(editFixedMode){btn.style.background="#111";btn.style.color="#fff";btn.style.borderColor="#111";btn.style.fontWeight="600";}
+  else{btn.style.background="var(--white)";btn.style.color="#999";btn.style.borderColor="#bbb";btn.style.fontWeight="400";}
+}
+function updateEditFixedPeriodDisplay(){
+  const [sy,sm]=editFixedStart.split("-").map(Number);
+  document.getElementById("edit-fixed-start-y").textContent=sy;
+  document.getElementById("edit-fixed-start-m").textContent=sm;
+  if(editFixedEnd){
+    const [ey,em]=editFixedEnd.split("-").map(Number);
+    document.getElementById("edit-fixed-end-y").textContent=ey;
+    document.getElementById("edit-fixed-end-m").textContent=em;
+  }
+}
+document.getElementById("btn-edit-fixed-mode").addEventListener("click",()=>{
+  if(editModalMode!=="normal")return;
+  editFixedMode=!editFixedMode;
+  if(editFixedMode){
+    editOriginalCategory=editState.category;
+    editState.category=FIXED_CAT;
+    editFixedStart=(editState.date||todayString()).slice(0,7);
+    editFixedEnd=null;
+    document.getElementById("edit-modal-date").style.visibility="hidden";
+    document.getElementById("edit-cat-grid").style.display="none";
+    document.getElementById("edit-fixed-period-area").style.display="block";
+    document.getElementById("edit-fixed-end-area").style.display="none";
+    document.getElementById("edit-fixed-end-toggle-row").style.display="block";
+    updateEditFixedPeriodDisplay();
+  }else{
+    editState.category=editOriginalCategory;
+    document.getElementById("edit-modal-date").style.visibility="visible";
+    document.getElementById("edit-cat-grid").style.display="grid";
+    document.getElementById("edit-fixed-period-area").style.display="none";
+    renderEditCatGrid();
+  }
+  updateEditFixedModeBtn();
+});
+document.getElementById("edit-fixed-start-prev").addEventListener("click",()=>{
+  editFixedStart=ymAdd(editFixedStart,-1);
+  if(editFixedEnd&&editFixedEnd<editFixedStart)editFixedEnd=editFixedStart;
+  updateEditFixedPeriodDisplay();
+});
+document.getElementById("edit-fixed-start-next").addEventListener("click",()=>{
+  editFixedStart=ymAdd(editFixedStart,1);
+  if(editFixedEnd&&editFixedEnd<editFixedStart)editFixedEnd=editFixedStart;
+  updateEditFixedPeriodDisplay();
+});
+document.getElementById("edit-btn-fixed-end-toggle").addEventListener("click",()=>{
+  editFixedEnd=editFixedEnd||ymAdd(editFixedStart,1);
+  document.getElementById("edit-fixed-end-area").style.display="block";
+  document.getElementById("edit-fixed-end-toggle-row").style.display="none";
+  updateEditFixedPeriodDisplay();
+});
+document.getElementById("edit-fixed-end-prev").addEventListener("click",()=>{
+  const prev=ymAdd(editFixedEnd,-1);
+  if(prev>=editFixedStart){editFixedEnd=prev;updateEditFixedPeriodDisplay();}
+});
+document.getElementById("edit-fixed-end-next").addEventListener("click",()=>{
+  editFixedEnd=ymAdd(editFixedEnd,1);updateEditFixedPeriodDisplay();
+});
+document.getElementById("edit-btn-fixed-end-clear").addEventListener("click",()=>{
+  editFixedEnd=null;
+  document.getElementById("edit-fixed-end-area").style.display="none";
+  document.getElementById("edit-fixed-end-toggle-row").style.display="block";
+});
+["edit-fixed-start-y","edit-fixed-start-m"].forEach(id=>{
+  document.getElementById(id).addEventListener("click",()=>{
+    openYMPicker(editFixedStart,ym=>{
+      editFixedStart=ym;
+      if(editFixedEnd&&editFixedEnd<editFixedStart)editFixedEnd=editFixedStart;
+      updateEditFixedPeriodDisplay();
+    });
+  });
+});
+["edit-fixed-end-y","edit-fixed-end-m"].forEach(id=>{
+  document.getElementById(id).addEventListener("click",()=>{
+    if(!editFixedEnd)return;
+    openYMPicker(editFixedEnd,ym=>{
+      if(ym>=editFixedStart){editFixedEnd=ym;updateEditFixedPeriodDisplay();}
+    });
+  });
+});
 document.getElementById("edit-amount-row").addEventListener("click",e=>{
   if(e.target.id==="edit-currency-badge")return;
   numpadTarget="edit";numpadValue=editState.amount>0?String(editState.amount):"0";
@@ -2349,8 +2485,42 @@ document.getElementById("edit-amount-row").addEventListener("click",e=>{
   document.getElementById("numpad-overlay").classList.add("open");
 });
 document.getElementById("btn-edit-save").addEventListener("click",async()=>{
+  if(editModalMode!=="normal")return; // 固定費管理画面からの編集はopenRepeatingEditModal側の処理が担当
   if(!editState.memo?.trim()){showToast("「何に使ったか」を入力してください");return;}
   if(!editState.amount||editState.amount<=0){showToast("金額を入力してください");return;}
+  if(editFixedMode){
+    // 固定費へ変換：元の1件を削除し、開始月〜終了月（または5年先）まで一括push
+    try{
+      await remove(ref(db,`rooms/${state.roomId}/expenses/${editingExpenseId}`));
+      const groupId=Math.random().toString(36).slice(2,14);
+      const endYM=editFixedEnd||ymAdd(editFixedStart,60);
+      const endless=!editFixedEnd;
+      const pushTasks=[];
+      let cur=editFixedStart;
+      while(cur<=endYM){
+        const record={
+          date:`${cur}-01`,
+          memo:editState.memo.trim(),
+          paidBy:editState.paidBy,
+          forWhom:editState.forWhom,
+          amount:editState.amount,
+          currency:editState.currency||"JPY",
+          method:editState.method,
+          category:FIXED_CAT,
+          isRepeating:true,
+          repeatingGroupId:groupId,
+          repeatingEndless:endless,
+          createdAt:Date.now()
+        };
+        pushTasks.push(push(ref(db,`rooms/${state.roomId}/expenses`),record));
+        cur=ymAdd(cur,1);
+      }
+      await Promise.all(pushTasks);
+      document.getElementById("modal-edit").classList.remove("open");
+      showToast(`固定費に変更しました（${endless?`${formatYM(editFixedStart)}〜5年分`:`${formatYM(editFixedStart)}〜${formatYM(editFixedEnd)}`}） ✓`);
+    }catch(e){console.error(e);showToast("保存に失敗しました");}
+    return;
+  }
   if(!editState.category){showToast("カテゴリを選択してください");return;}
   try{
     await update(ref(db,`rooms/${state.roomId}/expenses/${editingExpenseId}`),{memo:editState.memo.trim(),paidBy:editState.paidBy,forWhom:editState.forWhom,method:editState.method,amount:editState.amount,category:editState.category,date:editState.date});
