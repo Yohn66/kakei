@@ -545,6 +545,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
       <div class="settle-divider"></div>
       <div class="section-lbl">貸し借り</div>
       <div id="settle-loan-row"></div>
+      <button class="primary-btn" id="btn-bulk-settle" style="display:none;margin:14px 0 4px;">まとめて精算済みにする</button>
       <div class="final-settle-box">
         <div class="final-settle-title">最終精算</div>
         <div class="final-settle-main" id="final-settle-main"></div>
@@ -1857,6 +1858,12 @@ function showSettleScreen(){
   document.getElementById("settle-loan-row").querySelectorAll(".detail-row").forEach(r=>r.addEventListener("click",()=>{
     if(settle.loanItems.length>0)showLoanList(ym);
   }));
+  // まとめて精算ボタン（未精算があるときのみ表示）
+  const unsettledCount=settle.advanceItems.filter(([id,e])=>!e.settledAt).length+settle.loanItems.filter(([id,l])=>!l.settledAt).length;
+  const bulkBtn=document.getElementById("btn-bulk-settle");
+  bulkBtn.style.display=unsettledCount>0?"block":"none";
+  bulkBtn.textContent=`まとめて精算済みにする（未精算${unsettledCount}件）`;
+  bulkBtn.onclick=()=>bulkSettle(ym);
   // 最終精算ボックス
   const tot=settle.total;
   const mainEl=document.getElementById("final-settle-main");
@@ -2257,7 +2264,8 @@ function showLoanList(ym){
     const toName=l.to==="person1"?p1:p2;
     const wrap=document.createElement("div");wrap.className="record-row-wrap";
     const row=document.createElement("div");row.className="record-row";row.style.cursor="pointer";
-    row.innerHTML=`<div class="record-main"><div class="record-memo">${l.memo||"（メモなし）"}</div><div class="record-sub">${fromName} → ${toName}${settledBadge(l,ym)}</div></div><div class="record-right"><div class="record-amount">${fmtAmt(l.amount)}</div></div>`;
+    row.innerHTML=`${bulkCheckHtml("l:"+id,l)}<div class="record-main"><div class="record-memo">${l.memo||"（メモなし）"}</div><div class="record-sub">${fromName} → ${toName}${settledBadge(l,ym)}</div></div><div class="record-right"><div class="record-amount">${fmtAmt(l.amount)}</div></div>`;
+    row.querySelector(".bulk-check")?.addEventListener("click",ev=>{ev.stopPropagation();toggleBulkCheck("l:"+id,ev.currentTarget);});
     row.addEventListener("click",()=>openLoanEditModal(id));
     wrap.appendChild(row);scroll.appendChild(wrap);
   });
@@ -2285,7 +2293,8 @@ function showAdvanceList(ym){
     const owner=e.forWhom==="person1"?p1:p2;
     const wrap=document.createElement("div");wrap.className="record-row-wrap";
     const row=document.createElement("div");row.className="record-row";row.style.cursor="pointer";
-    row.innerHTML=`<div class="record-main"><div class="record-memo">${e.memo||"（メモなし）"}</div><div class="record-sub">${payer}が${owner}の分を支払${settledBadge(e,ym)}</div></div><div class="record-right"><div class="record-amount">${fmtAmt(toJPY(e.amount,e.currency,state.fxRates||{},e.date.slice(0,7)))}</div></div>`;
+    row.innerHTML=`${bulkCheckHtml("e:"+id,e)}<div class="record-main"><div class="record-memo">${e.memo||"（メモなし）"}</div><div class="record-sub">${payer}が${owner}の分を支払${settledBadge(e,ym)}</div></div><div class="record-right"><div class="record-amount">${fmtAmt(toJPY(e.amount,e.currency,state.fxRates||{},e.date.slice(0,7)))}</div></div>`;
+    row.querySelector(".bulk-check")?.addEventListener("click",ev=>{ev.stopPropagation();toggleBulkCheck("e:"+id,ev.currentTarget);});
     row.addEventListener("click",()=>openEditModal(id,e));
     wrap.appendChild(row);scroll.appendChild(wrap);
   });
@@ -2340,6 +2349,38 @@ function refreshAfterSettleChange(){
   if(document.getElementById("screen-loan-list").classList.contains("active"))showLoanList(ym);
   if(document.getElementById("screen-settle").classList.contains("active"))showSettleScreen();
   if(document.getElementById("screen-summary").classList.contains("active"))renderSummary();
+}
+// まとめて精算：個別除外リスト（保存せず、開いている間だけ保持）
+const bulkExcluded=new Set(); // "e:支出id" / "l:貸し借りid"
+function bulkCheckHtml(key,item){
+  if(item.settledAt)return"";
+  const on=!bulkExcluded.has(key);
+  return `<div class="bulk-check" data-key="${key}" style="width:26px;height:26px;border-radius:50%;border:1.5px solid ${on?"#111":"#ccc"};display:flex;align-items:center;justify-content:center;flex-shrink:0;color:${on?"#111":"#ccc"};font-size:14px;font-weight:700;">${on?"✓":""}</div>`;
+}
+function toggleBulkCheck(key,el){
+  if(bulkExcluded.has(key))bulkExcluded.delete(key);else bulkExcluded.add(key);
+  const on=!bulkExcluded.has(key);
+  el.style.borderColor=on?"#111":"#ccc";el.style.color=on?"#111":"#ccc";el.textContent=on?"✓":"";
+}
+async function bulkSettle(ym){
+  const settle=calcSettle(state.expenses,state.loans,state.fxRates||{},ym);
+  const advTargets=settle.advanceItems.filter(([id,e])=>!e.settledAt&&!bulkExcluded.has("e:"+id));
+  const loanTargets=settle.loanItems.filter(([id,l])=>!l.settledAt&&!bulkExcluded.has("l:"+id));
+  const n=advTargets.length+loanTargets.length;
+  if(n===0){showToast("精算対象がありません（すべて除外されています）");return;}
+  const allUnsettled=settle.advanceItems.filter(([id,e])=>!e.settledAt).length+settle.loanItems.filter(([id,l])=>!l.settledAt).length;
+  let msg=`未精算の立て替え・貸し借り ${n}件を精算済みにします。よろしいですか？`;
+  if(allUnsettled-n>0)msg+=`\n（一覧でチェックを外した${allUnsettled-n}件は除外されます）`;
+  if(!confirm(msg))return;
+  const now=Date.now();
+  const updates={};
+  advTargets.forEach(([id,e])=>{updates[`rooms/${state.roomId}/expenses/${id}/settledAt`]=now;e.settledAt=now;});
+  loanTargets.forEach(([id,l])=>{updates[`rooms/${state.roomId}/loans/${id}/settledAt`]=now;l.settledAt=now;});
+  try{
+    await update(ref(db),updates);
+    showToast(`${n}件を精算済みにしました ✓`);
+    refreshAfterSettleChange();
+  }catch(e){showToast("保存に失敗しました");}
 }
 
 document.getElementById("btn-go-list").addEventListener("click",()=>{state.list.yearMonth=state.summary.yearMonth;state.list.filterCategory=null;state.list.filterPerson=state.summary.filter;showScreen("screen-list");});
