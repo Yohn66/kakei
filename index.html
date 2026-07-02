@@ -1590,27 +1590,62 @@ function toJPY(amount,currency,fxRates,ym){
   if(!rate)return amount;
   return Math.round(amount*rate);
 }
+function tsToYM(ts){
+  const d=new Date(ts);
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+}
+// 表示月ymの精算計算に含めるか（立て替え・貸し借り用）
+// 発生月≤表示月 かつ（未精算 または 精算月≥表示月）
+function isCountedInMonth(itemDate,settledAt,ym){
+  if(!itemDate)return false;
+  if(itemDate.slice(0,7)>ym)return false;
+  if(!settledAt)return true;
+  return tsToYM(settledAt)>=ym;
+}
 function calcSettle(expenses,loans,fxRates,ym){
-  const exps=Object.values(expenses||{}).filter(e=>e.date.startsWith(ym));
-  const lns=Object.values(loans||{}).filter(l=>l.date&&l.date.startsWith(ym));
-  let p1PaidBoth=0,p2PaidBoth=0,p1PaidForP2=0,p2PaidForP1=0,bothPaidForP1=0,bothPaidForP2=0;
+  const expEntries=Object.entries(expenses||{});
+  // 共通費・共通口座経由の個人支出：当月分のみ（従来通り・繰越対象外）
+  const exps=expEntries.map(([id,e])=>e).filter(e=>e.date&&e.date.startsWith(ym));
+  let p1PaidBoth=0,p2PaidBoth=0,bothPaidForP1=0,bothPaidForP2=0;
   exps.forEach(e=>{
     const amt=toJPY(e.amount,e.currency,fxRates,ym);
     if(e.paidBy==="person1"&&e.forWhom==="both")p1PaidBoth+=amt;
     else if(e.paidBy==="person2"&&e.forWhom==="both")p2PaidBoth+=amt;
-    else if(e.paidBy==="person1"&&e.forWhom==="person2")p1PaidForP2+=amt;
-    else if(e.paidBy==="person2"&&e.forWhom==="person1")p2PaidForP1+=amt;
     else if(e.paidBy==="both"&&e.forWhom==="person1")bothPaidForP1+=amt;
     else if(e.paidBy==="both"&&e.forWhom==="person2")bothPaidForP2+=amt;
   });
+  // 立て替え：未精算なら発生月以降ずっと含める（今月分／繰越分を区別）
+  let p1PaidForP2=0,p2PaidForP1=0,advanceNetNow=0,advanceNetCarry=0;
+  const advanceItems=[];
+  expEntries.forEach(([id,e])=>{
+    const isAdv=(e.paidBy==="person1"&&e.forWhom==="person2")||(e.paidBy==="person2"&&e.forWhom==="person1");
+    if(!isAdv)return;
+    if(!isCountedInMonth(e.date,e.settledAt,ym))return;
+    const eym=e.date.slice(0,7);
+    const amt=toJPY(e.amount,e.currency,fxRates,eym); // 換算は発生月のレートで固定
+    const signed=e.paidBy==="person2"?amt:-amt;
+    if(eym===ym)advanceNetNow+=signed;else advanceNetCarry+=signed;
+    if(e.paidBy==="person1")p1PaidForP2+=amt;else p2PaidForP1+=amt;
+    advanceItems.push([id,e]);
+  });
+  const advanceNet=advanceNetNow+advanceNetCarry;
+  // 貸し借り：同様に繰越対応
+  let loanNetNow=0,loanNetCarry=0;
+  const loanItems=[];
+  Object.entries(loans||{}).forEach(([id,l])=>{
+    if(!isCountedInMonth(l.date,l.settledAt,ym))return;
+    let signed=0;
+    if(l.from==="person1"&&l.to==="person2")signed=l.amount;
+    else if(l.from==="person2"&&l.to==="person1")signed=-l.amount;
+    if(l.date.slice(0,7)===ym)loanNetNow+=signed;else loanNetCarry+=signed;
+    loanItems.push([id,l]);
+  });
+  const loanNet=loanNetNow+loanNetCarry;
   const commonNet=Math.round(p2PaidBoth/2)-Math.round(p1PaidBoth/2);
   const hasBothPayer=exps.some(e=>e.paidBy==="both");
   const commonAccountNet=hasBothPayer?(bothPaidForP1-bothPaidForP2):0;
-  const advanceNet=p2PaidForP1-p1PaidForP2;
-  let loanNet=0;
-  lns.forEach(l=>{if(l.from==="person1"&&l.to==="person2")loanNet+=l.amount;else if(l.from==="person2"&&l.to==="person1")loanNet-=l.amount;});
   const total=commonNet+commonAccountNet+advanceNet+loanNet;
-  return{total,commonNet,commonAccountNet,advanceNet,loanNet,p1PaidBoth,p2PaidBoth,p1PaidForP2,p2PaidForP1,bothPaidForP1,bothPaidForP2,hasBothPayer};
+  return{total,commonNet,commonAccountNet,advanceNet,advanceNetNow,advanceNetCarry,loanNet,loanNetNow,loanNetCarry,p1PaidBoth,p2PaidBoth,p1PaidForP2,p2PaidForP1,bothPaidForP1,bothPaidForP2,hasBothPayer,advanceItems,loanItems};
 }
 
 // 計算式生成
@@ -1783,21 +1818,23 @@ function showSettleScreen(){
   const r2=document.createElement("div");r2.className="detail-row tappable";r2.style.borderBottom="none";
   r2.innerHTML=`<div class="detail-left">${p2}支払<div class="detail-sub">${p2cnt}件</div></div><div class="detail-right">${fmtAmt(settle.p2PaidBoth)}<span class="detail-arrow">›</span></div>`;
   r2.addEventListener("click",()=>showPaidList("person2",ym));cr.appendChild(r2);
-  // 立て替え
-  const adv=settle.advanceNet;
-  let advHtml='<div class="detail-row" style="border:none;"><div class="detail-left" style="color:#aaa;">なし</div></div>';
-  if(adv>0)advHtml=`<div class="detail-row" style="border:none;"><div class="detail-left">${p1}が${p2}分を支払<div class="detail-sub">差し引き後</div></div><div class="detail-right">${fmtAmt(adv)}</div></div>`;
-  else if(adv<0)advHtml=`<div class="detail-row" style="border:none;"><div class="detail-left">${p2}が${p1}分を支払<div class="detail-sub">差し引き後</div></div><div class="detail-right">${fmtAmt(adv)}</div></div>`;
-  document.getElementById("settle-advance-row").innerHTML=advHtml;
-  // 貸し借り
-  const loan=settle.loanNet;
-  let loanHtml='<div class="detail-row" style="border:none;"><div class="detail-left" style="color:#aaa;">なし</div></div>';
-  if(loan>0)loanHtml=`<div class="detail-row" style="border:none;"><div class="detail-left">${p1}が${p2}分を支払<div class="detail-sub">差し引き後</div></div><div class="detail-right">${fmtAmt(loan)}</div></div>`;
-  else if(loan<0)loanHtml=`<div class="detail-row" style="border:none;"><div class="detail-left">${p2}が${p1}分を支払<div class="detail-sub">差し引き後</div></div><div class="detail-right">${fmtAmt(loan)}</div></div>`;
-  document.getElementById("settle-loan-row").innerHTML=loanHtml;
-  document.getElementById("settle-loan-row").querySelector(".detail-row")?.addEventListener("click",()=>{
-    if(Object.values(state.loans||{}).filter(l=>l.date&&l.date.startsWith(ym)).length>0)showLoanList(ym);
-  });
+// 立て替え・貸し借り（今月分／繰越分を分けて表示）
+  const netRowsHtml=(now,carry)=>{
+    const mk=(label,net,sub)=>{
+      const payer=net>0?p1:p2;const receiver=net>0?p2:p1;
+      return `<div class="detail-row" style="border:none;"><div class="detail-left">${label}：${payer}が${receiver}分を支払<div class="detail-sub">${sub}</div></div><div class="detail-right">${fmtAmt(net)}</div></div>`;
+    };
+    let html="";
+    if(now!==0)html+=mk("今月分",now,"差し引き後");
+    if(carry!==0)html+=mk("繰越分",carry,"未精算の繰り越し");
+    if(html==="")html='<div class="detail-row" style="border:none;"><div class="detail-left" style="color:#aaa;">なし</div></div>';
+    return html;
+  };
+  document.getElementById("settle-advance-row").innerHTML=netRowsHtml(settle.advanceNetNow,settle.advanceNetCarry);
+  document.getElementById("settle-loan-row").innerHTML=netRowsHtml(settle.loanNetNow,settle.loanNetCarry);
+  document.getElementById("settle-loan-row").querySelectorAll(".detail-row").forEach(r=>r.addEventListener("click",()=>{
+    if(settle.loanItems.length>0)showLoanList(ym);
+  }));
   // 最終精算ボックス
   const tot=settle.total;
   const mainEl=document.getElementById("final-settle-main");
