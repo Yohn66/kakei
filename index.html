@@ -545,7 +545,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
       <div class="settle-divider"></div>
       <div class="section-lbl">貸し借り</div>
       <div id="settle-loan-row"></div>
-      <button class="primary-btn" id="btn-bulk-settle" style="display:none;margin:14px 0 4px;">まとめて精算済みにする</button>
+      <button class="primary-btn" id="btn-unsettled-list" style="display:none;margin:14px 0 4px;">未精算一覧</button>
       <div class="final-settle-box">
         <div class="final-settle-title">最終精算</div>
         <div class="final-settle-main" id="final-settle-main"></div>
@@ -584,6 +584,19 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
       <div style="width:48px;"></div>
     </div>
     <div class="list-scroll" id="advance-list-scroll"></div>
+  </div>
+
+  <!-- 未精算一覧画面 -->
+  <div id="screen-unsettled-list" class="screen">
+    <div class="list-nav">
+      <div class="list-nav-back" id="btn-unsettled-list-back">← 戻る</div>
+      <div class="list-nav-title">未精算一覧</div>
+      <div style="width:48px;"></div>
+    </div>
+    <div class="list-scroll" id="unsettled-list-scroll"></div>
+    <div style="padding:10px 16px calc(14px + env(safe-area-inset-bottom));background:var(--white);border-top:0.5px solid #ececec;flex-shrink:0;">
+      <button class="primary-btn" id="btn-bulk-settle">まとめて精算</button>
+    </div>
   </div>
 
   <!-- 固定費管理画面 -->
@@ -1858,12 +1871,12 @@ function showSettleScreen(){
   document.getElementById("settle-loan-row").querySelectorAll(".detail-row").forEach(r=>r.addEventListener("click",()=>{
     if(settle.loanItems.length>0)showLoanList(ym);
   }));
-  // まとめて精算ボタン（未精算があるときのみ表示）
+  // 未精算一覧ボタン（未精算があるときのみ表示）
   const unsettledCount=settle.advanceItems.filter(([id,e])=>!e.settledAt).length+settle.loanItems.filter(([id,l])=>!l.settledAt).length;
-  const bulkBtn=document.getElementById("btn-bulk-settle");
-  bulkBtn.style.display=unsettledCount>0?"block":"none";
-  bulkBtn.textContent=`まとめて精算済みにする（未精算${unsettledCount}件）`;
-  bulkBtn.onclick=()=>bulkSettle(ym);
+  const listBtn=document.getElementById("btn-unsettled-list");
+  listBtn.style.display=unsettledCount>0?"block":"none";
+  listBtn.textContent=`未精算一覧（${unsettledCount}件）`;
+  listBtn.onclick=()=>showUnsettledList(ym);
   // 最終精算ボックス
   const tot=settle.total;
   const mainEl=document.getElementById("final-settle-main");
@@ -2346,6 +2359,7 @@ document.getElementById("btn-loan-delete").addEventListener("click",async()=>{
 function refreshAfterSettleChange(){
   const ym=state.summary.yearMonth;
   if(document.getElementById("screen-advance-list").classList.contains("active"))showAdvanceList(ym);
+  if(document.getElementById("screen-unsettled-list").classList.contains("active"))showUnsettledList(ym);
   if(document.getElementById("screen-loan-list").classList.contains("active"))showLoanList(ym);
   if(document.getElementById("screen-settle").classList.contains("active"))showSettleScreen();
   if(document.getElementById("screen-summary").classList.contains("active"))renderSummary();
@@ -2361,6 +2375,7 @@ function toggleBulkCheck(key,el){
   if(bulkExcluded.has(key))bulkExcluded.delete(key);else bulkExcluded.add(key);
   const on=!bulkExcluded.has(key);
   el.style.borderColor=on?"#111":"#ccc";el.style.color=on?"#111":"#ccc";el.textContent=on?"✓":"";
+  updateBulkSettleCount();
 }
 async function bulkSettle(ym){
   const settle=calcSettle(state.expenses,state.loans,state.fxRates||{},ym);
@@ -2379,9 +2394,72 @@ async function bulkSettle(ym){
   try{
     await update(ref(db),updates);
     showToast(`${n}件を精算済みにしました ✓`);
-    refreshAfterSettleChange();
+    showSettleScreen();
   }catch(e){showToast("保存に失敗しました");}
 }
+// まとめて精算ボタンの件数表示（除外分を差し引いた数）
+function updateBulkSettleCount(){
+  const btn=document.getElementById("btn-bulk-settle");
+  if(!btn)return;
+  const ym=state.summary.yearMonth;
+  const settle=calcSettle(state.expenses,state.loans,state.fxRates||{},ym);
+  const n=settle.advanceItems.filter(([id,e])=>!e.settledAt&&!bulkExcluded.has("e:"+id)).length
+        +settle.loanItems.filter(([id,l])=>!l.settledAt&&!bulkExcluded.has("l:"+id)).length;
+  btn.textContent=`まとめて精算（未精算${n}件）`;
+  btn.disabled=n===0;
+  btn.style.opacity=n===0?"0.4":"1";
+}
+// 未精算一覧画面（立て替え・貸し借りを別セクションで表示）
+function showUnsettledList(ym){
+  const p1=state.meta?.person1||"一人目";
+  const p2=state.meta?.person2||"二人目";
+  const settle=calcSettle(state.expenses,state.loans,state.fxRates||{},ym);
+  const advItems=settle.advanceItems.filter(([id,e])=>!e.settledAt).sort((a,b)=>b[1].date.localeCompare(a[1].date)||(b[1].createdAt-a[1].createdAt));
+  const loanItems=settle.loanItems.filter(([id,l])=>!l.settledAt).sort((a,b)=>b[1].date.localeCompare(a[1].date)||(b[1].createdAt-a[1].createdAt));
+  const scroll=document.getElementById("unsettled-list-scroll");scroll.innerHTML="";
+  const sectionLbl=t=>{const d=document.createElement("div");d.className="section-lbl";d.style.padding="14px 16px 4px";d.textContent=t;scroll.appendChild(d);};
+  const emptyLbl=t=>{const d=document.createElement("div");d.style.cssText="padding:10px 16px;color:#aaa;font-size:13px;";d.textContent=t;scroll.appendChild(d);};
+  // 立て替えセクション
+  sectionLbl("立て替え");
+  if(advItems.length===0)emptyLbl("未精算の立て替えはありません");
+  let ld="";
+  advItems.forEach(([id,e])=>{
+    if(e.date!==ld){const h=document.createElement("div");h.className="date-group-header";h.textContent=formatDateJP(e.date);scroll.appendChild(h);ld=e.date;}
+    const payer=e.paidBy==="person1"?p1:p2;
+    const owner=e.forWhom==="person1"?p1:p2;
+    const wrap=document.createElement("div");wrap.className="record-row-wrap";
+    const row=document.createElement("div");row.className="record-row";row.style.cursor="pointer";
+    row.innerHTML=`${bulkCheckHtml("e:"+id,e)}<div class="record-main"><div class="record-memo">${e.memo||"（メモなし）"}</div><div class="record-sub">${payer}が${owner}の分を支払${settledBadge(e,ym)}</div></div><div class="record-right"><div class="record-amount">${fmtAmt(toJPY(e.amount,e.currency,state.fxRates||{},e.date.slice(0,7)))}</div></div>`;
+    row.querySelector(".bulk-check")?.addEventListener("click",ev=>{ev.stopPropagation();toggleBulkCheck("e:"+id,ev.currentTarget);});
+    row.addEventListener("click",()=>openEditModal(id,e));
+    wrap.appendChild(row);scroll.appendChild(wrap);
+  });
+  // 貸し借りセクション
+  sectionLbl("貸し借り");
+  if(loanItems.length===0)emptyLbl("未精算の貸し借りはありません");
+  ld="";
+  loanItems.forEach(([id,l])=>{
+    if(l.date!==ld){const h=document.createElement("div");h.className="date-group-header";h.textContent=formatDateJP(l.date);scroll.appendChild(h);ld=l.date;}
+    const fromName=l.from==="person1"?p1:p2;
+    const toName=l.to==="person1"?p1:p2;
+    const wrap=document.createElement("div");wrap.className="record-row-wrap";
+    const row=document.createElement("div");row.className="record-row";row.style.cursor="pointer";
+    row.innerHTML=`${bulkCheckHtml("l:"+id,l)}<div class="record-main"><div class="record-memo">${l.memo||"（メモなし）"}</div><div class="record-sub">${fromName} → ${toName}${settledBadge(l,ym)}</div></div><div class="record-right"><div class="record-amount">${fmtAmt(l.amount)}</div></div>`;
+    row.querySelector(".bulk-check")?.addEventListener("click",ev=>{ev.stopPropagation();toggleBulkCheck("l:"+id,ev.currentTarget);});
+    row.addEventListener("click",()=>openLoanEditModal(id));
+    wrap.appendChild(row);scroll.appendChild(wrap);
+  });
+  updateBulkSettleCount();
+  document.getElementById("btn-unsettled-list-back").onclick=()=>{
+    document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+    document.getElementById("screen-settle").classList.add("active");
+    document.getElementById("tab-bar").classList.remove("visible");
+  };
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById("screen-unsettled-list").classList.add("active");
+  document.getElementById("tab-bar").classList.remove("visible");
+}
+document.getElementById("btn-bulk-settle").addEventListener("click",()=>bulkSettle(state.summary.yearMonth));
 
 document.getElementById("btn-go-list").addEventListener("click",()=>{state.list.yearMonth=state.summary.yearMonth;state.list.filterCategory=null;state.list.filterPerson=state.summary.filter;showScreen("screen-list");});
 document.getElementById("btn-share-url").addEventListener("click",()=>{if(navigator.share)navigator.share({url:getRoomUrl(state.roomId)});else navigator.clipboard.writeText(getRoomUrl(state.roomId)).then(()=>showToast("URLをコピーしました"));});
